@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/gofiber/fiber/v3/middleware/logger"
+	recoverer "github.com/gofiber/fiber/v3/middleware/recover"
 	"github.com/joho/godotenv"
 	"github.com/mcctrix/ctrix-social-go-backend/routes"
 )
@@ -27,6 +28,8 @@ func main() {
 			Loopback: true,
 		},
 	})
+
+	mainRouter.Use(recoverer.New())
 
 	mainRouter.Use(logger.New(logger.Config{
 		Format: "[${ip}]: ${port} ${status} - ${method} ${path}\n",

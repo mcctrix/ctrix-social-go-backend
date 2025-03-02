@@ -8,10 +8,28 @@ import (
 
 func Login() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		fmt.Println("Reach in Login Controller!", c.OriginalURL())
-		// g.JSON(http.StatusOK, gin.H{
-		// 	"test": "working",
-		// })
+		username := c.FormValue("username")
+		password := c.FormValue("password")
+		fmt.Println(username)
+		fmt.Println(password)
+		return c.SendString("User: " + username)
+	}
+}
+
+func SignUp() fiber.Handler {
+	return func(c fiber.Ctx) error {
+		email := c.FormValue("email")
+		username := c.FormValue("username")
+		password := c.FormValue("password")
+		fmt.Println(email)
+		fmt.Println(username)
+		fmt.Println(password)
+		return c.SendString("User: " + username + " Found!")
+	}
+}
+func Logout() fiber.Handler {
+	return func(c fiber.Ctx) error {
+
 		return nil
 	}
 }
