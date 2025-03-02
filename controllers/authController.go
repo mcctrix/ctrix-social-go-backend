@@ -1,16 +1,17 @@
 package controllers
 
 import (
-	"github.com/gin-gonic/gin"
+	"fmt"
+
+	"github.com/gofiber/fiber/v3"
 )
 
-func Login() func(g *gin.Context) {
-
-	return func(g *gin.Context) {
-
-		g.JSON(200, gin.H{
-			"test": "working",
-		})
-
+func Login() fiber.Handler {
+	return func(c fiber.Ctx) error {
+		fmt.Println("Reach in Login Controller!", c.OriginalURL())
+		// g.JSON(http.StatusOK, gin.H{
+		// 	"test": "working",
+		// })
+		return nil
 	}
 }
