@@ -9,4 +9,5 @@ func AuthRouter(router fiber.Router) {
 	router.Post("/login", controllers.Login())
 	router.Post("/signup", controllers.SignUp())
 	router.Get("/logout", controllers.Logout())
+
 }
