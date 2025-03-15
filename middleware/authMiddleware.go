@@ -22,7 +22,7 @@ func AuthMiddleware() fiber.Handler {
 			return fiber.ErrInternalServerError
 		}
 
-		if jwtToken.Valid != true {
+		if !jwtToken.Valid {
 			return c.Status(400).JSON(map[string]string{
 				"error": "Invalid Token",
 			})
