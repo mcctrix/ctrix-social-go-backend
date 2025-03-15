@@ -16,7 +16,7 @@ import (
 
 type gnData struct {
 	Token       *jwt.Token
-	Exp_Time    time.Time
+	Exp_Time    int64
 	StringToken string
 }
 
@@ -25,16 +25,16 @@ func GenerateJwtToken(user *models.User) (*gnData, error) {
 
 	returnData := &gnData{}
 
-	returnData.Exp_Time = time.Now().Add(time.Hour * 24)
+	returnData.Exp_Time = time.Now().Add(time.Hour * 24).Unix()
 
 	claim := jwt.MapClaims{
 		"iss":   "ctrix-social-golang-backend",
-		"iat":   time.Now(),
+		"iat":   time.Now().Unix(),
 		"sub":   "user-auth",
 		"aud":   user.ID,
 		"exp":   returnData.Exp_Time,
 		"email": user.Email,
-		"id":    user.ID,
+		// "id":    user.ID,
 	}
 
 	// Create JWT Token with claim
