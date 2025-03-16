@@ -30,6 +30,7 @@ func main() {
 	})
 
 	routes.AuthRouter(mainRouter.Group("/api/auth"))
+	routes.UserManagementRouter(mainRouter.Group("/api/users"))
 
 	mainRouter.Listen(port)
 }

@@ -9,25 +9,28 @@ type User_Auth struct {
 	Password   string
 	Created_at time.Time
 }
+
 type User_Profile struct {
-	Id              string
-	First_name      string
-	Last_name       string
-	Profile_picture string
-	Last_seen       time.Time
-	Post_count      int
-	Followers       []string
-	Followings      []string
+	Id              string    `json:"id"`
+	First_name      string    `json:"first_name"`
+	Last_name       string    `json:"last_name"`
+	Profile_picture string    `json:"profile_profile"`
+	Last_seen       time.Time `json:"last_seen"`
+	Post_count      int       `json:"post_count"`
+	Followers       []string  `json:"followers"`
+	Followings      []string  `json:"followings"`
 }
+
 type User_Additional_Info struct {
-	Id              string
-	Hobbies         []string
+	Id              string   `json:"id"`
+	Hobbies         []string `json:"hobbies"`
 	Family_members  []string
 	Relation_status string
 	Dob             time.Time
 	Bio             string
 	Gender          string
 }
+
 type User_Settings struct {
 	Id          string
 	Hide_post   []string
@@ -35,12 +38,14 @@ type User_Settings struct {
 	Block_user  []string
 	Show_online bool
 }
+
 type User_Data struct {
 	Id      string
 	Posts   []string
 	Stories []string
 	Notes   []string
 }
+
 type User_Posts struct {
 	Id                string
 	Creator_id        string
@@ -51,6 +56,7 @@ type User_Posts struct {
 	Liked_by          []string
 	Comments          []string
 }
+
 type User_post_Comments struct {
 	Id                string
 	Post_id           string
