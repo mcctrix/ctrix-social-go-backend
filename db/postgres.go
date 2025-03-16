@@ -68,12 +68,10 @@ func SetUserProfileWithByteData(newProfileByte []byte, userID string) error {
 			newProfile := &models.User_Profile{}
 			err = json.Unmarshal(newProfileByte, newProfile)
 			if err != nil {
-				fmt.Println("Error with the decode of json", err)
 				return err
 			}
-			err = CreateUserProfile(newProfile)
+			err = createUserProfile(newProfile)
 			if err != nil {
-				fmt.Println("Error Creating new profile:", err)
 				return err
 			}
 		} else {
@@ -82,7 +80,6 @@ func SetUserProfileWithByteData(newProfileByte []byte, userID string) error {
 	}
 	json.Unmarshal(newProfileByte, userProfile)
 	if err != nil {
-		fmt.Println("Error with the decode of json", err)
 		return err
 	}
 	db.Table("user_profile").Save(userProfile)
@@ -112,16 +109,13 @@ func SetAdditionalUserProfileWithByteData(newProfileByte []byte, userID string) 
 			newProfile := &models.User_Additional_Info{}
 			err = json.Unmarshal(newProfileByte, newProfile)
 			if err != nil {
-				fmt.Println("Error with the decode of json", err)
 				return err
 			}
 			db, err := DBConnection()
 			if err != nil {
-				fmt.Println("Error while connecting to db: ", err)
 				return err
 			}
 			if err = db.Table("user_profile").Create(newProfile).Error; err != nil {
-				fmt.Println("Error Creating new profile:", err)
 				return err
 			}
 
@@ -138,12 +132,11 @@ func SetAdditionalUserProfileWithByteData(newProfileByte []byte, userID string) 
 
 	return nil
 }
-func CreateUserProfile(profileData *models.User_Profile) error {
+func createUserProfile(profileData *models.User_Profile) error {
 	db, err := DBConnection()
 	if err != nil {
 		return err
 	}
-	db.Table("user_profile").Create(profileData)
 
-	return nil
+	return db.Table("user_profile").Create(profileData).Error
 }
