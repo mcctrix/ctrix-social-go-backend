@@ -117,3 +117,9 @@ func GenerateEcdsaPrivateKey() {
 	}
 
 }
+func GetClaimData(token *jwt.Token, claimName string) string {
+	if claim, ok := token.Claims.(jwt.MapClaims); ok {
+		return claim[claimName].(string)
+	}
+	return ""
+}

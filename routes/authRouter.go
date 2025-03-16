@@ -8,6 +8,8 @@ import (
 func AuthRouter(router fiber.Router) {
 	router.Post("/login", controllers.Login())
 	router.Post("/signup", controllers.SignUp())
-	router.Get("/logout", controllers.Logout())
-	router.Get("/refresh-token", controllers.RefreshToken())
+	router.Post("/logout", controllers.Logout())
+	router.Post("/refresh-token", controllers.RefreshToken())
+	router.Post("/forgot-password", controllers.ForgetPassword())
+	router.Post("/reset-password", controllers.ResetPassword())
 }

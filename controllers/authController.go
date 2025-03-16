@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v3"
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/mcctrix/ctrix-social-go-backend/db"
 	"github.com/mcctrix/ctrix-social-go-backend/models"
@@ -157,37 +156,87 @@ func RefreshToken() fiber.Handler {
 			return c.SendString("Invalid Token!")
 		}
 
-		if claim, ok := jwtToken.Claims.(jwt.MapClaims); ok {
-			userID := claim["aud"].(string)
-			db, err := db.DBConnection()
-			if err != nil {
-				fmt.Println(err)
-				return fiber.ErrInternalServerError
-			}
-			var user *models.User = &models.User{}
-			if err = db.Table("user_auth").Where(struct{ ID string }{ID: userID}).First(user).Error; err != nil {
-				if errors.Is(err, gorm.ErrRecordNotFound) {
-					return c.SendString("user not found for refreshing token, is that even possible lol!")
-				}
-			}
-			gnToken, err := utils.GenerateJwtToken(user)
-			if err != nil {
-				fmt.Println("Error While Generating token from refresh token: ", err)
-				return fiber.ErrInternalServerError
-			}
-			c.Cookie(&fiber.Cookie{
-				Name:     "auth_token",
-				Value:    gnToken.StringToken,
-				Path:     "/",
-				HTTPOnly: true,
-				Secure:   true,
-				SameSite: "Lax",
-				Expires:  time.Unix(gnToken.Exp_Time, 0),
-			})
-			return c.SendString("Token is Refreshed!")
+		userID := utils.GetClaimData(jwtToken, "aud")
 
-		} else {
+		if userID == "" {
 			return fiber.ErrInternalServerError
 		}
+
+		db, err := db.DBConnection()
+		if err != nil {
+			fmt.Println(err)
+			return fiber.ErrInternalServerError
+		}
+		var user *models.User = &models.User{}
+		if err = db.Table("user_auth").Where(struct{ ID string }{ID: userID}).First(user).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return c.SendString("user not found for refreshing token, is that even possible lol!")
+			}
+		}
+		gnToken, err := utils.GenerateJwtToken(user)
+		if err != nil {
+			fmt.Println("Error While Generating token from refresh token: ", err)
+			return fiber.ErrInternalServerError
+		}
+		c.Cookie(&fiber.Cookie{
+			Name:     "auth_token",
+			Value:    gnToken.StringToken,
+			Path:     "/",
+			HTTPOnly: true,
+			Secure:   true,
+			SameSite: "Lax",
+			Expires:  time.Unix(gnToken.Exp_Time, 0),
+		})
+		return c.SendString("Token is Refreshed!")
+
+	}
+}
+func ForgetPassword() fiber.Handler {
+	return func(c fiber.Ctx) error {
+		email := c.FormValue("email")
+
+		db, err := db.DBConnection()
+		if err != nil {
+			fmt.Println("Error while connecting to db: ", err)
+			return fiber.ErrInternalServerError
+		}
+		var user *models.User = &models.User{}
+		if err = db.Table("user_auth").Where(struct{ Email string }{Email: email}).First(user).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return c.SendString("User not found with this email!")
+			}
+		}
+
+		return c.SendString("User exist but i can't forget password for you!")
+	}
+}
+func ResetPassword() fiber.Handler {
+	return func(c fiber.Ctx) error {
+		email := c.FormValue("email")
+		oldPassword := c.FormValue("old_password")
+		newPassword := c.FormValue("new_password")
+
+		db, err := db.DBConnection()
+		if err != nil {
+			fmt.Println("Error while connecting to db: ", err)
+			return fiber.ErrInternalServerError
+		}
+		var user *models.User = &models.User{}
+		if err = db.Table("user_auth").Where(struct {
+			Email    string
+			Password string
+		}{Email: email, Password: oldPassword}).First(user).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return c.SendString("User not found with this email or password!")
+			}
+		}
+
+		user.Password = newPassword
+		if err = db.Table("user_auth").Save(user).Error; err != nil {
+			fmt.Println("Error while updating password: ", err)
+			return fiber.ErrInternalServerError
+		}
+
+		return c.SendString("Password resetted!")
 	}
 }

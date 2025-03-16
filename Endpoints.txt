@@ -1,0 +1,70 @@
+Social Media Backend Endpoints in Golang
+Here's a comprehensive list of endpoints for a social media backend using Golang:
+
+User Authentication & Management
+POST /api/auth/register - User registration
+POST /api/auth/login - User login
+POST /api/auth/logout - User logout
+POST /api/auth/refresh-token - Refresh authentication token
+POST /api/auth/forgot-password - Initiate password reset
+POST /api/auth/reset-password/:token - Complete password reset
+
+PUT /api/users/profile - Update user profile
+GET /api/users/profile - Get current user profile
+GET /api/users/:userId - Get specific user profile
+PUT /api/users/:userId/password - Change user password
+
+
+Post Management
+POST /api/posts - Create new post
+GET /api/posts - Get list of posts (with pagination)
+GET /api/posts/:postId - Get specific post
+PUT /api/posts/:postId - Update post
+DELETE /api/posts/:postId - Delete post
+GET /api/users/:userId/posts - Get all posts by a user
+
+Comment & Reaction Management
+POST /api/posts/:postId/comments - Add comment to post
+GET /api/posts/:postId/comments - Get all comments for a post
+PUT /api/comments/:commentId - Update comment
+DELETE /api/comments/:commentId - Delete comment
+POST /api/posts/:postId/reactions - Add reaction to post
+GET /api/posts/:postId/reactions - Get all reactions for a post
+PUT /api/reactions/:reactionId - Update reaction
+DELETE /api/reactions/:reactionId - Delete reaction
+
+Media Handling
+POST /api/media/upload - Upload media (images/videos)
+GET /api/media/:mediaId - Get media file
+DELETE /api/media/:mediaId - Delete media file
+
+Search & Discovery
+GET /api/search/users?q=... - Search for users
+GET /api/search/posts?q=... - Search for posts
+GET /api/explore - Get trending posts/users
+
+Notifications
+GET /api/notifications - Get user notifications
+PUT /api/notifications/:notificationId/read - Mark notification as read
+DELETE /api/notifications/:notificationId - Clear notification
+
+Friendship & Following
+POST /api/users/:userId/follow - Follow a user
+DELETE /api/users/:userId/follow - Unfollow a user
+GET /api/users/:userId/followers - Get user's followers
+GET /api/users/:userId/following - Get users the user is following
+
+Analytics & Statistics
+GET /api/users/:userId/stats - Get user statistics
+GET /api/posts/:postId/stats - Get post statistics
+GET /api/analytics/engagement - Get engagement metrics
+
+Settings & Preferences
+PUT /api/settings/privacy - Update privacy settings
+PUT /api/settings/notifications - Update notification preferences
+PUT /api/settings/language - Update language preference
+
+Admin & Moderation
+GET /api/admin/users - Get list of all users (admin only)
+PUT /api/admin/users/:userId/status - Suspend/activate user (admin only)
+GET /api/admin/reports - Get list of reported content (admin only)
