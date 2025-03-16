@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS user_data (
 
 CREATE TABLE IF NOT EXISTS user_posts (
     id VARCHAR(20) PRIMARY KEY,
-    create_id VARCHAR(50) NOT NULL,
+    creator_id VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     group_id VARCHAR(50),
     text_content TEXT,

@@ -23,11 +23,11 @@ func SignUp() fiber.Handler {
 			return c.SendString("User already logged in!")
 		}
 
-		user := &models.User{}
+		user := &models.User_Auth{}
 		user.Email = c.FormValue("email")
 		user.Username = c.FormValue("username")
 		user.Password = c.FormValue("password")
-		user.ID = uuid.New().String()
+		user.Id = uuid.New().String()
 		user.Created_at = time.Now()
 
 		db, err := db.DBConnection()
@@ -81,7 +81,7 @@ func Login() fiber.Handler {
 		username := c.FormValue("username")
 		password := c.FormValue("password")
 
-		user := &models.User{}
+		user := &models.User_Auth{}
 
 		whereConditionData := &struct {
 			Username string
@@ -167,7 +167,7 @@ func RefreshToken() fiber.Handler {
 			fmt.Println(err)
 			return fiber.ErrInternalServerError
 		}
-		var user *models.User = &models.User{}
+		var user *models.User_Auth = &models.User_Auth{}
 		if err = db.Table("user_auth").Where(struct{ ID string }{ID: userID}).First(user).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				return c.SendString("user not found for refreshing token, is that even possible lol!")
@@ -200,7 +200,7 @@ func ForgetPassword() fiber.Handler {
 			fmt.Println("Error while connecting to db: ", err)
 			return fiber.ErrInternalServerError
 		}
-		var user *models.User = &models.User{}
+		var user *models.User_Auth = &models.User_Auth{}
 		if err = db.Table("user_auth").Where(struct{ Email string }{Email: email}).First(user).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				return c.SendString("User not found with this email!")
@@ -221,7 +221,7 @@ func ResetPassword() fiber.Handler {
 			fmt.Println("Error while connecting to db: ", err)
 			return fiber.ErrInternalServerError
 		}
-		var user *models.User = &models.User{}
+		var user *models.User_Auth = &models.User_Auth{}
 		if err = db.Table("user_auth").Where(struct {
 			Email    string
 			Password string

@@ -41,3 +41,6 @@ func CreateInitialDBStructure() {
 	}
 
 }
+func GetUserProfileByID(id string) {
+
+}

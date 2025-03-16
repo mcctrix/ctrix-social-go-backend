@@ -21,7 +21,7 @@ type gnData struct {
 }
 
 /*This Function takes User model and return a raw jwt token in string format*/
-func GenerateJwtToken(user *models.User) (*gnData, error) {
+func GenerateJwtToken(user *models.User_Auth) (*gnData, error) {
 
 	returnData := &gnData{}
 
@@ -31,7 +31,7 @@ func GenerateJwtToken(user *models.User) (*gnData, error) {
 		"iss":   "ctrix-social-golang-backend",
 		"iat":   time.Now().Unix(),
 		"sub":   "user-auth",
-		"aud":   user.ID,
+		"aud":   user.Id,
 		"exp":   returnData.Exp_Time,
 		"email": user.Email,
 		// "id":    user.ID,
@@ -122,4 +122,11 @@ func GetClaimData(token *jwt.Token, claimName string) string {
 		return claim[claimName].(string)
 	}
 	return ""
+}
+func GetUserIDWithToken(token string) (string, error) {
+	jwtToken, err := GetJwtToken(token)
+	if err != nil {
+		return "", err
+	}
+	return GetClaimData(jwtToken, "aud"), nil
 }
