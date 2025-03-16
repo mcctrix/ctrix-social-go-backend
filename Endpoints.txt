@@ -14,7 +14,6 @@ GET /api/users/profile - Get current user profile
 GET /api/users/:userId - Get specific user profile
 PUT /api/users/:userId/password - Change user password
 
-
 Post Management
 POST /api/posts - Create new post
 GET /api/posts - Get list of posts (with pagination)

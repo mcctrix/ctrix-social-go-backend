@@ -62,7 +62,7 @@ func SetUserProfileWithByteData(newProfileByte []byte, userID string) error {
 		return err
 	}
 	var userProfile *models.User_Profile = &models.User_Profile{}
-	fmt.Println("old: ", userProfile)
+
 	if err = db.Table("user_profile").Where("id = ?", userID).First(userProfile).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			newProfile := &models.User_Profile{}
@@ -89,14 +89,61 @@ func SetUserProfileWithByteData(newProfileByte []byte, userID string) error {
 
 	return nil
 }
+func GetAdditionalInfoProfileByID(id string) (*models.User_Additional_Info, error) {
+
+	db, err := DBConnection()
+	if err != nil {
+		return nil, err
+	}
+	var userProfile *models.User_Additional_Info = &models.User_Additional_Info{}
+	if err = db.Table("user_additional_info").Where("id = ?", id).First(userProfile).Error; err != nil {
+		return nil, err
+	}
+	return userProfile, nil
+}
+func SetAdditionalUserProfileWithByteData(newProfileByte []byte, userID string) error {
+	db, err := DBConnection()
+	if err != nil {
+		return err
+	}
+	var userProfile *models.User_Additional_Info = &models.User_Additional_Info{}
+	if err = db.Table("user_profile").Where("id = ?", userID).First(userProfile).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			newProfile := &models.User_Additional_Info{}
+			err = json.Unmarshal(newProfileByte, newProfile)
+			if err != nil {
+				fmt.Println("Error with the decode of json", err)
+				return err
+			}
+			db, err := DBConnection()
+			if err != nil {
+				fmt.Println("Error while connecting to db: ", err)
+				return err
+			}
+			if err = db.Table("user_profile").Create(newProfile).Error; err != nil {
+				fmt.Println("Error Creating new profile:", err)
+				return err
+			}
+
+		} else {
+			return err
+		}
+	}
+	json.Unmarshal(newProfileByte, userProfile)
+	if err != nil {
+		fmt.Println("Error with the decode of json", err)
+		return err
+	}
+	db.Table("user_profile").Save(userProfile)
+
+	return nil
+}
 func CreateUserProfile(profileData *models.User_Profile) error {
 	db, err := DBConnection()
 	if err != nil {
 		return err
 	}
-	fmt.Println(profileData.Id)
 	db.Table("user_profile").Create(profileData)
-	fmt.Println(profileData.Id)
 
 	return nil
 }
