@@ -24,6 +24,17 @@ func GetCurrentUserProfile() fiber.Handler {
 		return c.JSON(profile)
 	}
 }
+func GetUserProfileWithParam() fiber.Handler {
+	return func(c fiber.Ctx) error {
+		userID := c.Params("userid")
+		profile, err := db.GetUserProfileByID(userID)
+		if err != nil {
+			fmt.Println("unable to fetch profile: ", err)
+			return c.Status(500).SendString("unable to fetch user profile!")
+		}
+		return c.JSON(profile)
+	}
+}
 func SetCurrentUserProfile() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
