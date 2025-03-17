@@ -140,3 +140,86 @@ func createUserProfile(profileData *models.User_Profile) error {
 
 	return db.Table("user_profile").Create(profileData).Error
 }
+func GetUserSettingsByID(id string) (*models.User_Settings, error) {
+
+	db, err := DBConnection()
+	if err != nil {
+		return nil, err
+	}
+	var userSettingsData *models.User_Settings = &models.User_Settings{}
+	if err = db.Table("user_settings").Where("id = ?", id).First(userSettingsData).Error; err != nil {
+		return nil, err
+	}
+	return userSettingsData, nil
+}
+func SetUserSettingsWithByteData(newProfileByte []byte, userID string) error {
+	db, err := DBConnection()
+	if err != nil {
+		return err
+	}
+	var userSettings *models.User_Settings = &models.User_Settings{}
+
+	if err = db.Table("user_settings").Where("id = ?", userID).First(userSettings).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			newUserSettings := &models.User_Settings{}
+			if err = json.Unmarshal(newProfileByte, newUserSettings); err != nil {
+				return err
+			}
+
+			if err = db.Table("user_profile").Create(newUserSettings).Error; err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
+	}
+	err = json.Unmarshal(newProfileByte, userSettings)
+	if err != nil {
+		return err
+	}
+	db.Table("user_profile").Save(userSettings)
+
+	return nil
+}
+
+func GetUserDataByID(id string) (*models.User_Data, error) {
+
+	db, err := DBConnection()
+	if err != nil {
+		return nil, err
+	}
+	var userData *models.User_Data = &models.User_Data{}
+	if err = db.Table("user_data").Where("id = ?", id).First(userData).Error; err != nil {
+		return nil, err
+	}
+	return userData, nil
+}
+func SetUserDataWithByteData(newProfileByte []byte, userID string) error {
+	db, err := DBConnection()
+	if err != nil {
+		return err
+	}
+	var userData *models.User_Data = &models.User_Data{}
+
+	if err = db.Table("user_data").Where("id = ?", userID).First(userData).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			newUserData := &models.User_Data{}
+			if err = json.Unmarshal(newProfileByte, newUserData); err != nil {
+				return err
+			}
+
+			if err = db.Table("user_data").Create(newUserData).Error; err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
+	}
+	err = json.Unmarshal(newProfileByte, userData)
+	if err != nil {
+		return err
+	}
+	db.Table("user_profile").Save(userData)
+
+	return nil
+}
