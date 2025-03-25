@@ -43,7 +43,8 @@ func loadEnvironment() {
 		// Pem File exist so do nothing
 	} else {
 		utils.GenerateEcdsaPrivateKey()
-	}
+  }
+  db.ResetDB()
 	db.CreateInitialDBStructure()
 }
 

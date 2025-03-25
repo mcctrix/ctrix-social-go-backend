@@ -24,6 +24,7 @@ func GetCurrentUserProfile() fiber.Handler {
 		return c.JSON(profile)
 	}
 }
+
 func GetUserProfileWithParam() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		userID := c.Params("userid")
@@ -54,6 +55,7 @@ func SetCurrentUserProfile() fiber.Handler {
 		return c.SendString("Profile is set successfully!")
 	}
 }
+
 func GetAdditionalUserInfo() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
@@ -103,6 +105,7 @@ func GetUserSettings() fiber.Handler {
 		return c.JSON(additional_profile)
 	}
 }
+
 func SetUserSettings() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
@@ -118,6 +121,7 @@ func SetUserSettings() fiber.Handler {
 		return c.SendString("User Additional profile updated Successfully!")
 	}
 }
+
 func GetUserData() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
