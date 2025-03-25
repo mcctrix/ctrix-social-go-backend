@@ -44,32 +44,32 @@ func CreateInitialDBStructure() {
 
 }
 func ResetDB() {
-	db, err := gorm.Open(postgres.Open("host=localhost user=ctrix password=6205 dbname=postgres sslmode=disable"))
+	db, err := DBConnection()
 	if err != nil {
 		fmt.Println("error here!1")
 		log.Fatal("Error connecting to db: ", err)
 	}
-	if err := db.Exec("DROP DATABASE Ctrix_Social_DB"); err != nil {
-		fmt.Println("error here!2")
+	// if err := db.Exec("DROP DATABASE Ctrix_Social_DB"); err != nil {
+	// 	fmt.Println("error here!2")
 
-		log.Fatal(err)
-	}
-	if err := db.Exec("CREATE DATABASE IF NOT EXISTS Ctrix_Social_DB"); err != nil {
-		fmt.Println("error here!3")
-
-		log.Fatal(err)
-	}
-
-	// sqlFile, err := os.ReadFile("./sql/resetDB.sql")
-	// if err != nil {
-	// log.Fatal(err)
+	// 	log.Fatal(err)
 	// }
-	// err = db.Exec(string(sqlFile)).Error
-	// if err != nil {
-	// fmt.Println(err)
-	// } else {
-	// fmt.Println("DB Resetted Successfully!!!")
+	// if err := db.Exec("CREATE DATABASE IF NOT EXISTS Ctrix_Social_DB"); err != nil {
+	// 	fmt.Println("error here!3")
+
+	// 	log.Fatal(err)
 	// }
+
+	sqlFile, err := os.ReadFile("./sql/resetDB.sql")
+	if err != nil {
+	log.Fatal(err)
+	}
+	err = db.Exec(string(sqlFile)).Error
+	if err != nil {
+	fmt.Println(err)
+	} else {
+	fmt.Println("DB Resetted Successfully!!!")
+	}
 
 }
 

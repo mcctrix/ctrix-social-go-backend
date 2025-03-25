@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS user_profile (
     first_name VARCHAR(30),
     last_name VARCHAR(30),
     profile_picture VARCHAR(200),
+    avatar VARCHAR(25),
     last_seen TIMESTAMP,
     post_count INT,
     followers TEXT[],

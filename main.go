@@ -44,7 +44,7 @@ func loadEnvironment() {
 	} else {
 		utils.GenerateEcdsaPrivateKey()
   }
-  db.ResetDB()
+  // db.ResetDB()
 	db.CreateInitialDBStructure()
 }
 

@@ -15,6 +15,7 @@ type User_Profile struct {
 	First_name      string    `json:"first_name"`
 	Last_name       string    `json:"last_name"`
 	Profile_picture string    `json:"profile_profile"`
+	Avatar string    `json:"avatar"`
 	Last_seen       time.Time `json:"last_seen"`
 	Post_count      int       `json:"post_count"`
 	Followers       []string  `json:"followers"`
