@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v3"
@@ -22,10 +23,9 @@ func SignUp() fiber.Handler {
 			// return c.Redirect().To("/")
 			return c.SendString("User already logged in!")
 		}
-
 		user := &models.User_Auth{}
-		user.Email = c.FormValue("email")
-		user.Username = c.FormValue("username")
+		user.Email = strings.ToLower(c.FormValue("email"))
+		user.Username = strings.ToLower(c.FormValue("username"))
 		user.Password = c.FormValue("password")
 		user.Id = uuid.New().String()
 		user.Created_at = time.Now()
@@ -78,7 +78,7 @@ func Login() fiber.Handler {
 		if err != nil {
 			return fiber.ErrInternalServerError
 		}
-		username := c.FormValue("username")
+		username := strings.ToLower(c.FormValue("username"))
 		password := c.FormValue("password")
 
 		user := &models.User_Auth{}
