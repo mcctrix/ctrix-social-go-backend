@@ -94,11 +94,11 @@ func Login() fiber.Handler {
 		// select * from user_auth where password="12345678"
 		if err = dbConn.Table("user_auth").Where(whereConditionData).First(user).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return c.SendString("User not Found!")
+				return c.Status(fiber.StatusUnauthorized).SendString("User not Found!")
 			}
 		}
 		if password != user.Password {
-			return c.SendString("Incorrect Password for " + user.Username)
+			return c.Status(fiber.StatusUnauthorized).SendString("Incorrect Password for " + user.Username)
 		}
 		// Prank for sending passowrd of a user
 		// if user.Username != username {
@@ -139,6 +139,7 @@ func Logout() fiber.Handler {
 		return c.SendString("User logged out Successfully!")
 	}
 }
+
 func RefreshToken() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		auth_token := c.Cookies("auth_token")

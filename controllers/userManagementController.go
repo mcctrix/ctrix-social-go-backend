@@ -9,6 +9,12 @@ import (
 	"github.com/mcctrix/ctrix-social-go-backend/utils"
 )
 
+// func GetUserName() fiber.Handler {
+// 	return func(c fiber.Ctx) error {
+
+// 	}
+// }
+
 func GetCurrentUserProfile() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))

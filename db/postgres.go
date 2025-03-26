@@ -62,28 +62,60 @@ func ResetDB() {
 
 	sqlFile, err := os.ReadFile("./sql/resetDB.sql")
 	if err != nil {
-	log.Fatal(err)
+		log.Fatal(err)
 	}
 	err = db.Exec(string(sqlFile)).Error
 	if err != nil {
-	fmt.Println(err)
+		fmt.Println(err)
 	} else {
-	fmt.Println("DB Resetted Successfully!!!")
+		fmt.Println("DB Resetted Successfully!!!")
 	}
 
 }
 
-func GetUserProfileByID(id string) (*models.User_Profile, error) {
+type user_profile_data struct {
+  models.User_Profile
+  Email    string `json:"email"`
+  Username string `json:"username"`
+}
+
+func GetUserProfileByID(id string) (*user_profile_data, error) {
 
 	db, err := DBConnection()
 	if err != nil {
 		return nil, err
 	}
-	var userProfile *models.User_Profile = &models.User_Profile{}
+
+	user_auth_data, err := GetDataFromUserAuth(id)
+	if err != nil {
+		return nil, err
+	}
+
+	var userProfile *user_profile_data = &user_profile_data{}
 	if err = db.Table("user_profile").Where("id = ?", id).First(userProfile).Error; err != nil {
 		return nil, err
 	}
+  userProfile.Email = user_auth_data.Email
+  userProfile.Username = user_auth_data.Username
 	return userProfile, nil
+}
+
+type user_auth_data struct {
+	Username string
+	Email    string
+}
+
+func GetDataFromUserAuth(id string) (*user_auth_data, error) {
+	db, err := DBConnection()
+	if err != nil {
+		return nil, err
+	}
+	var user_auth *user_auth_data = &user_auth_data{}
+	if err = db.Table("user_auth").Select("username", "email").Where("id = ?", id).First(user_auth).Error; err != nil {
+		return nil, err
+	}
+
+	return user_auth, nil
 }
 
 func SetUserProfileWithByteData(newProfileByte []byte, userID string) error {
@@ -100,6 +132,7 @@ func SetUserProfileWithByteData(newProfileByte []byte, userID string) error {
 			if err != nil {
 				return err
 			}
+			newProfile.Id = userID
 			err = createUserProfile(newProfile)
 			if err != nil {
 				return err
