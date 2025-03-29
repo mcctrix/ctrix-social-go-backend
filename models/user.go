@@ -48,7 +48,7 @@ type User_Data struct {
 }
 
 type User_Posts struct {
-  Id                string    `json:"id" gorm:"-"`
+  Id                string    `json:"id" gorm:"primaryKey;type:uuid;default:uuid_generate_v4()"`
 	Creator_id        string    `json:"creator_id"`
 	Created_at        time.Time `json:"creator_at"`
 	Group_id          string    `json:"group_id"`
