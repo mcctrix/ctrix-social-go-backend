@@ -3,6 +3,8 @@ package db
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
+	"time"
 
 	"github.com/mcctrix/ctrix-social-go-backend/models"
 )
@@ -26,16 +28,21 @@ func CreateUserPostWithByteData(newPostByte []byte, userID string) error {
 		return err
 	}
 
+  fmt.Println(string(newPostByte))
+
 	// Create a new post
 	newPost := &models.User_Posts{}
 	if err = json.Unmarshal(newPostByte, newPost); err != nil {
 		return err
 	}
-
+  
 	// Set the creator ID to the authenticated user
 	newPost.Creator_id = userID
+	newPost.Created_at = time.Now()
 
-	// Save the post
+  fmt.Println(newPost)
+
+	// Save the post1
 	if err = db.Table("user_posts").Create(newPost).Error; err != nil {
 		return err
 	}

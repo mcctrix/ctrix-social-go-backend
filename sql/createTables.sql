@@ -1,3 +1,6 @@
+-- Enable the uuid-ossp extension if not already enabled
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE IF NOT EXISTS user_auth (
     id VARCHAR(50) PRIMARY KEY,
     email VARCHAR(50) UNIQUE NOT NULL,
@@ -49,7 +52,7 @@ CREATE TABLE IF NOT EXISTS user_data (
 );
 
 CREATE TABLE IF NOT EXISTS user_posts (
-    id VARCHAR(20) PRIMARY KEY,
+    id VARCHAR(50) PRIMARY KEY DEFAULT uuid_generate_v4(),
     creator_id VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     group_id VARCHAR(50),

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/gofiber/fiber/v3"
@@ -28,6 +29,7 @@ func GetUserPosts() fiber.Handler {
 
 func CreateUserPost() fiber.Handler {
 	return func(c fiber.Ctx) error {
+    fmt.Println("endpoint hit")
 		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
 		if err != nil {
 			fmt.Println("unable to fetch user with this Token: ", err)
@@ -40,7 +42,7 @@ func CreateUserPost() fiber.Handler {
 			return fiber.ErrInternalServerError
 		}
 
-		return c.SendString("Post created successfully!")
+		return c.Status(fiber.StatusCreated).SendString("Post created successfully!")
 	}
 }
 
@@ -122,6 +124,7 @@ func CreatePostComment() fiber.Handler {
 		if err := json.Unmarshal(commentData, &commentMap); err != nil {
 			return fiber.ErrBadRequest
 		}
+    
 		commentMap["post_id"] = postID
 		modifiedCommentData, err := json.Marshal(commentMap)
 		if err != nil {

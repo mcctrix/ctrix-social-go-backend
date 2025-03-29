@@ -48,7 +48,7 @@ type User_Data struct {
 }
 
 type User_Posts struct {
-	Id                string    `json:"id"`
+  Id                string    `json:"id" gorm:"-"`
 	Creator_id        string    `json:"creator_id"`
 	Created_at        time.Time `json:"creator_at"`
 	Group_id          string    `json:"group_id"`
@@ -59,7 +59,7 @@ type User_Posts struct {
 }
 
 type User_post_Comments struct {
-	Id                string    `json:"id"`
+	Id                string    `json:"id" gorm:"-"`
 	Post_id           string    `json:"post_id"`
 	Creator_id        string    `json:"creator_id"`
 	Created_at        time.Time `json:"created_at"`
