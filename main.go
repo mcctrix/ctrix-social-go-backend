@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"strings"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/cors"
@@ -31,7 +32,7 @@ func main() {
 
 	routes.AuthRouter(mainRouter.Group("/api/auth"))
 	routes.UserManagementRouter(mainRouter.Group("/api/users"))
-  routes.PostManagementRouter(mainRouter.Group("/api/post"))
+	routes.PostManagementRouter(mainRouter.Group("/api/post"))
 
 	mainRouter.Listen(port)
 }
@@ -44,8 +45,8 @@ func loadEnvironment() {
 		// Pem File exist so do nothing
 	} else {
 		utils.GenerateEcdsaPrivateKey()
-  }
-  // db.ResetDB()
+	}
+	// db.ResetDB()
 	db.CreateInitialDBStructure()
 }
 
@@ -64,8 +65,16 @@ func makeRouter() *fiber.App {
 	}))
 
 	corsMiddleware := cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000", "http://127.0.0.1:3000"}, // Allows all origins
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+		AllowOrigins: []string{"http://localhost:3000", "http://127.0.0.1:3000"}, // Allows all origins
+		AllowMethods: strings.Split(strings.Join([]string{
+			fiber.MethodGet,
+			fiber.MethodPost,
+			fiber.MethodHead,
+			fiber.MethodPut,
+			fiber.MethodDelete,
+			fiber.MethodPatch,
+			fiber.MethodOptions,
+		}, ","), ","),
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Set-Cookie"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,

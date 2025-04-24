@@ -12,16 +12,22 @@ import (
 	"gorm.io/gorm"
 )
 
-func DBConnection() (*gorm.DB, error) {
+var dbInstance *gorm.DB
+
+func DBConnection() (*gorm.DB,error) {
+  if dbInstance != nil {
+    return dbInstance,nil
+  }
 	dsn := "host=localhost user=ctrix password=6205 dbname=Ctrix_Social_DB sslmode=disable"
 	//Open the connection
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		TranslateError: true,
 	})
 	if err != nil {
-		return nil, err
+		return nil,err
 	}
-	return db, nil
+  dbInstance = db
+  return dbInstance,nil
 }
 
 func CreateInitialDBStructure() {

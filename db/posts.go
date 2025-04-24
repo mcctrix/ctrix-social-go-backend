@@ -16,7 +16,7 @@ func GetUserPostsByID(id string) ([]*models.User_Posts, error) {
 		return nil, err
 	}
 	var userPosts []*models.User_Posts
-	if err = db.Table("user_posts").Where("creator_id = ?", id).Find(&userPosts).Error; err != nil {
+	if err = db.Table("user_posts").Order("created_at desc").Where("creator_id = ?", id).Find(&userPosts).Error; err != nil {
 		return nil, err
 	}
 	return userPosts, nil
@@ -28,19 +28,15 @@ func CreateUserPostWithByteData(newPostByte []byte, userID string) error {
 		return err
 	}
 
-  fmt.Println(string(newPostByte))
-
 	// Create a new post
 	newPost := &models.User_Posts{}
 	if err = json.Unmarshal(newPostByte, newPost); err != nil {
 		return err
 	}
-  
+
 	// Set the creator ID to the authenticated user
 	newPost.Creator_id = userID
 	newPost.Created_at = time.Now()
-
-  fmt.Println(newPost)
 
 	// Save the post1
 	if err = db.Table("user_posts").Create(newPost).Error; err != nil {
@@ -69,7 +65,7 @@ func GetPostCommentsByPostID(postID string) ([]*models.User_post_Comments, error
 		return nil, err
 	}
 	var postComments []*models.User_post_Comments
-	if err = db.Table("user_post_comments").Where("post_id = ?", postID).Find(&postComments).Error; err != nil {
+	if err = db.Table("user_post_comments").Order("created_at desc").Where("post_id = ?", postID).Find(&postComments).Error; err != nil {
 		return nil, err
 	}
 	return postComments, nil
@@ -115,7 +111,7 @@ func UpdateUserPostWithByteData(postID string, updatedPostByte []byte, userID st
 	db, err := DBConnection()
 	if err != nil {
 		return err
-	}
+
 
 	// Find the existing post
 	var existingPost *models.User_Posts = &models.User_Posts{}
@@ -123,6 +119,7 @@ func UpdateUserPostWithByteData(postID string, updatedPostByte []byte, userID st
 		return err
 	}
 
+	fmt.Println(existingPost)
 	// Unmarshal the updated post data
 	if err = json.Unmarshal(updatedPostByte, existingPost); err != nil {
 		return err

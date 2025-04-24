@@ -15,7 +15,7 @@ type User_Profile struct {
 	First_name      string    `json:"first_name"`
 	Last_name       string    `json:"last_name"`
 	Profile_picture string    `json:"profile_profile"`
-	Avatar string    `json:"avatar"`
+	Avatar          string    `json:"avatar"`
 	Last_seen       time.Time `json:"last_seen"`
 	Post_count      int       `json:"post_count"`
 	Followers       []string  `json:"followers"`
@@ -48,13 +48,13 @@ type User_Data struct {
 }
 
 type User_Posts struct {
-  Id                string    `json:"id" gorm:"primaryKey;type:uuid;default:uuid_generate_v4()"`
+	Id                string    `json:"id" gorm:"primaryKey;type:uuid;default:uuid_generate_v4()"`
 	Creator_id        string    `json:"creator_id"`
-	Created_at        time.Time `json:"creator_at"`
+	Created_at        time.Time `json:"created_at"`
 	Group_id          string    `json:"group_id"`
 	Text_content      string    `json:"text_content"`
 	Pictures_attached []string  `json:"pictures_attached"`
-	Liked_by          []string  `json:"liked_by"`
+	Liked_by          []string  `json:"liked_by" gorm:"type:text[]"`
 	Comments          []string  `json:"comments"`
 }
 
@@ -68,8 +68,3 @@ type User_post_Comments struct {
 	Nested_comments   []string  `json:"nested_comments"`
 	Liked_by          []string  `json:"liked_by"`
 }
-
-
-
-
-

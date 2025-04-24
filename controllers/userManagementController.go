@@ -19,7 +19,7 @@ func GetCurrentUserProfile() fiber.Handler {
 		profile, err := db.GetUserProfileByID(userID)
 		if err != nil {
 			fmt.Println("unable to fetch profile: ", err)
-			return c.Status(500).SendString("unable to fetch user profile!")
+			return c.Status(fiber.StatusNotFound).SendString("unable to fetch user profile!")
 		}
 		return c.JSON(profile)
 	}

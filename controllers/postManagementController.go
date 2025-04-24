@@ -20,16 +20,16 @@ func GetUserPosts() fiber.Handler {
 		posts, err := db.GetUserPostsByID(userID)
 		if err != nil {
 			fmt.Println("error while fetching user posts: ", err)
-			return c.Status(500).SendString("unable to fetch user posts!")
+			return c.Status(fiber.StatusNotFound).SendString("unable to fetch user posts!")
 		}
 
-		return c.JSON(posts)
+		return c.Status(fiber.StatusOK).JSON(posts)
 	}
 }
 
 func CreateUserPost() fiber.Handler {
 	return func(c fiber.Ctx) error {
-    fmt.Println("endpoint hit")
+		fmt.Println("endpoint hit")
 		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
 		if err != nil {
 			fmt.Println("unable to fetch user with this Token: ", err)
@@ -124,7 +124,7 @@ func CreatePostComment() fiber.Handler {
 		if err := json.Unmarshal(commentData, &commentMap); err != nil {
 			return fiber.ErrBadRequest
 		}
-    
+
 		commentMap["post_id"] = postID
 		modifiedCommentData, err := json.Marshal(commentMap)
 		if err != nil {
