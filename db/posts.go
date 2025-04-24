@@ -111,7 +111,7 @@ func UpdateUserPostWithByteData(postID string, updatedPostByte []byte, userID st
 	db, err := DBConnection()
 	if err != nil {
 		return err
-
+	}
 
 	// Find the existing post
 	var existingPost *models.User_Posts = &models.User_Posts{}
