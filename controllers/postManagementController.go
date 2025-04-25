@@ -190,3 +190,9 @@ func DeletePostComment() fiber.Handler {
 		return c.SendString("Comment deleted successfully!")
 	}
 }
+
+func LikeToggler() fiber.Handler {
+	return func(c fiber.Ctx) error {
+		return c.Status(fiber.StatusOK).SendString("Like Updated Successfully!")
+	}
+}

@@ -201,13 +201,22 @@ func DeletePostComment(commentID string, userID string) error {
 	return nil
 }
 
-func PostLikeToggler(postID string, userID string) error {
+func PostLikeToggler(postID string, userToAddInLikedList string) error {
 	db, err := DBConnection()
 	if err != nil {
 		return err
 	}
 
-	db.Error = nil
+	oldLikedData := &struct {
+		Liked_by string
+	}{
+		Liked_by: "",
+	}
+
+	if err = db.Table("user_posts").Model(oldLikedData).Select("liked_by").Where("id = ?", postID).Error; err != nil {
+		fmt.Println("Error", err)
+	}
+	fmt.Println(oldLikedData)
 
 	return nil
 }
