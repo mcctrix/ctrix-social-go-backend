@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
@@ -73,7 +72,6 @@ func makeRouter() *fiber.App {
 		fiber.MethodPatch,
 		fiber.MethodOptions,
 	}, ","), ",")
-  fmt.Println(corsMethods)
 
 	corsMiddleware := cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000", "http://127.0.0.1:3000"}, // Allows all origins

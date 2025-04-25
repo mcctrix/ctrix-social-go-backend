@@ -119,11 +119,13 @@ func UpdateUserPostWithByteData(postID string, updatedPostByte []byte, userID st
 		return err
 	}
 
-	fmt.Println(existingPost)
+	fmt.Println("existing data:", existingPost)
+	fmt.Println("New Data", string(updatedPostByte))
 	// Unmarshal the updated post data
 	if err = json.Unmarshal(updatedPostByte, existingPost); err != nil {
 		return err
 	}
+	fmt.Println("UPDATED existing data:", existingPost)
 
 	// Save the updated post
 	if err = db.Table("user_posts").Save(existingPost).Error; err != nil {
@@ -195,6 +197,17 @@ func DeletePostComment(commentID string, userID string) error {
 	if result.RowsAffected == 0 {
 		return errors.New("no comment found or unauthorized to delete")
 	}
+
+	return nil
+}
+
+func PostLikeToggler(postID string, userID string) error {
+	db, err := DBConnection()
+	if err != nil {
+		return err
+	}
+
+	db.Error = nil
 
 	return nil
 }
