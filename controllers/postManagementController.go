@@ -193,6 +193,25 @@ func DeletePostComment() fiber.Handler {
 
 func LikeToggler() fiber.Handler {
 	return func(c fiber.Ctx) error {
+		// userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
+		// if err != nil {
+		// 	fmt.Println("unable to fetch user with this Token: ", err)
+		// 	return c.Status(401).SendString("unable to fetch user with this Token!")
+		// }
+		bodyData := &struct{ like string }{}
+		rawData := c.Body()
+
+		err := json.Unmarshal(rawData, bodyData)
+
+		if err != nil {
+			fmt.Println(err)
+			return fiber.ErrInternalServerError
+		}
+
+		fmt.Println("body data:", bodyData)
+		fmt.Println("body raw data:", string(rawData))
+		fmt.Println("post id: ", c.Params("postid"))
+
 		return c.Status(fiber.StatusOK).SendString("Like Updated Successfully!")
 	}
 }

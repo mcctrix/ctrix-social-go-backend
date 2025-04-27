@@ -10,12 +10,12 @@ import (
 )
 
 // Posts Database Functions
-func GetUserPostsByID(id string) ([]*models.User_Posts, error) {
+func GetUserPostsByID(id string) ([]models.User_Posts, error) {
 	db, err := DBConnection()
 	if err != nil {
 		return nil, err
 	}
-	var userPosts []*models.User_Posts
+	var userPosts []models.User_Posts
 	if err = db.Table("user_posts").Order("created_at desc").Where("creator_id = ?", id).Find(&userPosts).Error; err != nil {
 		return nil, err
 	}
@@ -201,7 +201,7 @@ func DeletePostComment(commentID string, userID string) error {
 	return nil
 }
 
-func PostLikeToggler(postID string, userToAddInLikedList string) error {
+func PostLikeToggler(postID string, userToAddInLikedList string, like bool) error {
 	db, err := DBConnection()
 	if err != nil {
 		return err
