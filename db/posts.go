@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gofiber/fiber/v3"
 	"github.com/mcctrix/ctrix-social-go-backend/models"
+	"gorm.io/gorm"
 )
 
 // Posts Database Functions
@@ -207,16 +209,18 @@ func PostLikeToggler(postID string, userToAddInLikedList string, like bool) erro
 		return err
 	}
 
-	oldLikedData := &struct {
-		Liked_by string
-	}{
-		Liked_by: "",
+	if like {
+		// arrayLiteral := fmt.Sprintf("'{%s}'", userToAddInLikedList)
+		if err = db.Table("user_posts").Where("id = ?", postID).Update("liked_by", gorm.Expr("array_cat(liked_by, ARRAY[?])", userToAddInLikedList)).Error; err != nil {
+			fmt.Println("Error", err)
+			return fiber.ErrInternalServerError
+		}
+	} else {
+		if err = db.Table("user_posts").Where("id = ?", postID).Update("liked_by", gorm.Expr("array_remove(liked_by, ?::text)", []string{userToAddInLikedList})).Error; err != nil {
+			fmt.Println("Error", err)
+			return fiber.ErrInternalServerError
+		}
 	}
-
-	if err = db.Table("user_posts").Model(oldLikedData).Select("liked_by").Where("id = ?", postID).Error; err != nil {
-		fmt.Println("Error", err)
-	}
-	fmt.Println(oldLikedData)
 
 	return nil
 }
