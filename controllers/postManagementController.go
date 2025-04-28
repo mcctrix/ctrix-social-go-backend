@@ -212,7 +212,7 @@ func LikeToggler() fiber.Handler {
 			fmt.Println(err)
 			return fiber.ErrInternalServerError
 		}
-		4
+
 		return c.Status(fiber.StatusOK).SendString("Like Updated Successfully!")
 	}
 }
