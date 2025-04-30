@@ -112,13 +112,13 @@ func Login() fiber.Handler {
 			fmt.Println("Error Creating Jwt while login: ", err)
 			return fiber.ErrInternalServerError
 		}
-		isSecure := os.Getenv("APP_ENV") == "production"
+		// isSecure := os.Getenv("APP_ENV") == "production"
 		c.Cookie(&fiber.Cookie{
 			Name:     "auth_token",
 			Value:    gnToken.StringToken,
 			Path:     "/",
 			HTTPOnly: true,
-			Secure:   isSecure,
+			Secure:   false,
 			SameSite: "None",
 			Expires:  time.Unix(gnToken.Exp_Time, 0),
 		})
