@@ -27,6 +27,24 @@ func GetUserPosts() fiber.Handler {
 	}
 }
 
+func GetPostReactions() fiber.Handler {
+	return func(c fiber.Ctx) error {
+		// userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
+		// if err != nil {
+		// 	fmt.Println("unable to fetch user with this Token: ", err)
+		// 	return c.Status(401).SendString("unable to fetch user with this Token!")
+		// }
+		postID := c.Params("postid")
+		reactions, err := db.GetAllPostReaction(postID)
+		if err != nil {
+			fmt.Println(err)
+			return c.Status(fiber.StatusInternalServerError).SendString("Unable to fetch Reactions for the post!")
+		}
+
+		return c.Status(fiber.StatusOK).JSON(reactions)
+	}
+}
+
 func CreateUserPost() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		fmt.Println("endpoint hit")
@@ -199,7 +217,10 @@ func LikeToggler() fiber.Handler {
 			return c.Status(401).SendString("unable to fetch user with this Token!")
 		}
 
-		bodyData := &struct{ Like bool }{}
+		bodyData := &struct {
+			Toggle    bool
+			Like_type string
+		}{}
 		rawData := c.Body()
 
 		err = json.Unmarshal(rawData, bodyData)
@@ -208,7 +229,7 @@ func LikeToggler() fiber.Handler {
 			return fiber.ErrInternalServerError
 		}
 
-		if err = db.PostLikeToggler(c.Params("postid"), userID, bodyData.Like); err != nil {
+		if err = db.PostLikeToggler(c.Params("postid"), userID, bodyData.Toggle, bodyData.Like_type); err != nil {
 			fmt.Println(err)
 			return fiber.ErrInternalServerError
 		}

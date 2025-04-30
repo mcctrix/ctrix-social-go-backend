@@ -13,6 +13,7 @@ func PostManagementRouter(router fiber.Router) {
 	router.Get("/", controllers.GetUserPosts())
 	router.Post("/", controllers.CreateUserPost())
 	router.Get("/:postid", controllers.GetPostByID())
+	router.Get("/:postid/reacts", controllers.GetPostReactions())
 	router.Patch("/:postid", controllers.UpdateUserPost())
 	router.Delete("/:postid", controllers.DeleteUserPost())
 	router.Patch("/:postid/liketoggler", controllers.LikeToggler())

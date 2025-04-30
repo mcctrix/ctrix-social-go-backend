@@ -14,20 +14,40 @@ import (
 
 var dbInstance *gorm.DB
 
-func DBConnection() (*gorm.DB,error) {
-  if dbInstance != nil {
-    return dbInstance,nil
-  }
-	dsn := "host=localhost user=ctrix password=6205 dbname=Ctrix_Social_DB sslmode=disable"
+func DBConnection() (*gorm.DB, error) {
+	if dbInstance != nil {
+		return dbInstance, nil
+	}
+
+	var host, username, password, dbname string = "", "", "", ""
+
+	currentEnv := os.Getenv("APP_ENV")
+	if currentEnv == "dev" {
+		host = os.Getenv("postgresHostDev")
+		dbname = os.Getenv("postgresDBDev")
+		username = os.Getenv("postgresUsernameDev")
+		password = os.Getenv("postgresPasswordDev")
+	}
+
+	if currentEnv == "production" {
+		host = os.Getenv("postgresHostProd")
+		dbname = os.Getenv("postgresDBProd")
+		username = os.Getenv("postgresUsernameProd")
+		password = os.Getenv("postgresPasswordProd")
+	}
+
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", host, username, password, dbname)
 	//Open the connection
+
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		TranslateError: true,
 	})
+
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
-  dbInstance = db
-  return dbInstance,nil
+	dbInstance = db
+	return dbInstance, nil
 }
 
 func CreateInitialDBStructure() {
@@ -80,9 +100,9 @@ func ResetDB() {
 }
 
 type user_profile_data struct {
-  models.User_Profile
-  Email    string `json:"email"`
-  Username string `json:"username"`
+	models.User_Profile
+	Email    string `json:"email"`
+	Username string `json:"username"`
 }
 
 func GetUserProfileByID(id string) (*user_profile_data, error) {
@@ -101,8 +121,8 @@ func GetUserProfileByID(id string) (*user_profile_data, error) {
 	if err = db.Table("user_profile").Where("id = ?", id).First(userProfile).Error; err != nil {
 		return nil, err
 	}
-  userProfile.Email = user_auth_data.Email
-  userProfile.Username = user_auth_data.Username
+	userProfile.Email = user_auth_data.Email
+	userProfile.Username = user_auth_data.Username
 	return userProfile, nil
 }
 

@@ -6,9 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gofiber/fiber/v3"
 	"github.com/mcctrix/ctrix-social-go-backend/models"
-	"gorm.io/gorm"
 )
 
 // Posts Database Functions
@@ -203,22 +201,43 @@ func DeletePostComment(commentID string, userID string) error {
 	return nil
 }
 
-func PostLikeToggler(postID string, userToAddInLikedList string, like bool) error {
+func GetAllPostReaction(postID string) ([]models.User_Post_Like_Table, error) {
+	db, err := DBConnection()
+	if err != nil {
+		return nil, err
+	}
+
+	var allReacts []models.User_Post_Like_Table
+
+	if err = db.Table("user_post_like").Where("post_id = ? ", postID).Find(allReacts).Select("user_id", "like_type").Error; err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	return allReacts, nil
+}
+
+func PostLikeToggler(postID string, userLikedID string, liked bool, likeType string) error {
 	db, err := DBConnection()
 	if err != nil {
 		return err
 	}
 
-	if like {
-		// arrayLiteral := fmt.Sprintf("'{%s}'", userToAddInLikedList)
-		if err = db.Table("user_posts").Where("id = ?", postID).Update("liked_by", gorm.Expr("array_cat(liked_by, ARRAY[?])", userToAddInLikedList)).Error; err != nil {
-			fmt.Println("Error", err)
-			return fiber.ErrInternalServerError
+	if liked {
+		post_like_data := models.User_Post_Like_Table{User_id: userLikedID, Post_id: postID, Like_type: "like"}
+
+		if err = db.Table("user_post_like").Create(post_like_data).Error; err != nil {
+			fmt.Println(err)
+			return errors.New("unable to create post reaction")
 		}
 	} else {
-		if err = db.Table("user_posts").Where("id = ?", postID).Update("liked_by", gorm.Expr("array_remove(liked_by, ?::text)", []string{userToAddInLikedList})).Error; err != nil {
-			fmt.Println("Error", err)
-			return fiber.ErrInternalServerError
+		// if err = db.Table("user_posts").Where("id = ?", postID).Update("liked_by", gorm.Expr("array_remove(liked_by, ?::text)", []string{userToAddInLikedList})).Error; err != nil {
+		// 	fmt.Println("Error", err)
+		// 	return fiber.ErrInternalServerError
+		// }
+		if err = db.Table("user_post_like").Where("post_id = ?", postID).Where("user_id = ?", userLikedID).Delete(&models.User_Post_Like_Table{}).Error; err != nil {
+			fmt.Println(err)
+			return errors.New("unable to remove post reaction")
 		}
 	}
 

@@ -54,8 +54,12 @@ type User_Posts struct {
 	Group_id          string    `json:"group_id"`
 	Text_content      string    `json:"text_content"`
 	Pictures_attached []string  `json:"pictures_attached" gorm:"type:text[]"`
-	Liked_by          []string  `json:"liked_by" gorm:"type:text[]"`
 	Comments          []string  `json:"comments" gorm:"type:text[]"`
+}
+type User_Post_Like_Table struct {
+	User_id   string `json:"user_id"`
+	Post_id   string `json:"post_id"`
+	Like_type string `json:"like_type"`
 }
 
 type User_post_Comments struct {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -21,9 +22,8 @@ func main() {
 	port := os.Getenv("PORT")
 
 	if port == "" {
-		port = ":4000"
+		port = "4000"
 	}
-
 	mainRouter := makeRouter()
 
 	mainRouter.Get("/", func(c fiber.Ctx) error {
@@ -34,7 +34,10 @@ func main() {
 	routes.UserManagementRouter(mainRouter.Group("/api/users"))
 	routes.PostManagementRouter(mainRouter.Group("/api/post"))
 
-	mainRouter.Listen(port)
+	err := mainRouter.Listen(":" + port)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func loadEnvironment() {
