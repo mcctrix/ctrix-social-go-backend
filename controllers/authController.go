@@ -58,7 +58,7 @@ func SignUp() fiber.Handler {
 			Path:     "/",
 			HTTPOnly: true,
 			Secure:   isSecure,
-			SameSite: "Lax",
+			SameSite: "Nonex",
 			Expires:  time.Unix(gnToken.Exp_Time, 0),
 		})
 
