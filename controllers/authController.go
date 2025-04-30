@@ -30,7 +30,7 @@ func setupCookie(c fiber.Ctx, user *models.User_Auth) error {
 		Path:     "/",
 		HTTPOnly: true,
 		Secure:   true,
-		// Domain:   "ctrix-social.vercel.app",
+		Domain:   "ctrix-social.vercel.app",
 		SameSite: "None",
 		Expires:  time.Unix(gnToken.Exp_Time, 0),
 	})
