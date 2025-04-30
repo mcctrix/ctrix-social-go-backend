@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -13,6 +14,29 @@ import (
 	"github.com/mcctrix/ctrix-social-go-backend/utils"
 	"gorm.io/gorm"
 )
+
+func setupCookie(c fiber.Ctx, user *models.User_Auth) error {
+	gnToken, err := utils.GenerateJwtToken(user)
+	if err != nil {
+		fmt.Println("Error While Generating token: ", err)
+		return fiber.ErrInternalServerError
+	}
+
+	isSecure := os.Getenv("APP_ENV") == "production"
+	fmt.Println("isSecure:", isSecure)
+	c.Cookie(&fiber.Cookie{
+		Name:     "auth_token",
+		Value:    gnToken.StringToken,
+		Path:     "/",
+		HTTPOnly: true,
+		Secure:   true,
+		Domain:   "ctrix-social.vercel.app",
+		SameSite: "None",
+		Expires:  time.Unix(gnToken.Exp_Time, 0),
+	})
+
+	return nil
+}
 
 func SignUp() fiber.Handler {
 	return func(c fiber.Ctx) error {
@@ -45,21 +69,9 @@ func SignUp() fiber.Handler {
 			return fiber.ErrInternalServerError
 		}
 
-		gnToken, err := utils.GenerateJwtToken(user)
-		if err != nil {
-			fmt.Println("Error While Generating token: ", err)
-			return fiber.ErrInternalServerError
+		if err = setupCookie(c, user); err != nil {
+			return err
 		}
-
-		c.Cookie(&fiber.Cookie{
-			Name:     "auth_token",
-			Value:    gnToken.StringToken,
-			Path:     "/",
-			HTTPOnly: true,
-			// Secure:   true,
-			SameSite: "Lax",
-			Expires:  time.Unix(gnToken.Exp_Time, 0),
-		})
 
 		return c.SendString("User Created Successfully!")
 	}
@@ -105,21 +117,9 @@ func Login() fiber.Handler {
 		// 	return c.SendString("Password is of user: " + user.Username)
 		// }
 
-		gnToken, err := utils.GenerateJwtToken(user)
-
-		if err != nil {
-			fmt.Println("Error Creating Jwt while login: ", err)
-			return fiber.ErrInternalServerError
+		if err = setupCookie(c, user); err != nil {
+			return err
 		}
-		c.Cookie(&fiber.Cookie{
-			Name:     "auth_token",
-			Value:    gnToken.StringToken,
-			Path:     "/",
-			HTTPOnly: true,
-			Secure:   true,
-			SameSite: "Lax",
-			Expires:  time.Unix(gnToken.Exp_Time, 0),
-		})
 
 		return c.SendString("User logged in Succesfully!")
 	}
