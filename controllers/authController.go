@@ -52,13 +52,14 @@ func SignUp() fiber.Handler {
 			return fiber.ErrInternalServerError
 		}
 		isSecure := os.Getenv("APP_ENV") == "production"
+		fmt.Println("isSecure:", isSecure)
 		c.Cookie(&fiber.Cookie{
 			Name:     "auth_token",
 			Value:    gnToken.StringToken,
 			Path:     "/",
 			HTTPOnly: true,
 			Secure:   isSecure,
-			Domain:   "https://720f-2409-40d4-11-42e6-3ffd-3571-aee2-d38f.ngrok-free.app",
+			Domain:   "720f-2409-40d4-11-42e6-3ffd-3571-aee2-d38f.ngrok-free.app",
 			SameSite: "None",
 			Expires:  time.Unix(gnToken.Exp_Time, 0),
 		})
