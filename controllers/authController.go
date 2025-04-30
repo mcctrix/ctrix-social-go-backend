@@ -59,7 +59,6 @@ func SignUp() fiber.Handler {
 			Path:     "/",
 			HTTPOnly: true,
 			Secure:   isSecure,
-			Domain:   "720f-2409-40d4-11-42e6-3ffd-3571-aee2-d38f.ngrok-free.app",
 			SameSite: "None",
 			Expires:  time.Unix(gnToken.Exp_Time, 0),
 		})
