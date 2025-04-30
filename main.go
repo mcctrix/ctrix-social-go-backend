@@ -77,7 +77,7 @@ func makeRouter() *fiber.App {
 	}, ","), ",")
 
 	corsMiddleware := cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000", "http://127.0.0.1:3000"}, // Allows all origins
+		AllowOrigins:     []string{"http://localhost:3000", "http://127.0.0.1:3000", "https://720f-2409-40d4-11-42e6-3ffd-3571-aee2-d38f.ngrok-free.app"}, // Allows all origins
 		AllowMethods:     corsMethods,
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Set-Cookie"},
 		ExposeHeaders:    []string{"Content-Length"},
