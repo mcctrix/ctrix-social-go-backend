@@ -119,6 +119,7 @@ func Login() fiber.Handler {
 			Path:     "/",
 			HTTPOnly: true,
 			Secure:   false,
+			Domain:   "localhost",
 			SameSite: "None",
 			Expires:  time.Unix(gnToken.Exp_Time, 0),
 		})
