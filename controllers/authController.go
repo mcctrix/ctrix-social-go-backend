@@ -51,6 +51,8 @@ func SignUp() fiber.Handler {
 			return fiber.ErrInternalServerError
 		}
 
+		expireTime := time.Unix(gnToken.Exp_Time, 0)
+
 		c.Cookie(&fiber.Cookie{
 			Name:     "auth_token",
 			Value:    gnToken.StringToken,
@@ -59,10 +61,10 @@ func SignUp() fiber.Handler {
 			Secure:   true,
 			Domain:   "ctrix-social.vercel.app",
 			SameSite: "None",
-			Expires:  time.Unix(gnToken.Exp_Time, 0),
+			Expires:  expireTime,
 		})
 
-		return c.SendString("User Created Successfully!")
+		return c.JSON(fiber.Map{"tokenValue": gnToken.StringToken, "Expires": expireTime})
 	}
 }
 
@@ -112,6 +114,8 @@ func Login() fiber.Handler {
 			return fiber.ErrInternalServerError
 		}
 
+		expireTime := time.Unix(gnToken.Exp_Time, 0)
+
 		c.Cookie(&fiber.Cookie{
 			Name:     "auth_token",
 			Value:    gnToken.StringToken,
@@ -120,10 +124,10 @@ func Login() fiber.Handler {
 			Secure:   true,
 			Domain:   "ctrix-social.vercel.app",
 			SameSite: "None",
-			Expires:  time.Unix(gnToken.Exp_Time, 0),
+			Expires:  expireTime,
 		})
 
-		return c.SendString("User logged in Succesfully!")
+		return c.JSON(fiber.Map{"tokenValue": gnToken.StringToken, "Expires": expireTime})
 	}
 }
 
