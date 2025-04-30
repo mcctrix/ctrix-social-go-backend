@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -50,13 +51,13 @@ func SignUp() fiber.Handler {
 			fmt.Println("Error While Generating token: ", err)
 			return fiber.ErrInternalServerError
 		}
-
+		isSecure := os.Getenv("APP_ENV") == "production"
 		c.Cookie(&fiber.Cookie{
 			Name:     "auth_token",
 			Value:    gnToken.StringToken,
 			Path:     "/",
 			HTTPOnly: true,
-			// Secure:   true,
+			Secure:   isSecure,
 			SameSite: "Lax",
 			Expires:  time.Unix(gnToken.Exp_Time, 0),
 		})
