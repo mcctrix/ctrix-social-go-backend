@@ -242,10 +242,24 @@ func GetUserSettingsByID(id string) (*models.User_Settings, error) {
 		return nil, err
 	}
 	var userSettingsData *models.User_Settings = &models.User_Settings{}
-	if err = db.Table("user_settings").Where("id = ?", id).First(userSettingsData).Error; err != nil {
+	if err = db.Table("user_settings").Select("hide_post", "hide_story", "block_user", "show_online").Where("id = ?", id).First(userSettingsData).Error; err != nil {
 		return nil, err
 	}
 	return userSettingsData, nil
+}
+func CreateUserSettingsWithByteData(userSettingsByte []byte, userID string) error {
+	db, err := DBConnection()
+	if err != nil {
+		return err
+	}
+	var userSettings *models.User_Settings = &models.User_Settings{}
+	if err = json.Unmarshal(userSettingsByte, userSettings); err != nil {
+		fmt.Println(err)
+		return err
+	}
+	userSettings.Id = userID
+
+	return db.Table("user_settings").Create(userSettings).Error
 }
 
 func UpdateUserSettingsWithByteData(newProfileByte []byte, userID string) error {
@@ -256,26 +270,14 @@ func UpdateUserSettingsWithByteData(newProfileByte []byte, userID string) error 
 	var userSettings *models.User_Settings = &models.User_Settings{}
 
 	if err = db.Table("user_settings").Where("id = ?", userID).First(userSettings).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			newUserSettings := &models.User_Settings{}
-			if err = json.Unmarshal(newProfileByte, newUserSettings); err != nil {
-				return err
-			}
-
-			if err = db.Table("user_profile").Create(newUserSettings).Error; err != nil {
-				return err
-			}
-		} else {
-			return err
-		}
+		fmt.Println(err)
+		return err
 	}
 	err = json.Unmarshal(newProfileByte, userSettings)
 	if err != nil {
 		return err
 	}
-	db.Table("user_profile").Save(userSettings)
-
-	return nil
+	return db.Table("user_settings").Save(userSettings).Error
 }
 
 func GetUserDataByID(id string) (*models.User_Data, error) {

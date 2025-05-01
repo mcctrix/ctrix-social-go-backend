@@ -117,7 +117,7 @@ func GetUserSettings() fiber.Handler {
 		additional_profile, err := db.GetUserSettingsByID(userID)
 		if err != nil {
 			fmt.Println("error while fetching additional profile: ", err)
-			return c.Status(500).SendString("unable to fetch user additional profile!")
+			return c.Status(500).SendString("unable to fetch user settings!")
 		}
 
 		return c.JSON(additional_profile)
@@ -131,12 +131,15 @@ func CreateUserSettings() fiber.Handler {
 			fmt.Println("unable to fetch user with this Token: ", err)
 			return c.Status(401).SendString("unable to fetch user with this Token!")
 		}
-		err = db.UpdateUserSettingsWithByteData(c.BodyRaw(), userID)
+		err = db.CreateUserSettingsWithByteData(c.BodyRaw(), userID)
 		if err != nil {
-			fmt.Println("Error Setting the additional profile: ", err)
+			if errors.Is(err, gorm.ErrDuplicatedKey) {
+				return c.Status(500).SendString("User Settings already exist!")
+			}
+			fmt.Println("Error creating User Settings: ", err)
 			return fiber.ErrInternalServerError
 		}
-		return c.SendString("User Additional profile updated Successfully!")
+		return c.SendString("User Settings Created Successfully!")
 	}
 }
 
