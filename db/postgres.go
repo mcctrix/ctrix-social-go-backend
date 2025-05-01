@@ -287,12 +287,26 @@ func GetUserDataByID(id string) (*models.User_Data, error) {
 		return nil, err
 	}
 	var userData *models.User_Data = &models.User_Data{}
-	if err = db.Table("user_data").Where("id = ?", id).First(userData).Error; err != nil {
+	if err = db.Table("user_data").Select("posts", "stories", "notes").Where("id = ?", id).First(userData).Error; err != nil {
 		return nil, err
 	}
 	return userData, nil
 }
-func SetUserDataWithByteData(newProfileByte []byte, userID string) error {
+func CreateUserDataWithByteData(newUserDataByte []byte, userID string) error {
+	db, err := DBConnection()
+	if err != nil {
+		return err
+	}
+	var userData *models.User_Data = &models.User_Data{}
+	if err = json.Unmarshal(newUserDataByte, userData); err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	return db.Table("user_data").Create(userData).Error
+}
+
+func UpdateUserDataWithByteData(newUserDataByte []byte, userID string) error {
 	db, err := DBConnection()
 	if err != nil {
 		return err
@@ -300,24 +314,13 @@ func SetUserDataWithByteData(newProfileByte []byte, userID string) error {
 	var userData *models.User_Data = &models.User_Data{}
 
 	if err = db.Table("user_data").Where("id = ?", userID).First(userData).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			newUserData := &models.User_Data{}
-			if err = json.Unmarshal(newProfileByte, newUserData); err != nil {
-				return err
-			}
-
-			if err = db.Table("user_data").Create(newUserData).Error; err != nil {
-				return err
-			}
-		} else {
-			return err
-		}
+		fmt.Println(err)
+		return err
 	}
-	err = json.Unmarshal(newProfileByte, userData)
+
+	err = json.Unmarshal(newUserDataByte, userData)
 	if err != nil {
 		return err
 	}
-	db.Table("user_profile").Save(userData)
-
-	return nil
+	return db.Table("user_profile").Save(userData).Error
 }

@@ -21,6 +21,7 @@ func UserManagementRouter(router fiber.Router) {
 	router.Patch("/user_settings", controllers.UpdateUserSettings())
 
 	router.Get("/user_data", controllers.GetUserData())
-	router.Post("/user_data", controllers.SetUserData())
+	router.Patch("/user_data", controllers.UpdateUserData())
+	router.Post("/user_data", controllers.UpdateUserData())
 
 }

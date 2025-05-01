@@ -170,24 +170,41 @@ func GetUserData() fiber.Handler {
 		additional_profile, err := db.GetUserDataByID(userID)
 		if err != nil {
 			fmt.Println("error while fetching additional profile: ", err)
-			return c.Status(500).SendString("unable to fetch user additional profile!")
+			return c.Status(500).SendString("unable to fetch user data!")
 		}
 
 		return c.JSON(additional_profile)
 	}
 }
-func SetUserData() fiber.Handler {
+
+func CreateUserData() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
 		if err != nil {
 			fmt.Println("unable to fetch user with this Token: ", err)
 			return c.Status(401).SendString("unable to fetch user with this Token!")
 		}
-		err = db.SetUserDataWithByteData(c.BodyRaw(), userID)
+		err = db.CreateUserDataWithByteData(c.BodyRaw(), userID)
 		if err != nil {
 			fmt.Println("Error Setting the additional profile: ", err)
 			return fiber.ErrInternalServerError
 		}
-		return c.SendString("User Additional profile updated Successfully!")
+		return c.Status(201).SendString("User Data Created Successfully!")
+	}
+}
+
+func UpdateUserData() fiber.Handler {
+	return func(c fiber.Ctx) error {
+		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
+		if err != nil {
+			fmt.Println("unable to fetch user with this Token: ", err)
+			return c.Status(401).SendString("unable to fetch user with this Token!")
+		}
+		err = db.UpdateUserDataWithByteData(c.BodyRaw(), userID)
+		if err != nil {
+			fmt.Println("Error Setting the additional profile: ", err)
+			return fiber.ErrInternalServerError
+		}
+		return c.SendString("User Data updated Successfully!")
 	}
 }

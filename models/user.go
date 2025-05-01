@@ -42,9 +42,9 @@ type User_Settings struct {
 
 type User_Data struct {
 	Id      string   `json:"id,omitempty"`
-	Posts   []string `json:"posts" gorm:"type:text[]"`
-	Stories []string `json:"stories" gorm:"type:text[]"`
-	Notes   []string `json:"notes" gorm:"type:text[]"`
+	Posts   []string `json:"posts,omitempty" gorm:"type:text[]"`
+	Stories []string `json:"stories,omitempty" gorm:"type:text[]"`
+	Notes   []string `json:"notes,omitempty" gorm:"type:text[]"`
 }
 
 type User_Posts struct {
