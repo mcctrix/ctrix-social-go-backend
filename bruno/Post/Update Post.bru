@@ -1,0 +1,17 @@
+meta {
+  name: Update Post
+  type: http
+  seq: 5
+}
+
+patch {
+  url: http://localhost:4000/api/post/f1c4529d-cdec-4d50-ac7d-e824b455a8bd
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "text_content": "First Post Text Updated!"
+  }
+}

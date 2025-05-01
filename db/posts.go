@@ -119,13 +119,10 @@ func UpdateUserPostWithByteData(postID string, updatedPostByte []byte, userID st
 		return err
 	}
 
-	fmt.Println("existing data:", existingPost)
-	fmt.Println("New Data", string(updatedPostByte))
 	// Unmarshal the updated post data
 	if err = json.Unmarshal(updatedPostByte, existingPost); err != nil {
 		return err
 	}
-	fmt.Println("UPDATED existing data:", existingPost)
 
 	// Save the updated post
 	if err = db.Table("user_posts").Save(existingPost).Error; err != nil {
@@ -209,7 +206,7 @@ func GetAllPostReaction(postID string) ([]models.User_Post_Like_Table, error) {
 
 	var allReacts []models.User_Post_Like_Table
 
-	if err = db.Table("user_post_like").Where("post_id = ? ", postID).Find(allReacts).Select("user_id", "like_type").Error; err != nil {
+	if err = db.Table("user_post_like").Where("post_id = ? ", postID).Select("user_id", "like_type").Find(&allReacts).Error; err != nil {
 		fmt.Println(err)
 		return nil, err
 	}

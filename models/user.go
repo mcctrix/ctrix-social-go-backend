@@ -58,7 +58,7 @@ type User_Posts struct {
 }
 type User_Post_Like_Table struct {
 	User_id   string `json:"user_id"`
-	Post_id   string `json:"post_id"`
+	Post_id   string `json:"post_id,omitempty"`
 	Like_type string `json:"like_type"`
 }
 

@@ -47,7 +47,7 @@ func GetPostReactions() fiber.Handler {
 
 func CreateUserPost() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		fmt.Println("endpoint hit")
+
 		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
 		if err != nil {
 			fmt.Println("unable to fetch user with this Token: ", err)
@@ -231,7 +231,7 @@ func LikeToggler() fiber.Handler {
 
 		if err = db.PostLikeToggler(c.Params("postid"), userID, bodyData.Toggle, bodyData.Like_type); err != nil {
 			fmt.Println(err)
-			return fiber.ErrInternalServerError
+			return err
 		}
 
 		return c.Status(fiber.StatusOK).SendString("Like Updated Successfully!")
