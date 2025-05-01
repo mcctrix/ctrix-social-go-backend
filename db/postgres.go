@@ -10,6 +10,7 @@ import (
 	"github.com/mcctrix/ctrix-social-go-backend/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 var dbInstance *gorm.DB
@@ -41,6 +42,9 @@ func DBConnection() (*gorm.DB, error) {
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		TranslateError: true,
+		NamingStrategy: schema.NamingStrategy{
+			SingularTable: true,
+		},
 	})
 
 	if err != nil {
@@ -302,6 +306,7 @@ func CreateUserDataWithByteData(newUserDataByte []byte, userID string) error {
 		fmt.Println(err)
 		return err
 	}
+	userData.Id = userID
 
 	return db.Table("user_data").Create(userData).Error
 }
@@ -322,5 +327,5 @@ func UpdateUserDataWithByteData(newUserDataByte []byte, userID string) error {
 	if err != nil {
 		return err
 	}
-	return db.Table("user_profile").Save(userData).Error
+	return db.Table("user_data").Save(userData).Error
 }

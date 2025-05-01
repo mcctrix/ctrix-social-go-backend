@@ -186,7 +186,7 @@ func CreateUserData() fiber.Handler {
 		}
 		err = db.CreateUserDataWithByteData(c.BodyRaw(), userID)
 		if err != nil {
-			fmt.Println("Error Setting the additional profile: ", err)
+			fmt.Println("Error Setting User data profile: ", err)
 			return fiber.ErrInternalServerError
 		}
 		return c.Status(201).SendString("User Data Created Successfully!")
@@ -202,9 +202,10 @@ func UpdateUserData() fiber.Handler {
 		}
 		err = db.UpdateUserDataWithByteData(c.BodyRaw(), userID)
 		if err != nil {
-			fmt.Println("Error Setting the additional profile: ", err)
+			fmt.Println("Error Setting the user data: ", err)
 			return fiber.ErrInternalServerError
 		}
+
 		return c.SendString("User Data updated Successfully!")
 	}
 }
