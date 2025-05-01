@@ -186,6 +186,9 @@ func CreateUserData() fiber.Handler {
 		}
 		err = db.CreateUserDataWithByteData(c.BodyRaw(), userID)
 		if err != nil {
+			if errors.Is(err, gorm.ErrDuplicatedKey) {
+				return c.Status(500).SendString("User Data Already exists!")
+			}
 			fmt.Println("Error Setting User data profile: ", err)
 			return fiber.ErrInternalServerError
 		}
