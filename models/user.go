@@ -12,24 +12,24 @@ type User_Auth struct {
 
 type User_Profile struct {
 	Id              string    `json:"id"`
-	First_name      string    `json:"first_name"`
-	Last_name       string    `json:"last_name"`
-	Profile_picture string    `json:"profile_profile"`
-	Avatar          string    `json:"avatar"`
-	Last_seen       time.Time `json:"last_seen"`
-	Post_count      int       `json:"post_count"`
-	Followers       []string  `json:"followers" gorm:"type:text[]"`
-	Followings      []string  `json:"followings" gorm:"type:text[]"`
+	First_name      string    `json:"first_name,omitempty"`
+	Last_name       string    `json:"last_name,omitempty"`
+	Profile_picture string    `json:"profile_profile,omitempty"`
+	Avatar          string    `json:"avatar,omitempty"`
+	Last_seen       time.Time `json:"last_seen,omitempty"`
+	Post_count      int       `json:"post_count,omitempty"`
+	Followers       []string  `json:"followers,omitempty" gorm:"type:text[]"`
+	Followings      []string  `json:"followings,omitempty" gorm:"type:text[]"`
 }
 
 type User_Additional_Info struct {
 	Id              string    `json:"id"`
-	Hobbies         []string  `json:"hobbies" gorm:"type:text[]"`
-	Family_members  []string  `json:"family_members" gorm:"type:text[]"`
-	Relation_status string    `json:"relation_status"`
-	Dob             time.Time `json:"dob"`
-	Bio             string    `json:"bio"`
-	Gender          string    `json:"gender"`
+	Hobbies         []string  `json:"hobbies,omitempty" gorm:"type:text[]"`
+	Family_members  []string  `json:"family_members,omitempty" gorm:"type:text[]"`
+	Relation_status string    `json:"relation_status,omitempty"`
+	Dob             time.Time `json:"dob,omitempty"`
+	Bio             string    `json:"bio,omitempty"`
+	Gender          string    `json:"gender,omitempty"`
 }
 
 type User_Settings struct {
@@ -63,12 +63,12 @@ type User_Post_Like_Table struct {
 }
 
 type User_post_Comments struct {
-	Id                string    `json:"id" gorm:"-"`
+	Id                string    `json:"id" gorm:"primaryKey;type:uuid;default:uuid_generate_v4()"`
 	Post_id           string    `json:"post_id"`
 	Creator_id        string    `json:"creator_id"`
 	Created_at        time.Time `json:"created_at"`
 	Content           string    `json:"content"`
-	Pictures_attached []string  `json:"pictures_attached"`
-	Nested_comments   []string  `json:"nested_comments"`
-	Liked_by          []string  `json:"liked_by"`
+	Pictures_attached []string  `json:"pictures_attached,omitempty"`
+	Nested_comments   []string  `json:"nested_comments,omitempty"`
+	Liked_by          []string  `json:"liked_by,omitempty"`
 }

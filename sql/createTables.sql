@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS user_post_like (
 
 CREATE TABLE IF NOT EXISTS user_post_comments (
     id VARCHAR(50) PRIMARY KEY DEFAULT uuid_generate_v4(),
-    post_id VARCHAR(20) NOT NULL,
+    post_id VARCHAR(50) NOT NULL,
     FOREIGN KEY(post_id) REFERENCES user_posts(id) ON DELETE CASCADE ON UPDATE CASCADE,
     creator_id VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),

@@ -31,7 +31,7 @@ func main() {
 	})
 
 	routes.AuthRouter(mainRouter.Group("/api/auth"))
-	routes.UserManagementRouter(mainRouter.Group("/api/users"))
+	routes.UserManagementRouter(mainRouter.Group("/api/user"))
 	routes.PostManagementRouter(mainRouter.Group("/api/post"))
 
 	err := mainRouter.Listen(":" + port)

@@ -138,18 +138,8 @@ func CreatePostComment() fiber.Handler {
 		postID := c.Params("postid")
 		// Modify the byte data to include the post ID
 		commentData := c.BodyRaw()
-		var commentMap map[string]interface{}
-		if err := json.Unmarshal(commentData, &commentMap); err != nil {
-			return fiber.ErrBadRequest
-		}
 
-		commentMap["post_id"] = postID
-		modifiedCommentData, err := json.Marshal(commentMap)
-		if err != nil {
-			return fiber.ErrInternalServerError
-		}
-
-		err = db.CreatePostCommentWithByteData(modifiedCommentData, userID)
+		err = db.CreatePostCommentWithByteData(commentData, userID, postID)
 		if err != nil {
 			fmt.Println("Error creating comment: ", err)
 			return fiber.ErrInternalServerError

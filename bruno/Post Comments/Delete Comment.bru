@@ -1,0 +1,17 @@
+meta {
+  name: Delete Comment
+  type: http
+  seq: 5
+}
+
+delete {
+  url: http://localhost:4000/api/post/comments/5f3ac361-ef13-45a6-82f9-ef639eace445
+  body: none
+  auth: inherit
+}
+
+body:json {
+  {
+    "content": "updated first comment!"
+  }
+}

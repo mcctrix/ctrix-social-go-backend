@@ -188,40 +188,42 @@ func GetAdditionalInfoProfileByID(id string) (*models.User_Additional_Info, erro
 	}
 	return userProfile, nil
 }
-
-func SetAdditionalUserProfileWithByteData(newProfileByte []byte, userID string) error {
+func CreateAdditionalUserProfileWithByteData(newProfileByte []byte, userID string) error {
 	db, err := DBConnection()
 	if err != nil {
 		return err
 	}
 	var userProfile *models.User_Additional_Info = &models.User_Additional_Info{}
-	if err = db.Table("user_profile").Where("id = ?", userID).First(userProfile).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			newProfile := &models.User_Additional_Info{}
-			err = json.Unmarshal(newProfileByte, newProfile)
-			if err != nil {
-				return err
-			}
-			db, err := DBConnection()
-			if err != nil {
-				return err
-			}
-			if err = db.Table("user_profile").Create(newProfile).Error; err != nil {
-				return err
-			}
+	err = json.Unmarshal(newProfileByte, userProfile)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	userProfile.Id = userID
 
+	return db.Table("user_additional_info").Create(userProfile).Error
+}
+
+func UpdateAdditionalUserProfileWithByteData(newProfileByte []byte, userID string) error {
+	db, err := DBConnection()
+	if err != nil {
+		return err
+	}
+	var userProfile *models.User_Additional_Info = &models.User_Additional_Info{}
+	if err = db.Table("user_additional_info").Where("id = ?", userID).First(userProfile).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			fmt.Println("Additional Profile not found!")
 		} else {
-			return err
+			fmt.Println(err)
 		}
+		return err
 	}
 	json.Unmarshal(newProfileByte, userProfile)
 	if err != nil {
 		fmt.Println("Error with the decode of json", err)
 		return err
 	}
-	db.Table("user_profile").Save(userProfile)
-
-	return nil
+	return db.Table("user_additional_info").Save(userProfile).Error
 }
 
 func createUserProfile(profileData *models.User_Profile) error {
@@ -246,7 +248,7 @@ func GetUserSettingsByID(id string) (*models.User_Settings, error) {
 	return userSettingsData, nil
 }
 
-func SetUserSettingsWithByteData(newProfileByte []byte, userID string) error {
+func UpdateUserSettingsWithByteData(newProfileByte []byte, userID string) error {
 	db, err := DBConnection()
 	if err != nil {
 		return err

@@ -71,7 +71,7 @@ func GetPostCommentsByPostID(postID string) ([]*models.User_post_Comments, error
 	return postComments, nil
 }
 
-func CreatePostCommentWithByteData(newCommentByte []byte, userID string) error {
+func CreatePostCommentWithByteData(newCommentByte []byte, userID string, postID string) error {
 	db, err := DBConnection()
 	if err != nil {
 		return err
@@ -84,7 +84,9 @@ func CreatePostCommentWithByteData(newCommentByte []byte, userID string) error {
 	}
 
 	// Set the creator ID to the authenticated user
+	newComment.Created_at = time.Now()
 	newComment.Creator_id = userID
+	newComment.Post_id = postID
 
 	// Save the comment
 	if err = db.Table("user_post_comments").Create(newComment).Error; err != nil {
