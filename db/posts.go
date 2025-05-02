@@ -234,10 +234,7 @@ func PostLikeToggler(postID string, userLikedID string, liked bool, likeType str
 		}
 
 	} else {
-		// if err = db.Table("user_posts").Where("id = ?", postID).Update("liked_by", gorm.Expr("array_remove(liked_by, ?::text)", []string{userToAddInLikedList})).Error; err != nil {
-		// 	fmt.Println("Error", err)
-		// 	return fiber.ErrInternalServerError
-		// }
+
 		if err = db.Table("user_post_like").Where("post_id = ?", postID).Where("user_id = ?", userLikedID).Delete(&models.User_Post_Like_Table{}).Error; err != nil {
 			fmt.Println(err)
 			return errors.New("unable to remove post reaction")
