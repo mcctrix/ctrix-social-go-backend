@@ -121,9 +121,9 @@ func Login() fiber.Handler {
 			Value:    gnToken.StringToken,
 			Path:     "/",
 			HTTPOnly: true,
-			Secure:   true,
-			Domain:   "ctrix-social.vercel.app",
-			SameSite: "None",
+			Secure:   false,
+			// Domain:   "ctrix-social.vercel.app",
+			SameSite: "Lax",
 			Expires:  expireTime,
 		})
 

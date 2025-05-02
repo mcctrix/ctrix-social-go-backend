@@ -224,11 +224,15 @@ func PostLikeToggler(postID string, userLikedID string, liked bool, likeType str
 
 	if liked {
 		post_like_data := models.User_Post_Like_Table{User_id: userLikedID, Post_id: postID, Like_type: "like"}
-
-		if err = db.Table("user_post_like").Create(post_like_data).Error; err != nil {
-			fmt.Println(err)
-			return errors.New("unable to create post reaction")
+		if db.Table("user_post_like").Where("user_id = ?", userLikedID).Where("post_id = ?", postID).Updates(map[string]interface{}{
+			"like_type": likeType,
+		}).RowsAffected == 0 {
+			if err = db.Table("user_post_like").Create(post_like_data).Error; err != nil {
+				fmt.Println(err)
+				return errors.New("unable to create post reaction")
+			}
 		}
+
 	} else {
 		// if err = db.Table("user_posts").Where("id = ?", postID).Update("liked_by", gorm.Expr("array_remove(liked_by, ?::text)", []string{userToAddInLikedList})).Error; err != nil {
 		// 	fmt.Println("Error", err)
