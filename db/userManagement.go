@@ -9,6 +9,19 @@ import (
 	"gorm.io/gorm"
 )
 
+func GetDataFromUserAuth(id string) (*user_auth_data, error) {
+	db, err := DBConnection()
+	if err != nil {
+		return nil, err
+	}
+	var user_auth *user_auth_data = &user_auth_data{}
+	if err = db.Table("user_auth").Select("username", "email").Where("id = ?", id).First(user_auth).Error; err != nil {
+		return nil, err
+	}
+
+	return user_auth, nil
+}
+
 type user_profile_data struct {
 	models.User_Profile
 	Email    string `json:"email"`
@@ -34,24 +47,6 @@ func GetUserProfileByID(id string) (*user_profile_data, error) {
 	userProfile.Email = user_auth_data.Email
 	userProfile.Username = user_auth_data.Username
 	return userProfile, nil
-}
-
-type user_auth_data struct {
-	Username string
-	Email    string
-}
-
-func GetDataFromUserAuth(id string) (*user_auth_data, error) {
-	db, err := DBConnection()
-	if err != nil {
-		return nil, err
-	}
-	var user_auth *user_auth_data = &user_auth_data{}
-	if err = db.Table("user_auth").Select("username", "email").Where("id = ?", id).First(user_auth).Error; err != nil {
-		return nil, err
-	}
-
-	return user_auth, nil
 }
 
 func SetUserProfileWithByteData(newProfileByte []byte, userID string) error {
@@ -84,6 +79,11 @@ func SetUserProfileWithByteData(newProfileByte []byte, userID string) error {
 	db.Table("user_profile").Save(userProfile)
 
 	return nil
+}
+
+type user_auth_data struct {
+	Username string
+	Email    string
 }
 
 func GetAdditionalInfoProfileByID(id string) (*models.User_Additional_Info, error) {
