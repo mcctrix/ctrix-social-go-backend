@@ -10,15 +10,18 @@ func UserManagementRouter(router fiber.Router) {
 	router.Use(middleware.AuthMiddleware())
 	router.Get("/profile", controllers.GetCurrentUserProfile())
 	router.Post("/profile", controllers.SetCurrentUserProfile())
-	router.Get(":userid", controllers.GetUserProfileWithParam())
+	router.Get("/profile/:userid", controllers.GetUserProfileWithParam())
 
 	router.Get("/additional_info", controllers.GetAdditionalUserInfo())
-	router.Post("/additional_info", controllers.SetAdditionalUserInfo())
+	router.Post("/additional_info", controllers.CreateAdditionalUserInfo())
+	router.Patch("/additional_info", controllers.UpdateAdditionalUserInfo())
 
 	router.Get("/user_settings", controllers.GetUserSettings())
-	router.Post("/user_settings", controllers.SetUserSettings())
+	router.Post("/user_settings", controllers.CreateUserSettings())
+	router.Patch("/user_settings", controllers.UpdateUserSettings())
 
 	router.Get("/user_data", controllers.GetUserData())
-	router.Post("/user_data", controllers.SetUserData())
+	router.Patch("/user_data", controllers.UpdateUserData())
+	router.Post("/user_data", controllers.CreateUserData())
 
 }

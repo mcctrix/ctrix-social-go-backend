@@ -121,9 +121,9 @@ func Login() fiber.Handler {
 			Value:    gnToken.StringToken,
 			Path:     "/",
 			HTTPOnly: true,
-			Secure:   true,
-			Domain:   "ctrix-social.vercel.app",
-			SameSite: "None",
+			Secure:   false,
+			// Domain:   "ctrix-social.vercel.app",
+			SameSite: "Lax",
 			Expires:  expireTime,
 		})
 
@@ -234,7 +234,7 @@ func ResetPassword() fiber.Handler {
 			Password string
 		}{Email: email, Password: oldPassword}).First(user).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return c.SendString("User not found with this email or password!")
+				return c.SendString("User not found with this password!")
 			}
 		}
 

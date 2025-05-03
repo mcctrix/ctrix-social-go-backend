@@ -27,11 +27,11 @@ func main() {
 	mainRouter := makeRouter()
 
 	mainRouter.Get("/", func(c fiber.Ctx) error {
-		return c.SendString("Hello world fiber v3")
+		return c.SendString("This is backend of Ctrix Social App!")
 	})
 
 	routes.AuthRouter(mainRouter.Group("/api/auth"))
-	routes.UserManagementRouter(mainRouter.Group("/api/users"))
+	routes.UserManagementRouter(mainRouter.Group("/api/user"))
 	routes.PostManagementRouter(mainRouter.Group("/api/post"))
 
 	err := mainRouter.Listen(":" + port)

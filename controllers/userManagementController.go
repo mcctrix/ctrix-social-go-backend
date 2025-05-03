@@ -1,12 +1,13 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/mcctrix/ctrix-social-go-backend/db"
-	"github.com/mcctrix/ctrix-social-go-backend/models"
 	"github.com/mcctrix/ctrix-social-go-backend/utils"
+	"gorm.io/gorm"
 )
 
 func GetCurrentUserProfile() fiber.Handler {
@@ -43,8 +44,6 @@ func SetCurrentUserProfile() fiber.Handler {
 			fmt.Println("unable to fetch user with this Token: ", err)
 			return c.Status(401).SendString("unable to fetch user with this Token!")
 		}
-		newProfile := &models.User_Profile{}
-		newProfile.Id = userID
 
 		err = db.SetUserProfileWithByteData(c.BodyRaw(), userID)
 		if err != nil {
@@ -52,7 +51,7 @@ func SetCurrentUserProfile() fiber.Handler {
 			return fiber.ErrInternalServerError
 		}
 
-		return c.SendString("Profile is set successfully!")
+		return c.SendString("Profile is updated successfully!")
 	}
 }
 
@@ -73,14 +72,32 @@ func GetAdditionalUserInfo() fiber.Handler {
 		return c.JSON(additional_profile)
 	}
 }
-func SetAdditionalUserInfo() fiber.Handler {
+func CreateAdditionalUserInfo() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
 		if err != nil {
 			fmt.Println("unable to fetch user with this Token: ", err)
 			return c.Status(401).SendString("unable to fetch user with this Token!")
 		}
-		err = db.SetAdditionalUserProfileWithByteData(c.BodyRaw(), userID)
+		err = db.CreateAdditionalUserProfileWithByteData(c.BodyRaw(), userID)
+		if err != nil {
+			if errors.Is(err, gorm.ErrDuplicatedKey) {
+				return c.Status(500).SendString("Additional info profile already exists!")
+			}
+			fmt.Println("Error Creating the additional profile: ", err)
+			return fiber.ErrInternalServerError
+		}
+		return c.SendString("User Additional profile Created Successfully!")
+	}
+}
+func UpdateAdditionalUserInfo() fiber.Handler {
+	return func(c fiber.Ctx) error {
+		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
+		if err != nil {
+			fmt.Println("unable to fetch user with this Token: ", err)
+			return c.Status(401).SendString("unable to fetch user with this Token!")
+		}
+		err = db.UpdateAdditionalUserProfileWithByteData(c.BodyRaw(), userID)
 		if err != nil {
 			fmt.Println("Error Setting the additional profile: ", err)
 			return fiber.ErrInternalServerError
@@ -88,6 +105,7 @@ func SetAdditionalUserInfo() fiber.Handler {
 		return c.SendString("User Additional profile updated Successfully!")
 	}
 }
+
 func GetUserSettings() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
@@ -99,21 +117,40 @@ func GetUserSettings() fiber.Handler {
 		additional_profile, err := db.GetUserSettingsByID(userID)
 		if err != nil {
 			fmt.Println("error while fetching additional profile: ", err)
-			return c.Status(500).SendString("unable to fetch user additional profile!")
+			return c.Status(500).SendString("unable to fetch user settings!")
 		}
 
 		return c.JSON(additional_profile)
 	}
 }
 
-func SetUserSettings() fiber.Handler {
+func CreateUserSettings() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
 		if err != nil {
 			fmt.Println("unable to fetch user with this Token: ", err)
 			return c.Status(401).SendString("unable to fetch user with this Token!")
 		}
-		err = db.SetUserSettingsWithByteData(c.BodyRaw(), userID)
+		err = db.CreateUserSettingsWithByteData(c.BodyRaw(), userID)
+		if err != nil {
+			if errors.Is(err, gorm.ErrDuplicatedKey) {
+				return c.Status(500).SendString("User Settings already exist!")
+			}
+			fmt.Println("Error creating User Settings: ", err)
+			return fiber.ErrInternalServerError
+		}
+		return c.SendString("User Settings Created Successfully!")
+	}
+}
+
+func UpdateUserSettings() fiber.Handler {
+	return func(c fiber.Ctx) error {
+		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
+		if err != nil {
+			fmt.Println("unable to fetch user with this Token: ", err)
+			return c.Status(401).SendString("unable to fetch user with this Token!")
+		}
+		err = db.UpdateUserSettingsWithByteData(c.BodyRaw(), userID)
 		if err != nil {
 			fmt.Println("Error Setting the additional profile: ", err)
 			return fiber.ErrInternalServerError
@@ -133,24 +170,45 @@ func GetUserData() fiber.Handler {
 		additional_profile, err := db.GetUserDataByID(userID)
 		if err != nil {
 			fmt.Println("error while fetching additional profile: ", err)
-			return c.Status(500).SendString("unable to fetch user additional profile!")
+			return c.Status(500).SendString("unable to fetch user data!")
 		}
 
 		return c.JSON(additional_profile)
 	}
 }
-func SetUserData() fiber.Handler {
+
+func CreateUserData() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
 		if err != nil {
 			fmt.Println("unable to fetch user with this Token: ", err)
 			return c.Status(401).SendString("unable to fetch user with this Token!")
 		}
-		err = db.SetUserDataWithByteData(c.BodyRaw(), userID)
+		err = db.CreateUserDataWithByteData(c.BodyRaw(), userID)
 		if err != nil {
-			fmt.Println("Error Setting the additional profile: ", err)
+			if errors.Is(err, gorm.ErrDuplicatedKey) {
+				return c.Status(500).SendString("User Data Already exists!")
+			}
+			fmt.Println("Error Setting User data profile: ", err)
 			return fiber.ErrInternalServerError
 		}
-		return c.SendString("User Additional profile updated Successfully!")
+		return c.Status(201).SendString("User Data Created Successfully!")
+	}
+}
+
+func UpdateUserData() fiber.Handler {
+	return func(c fiber.Ctx) error {
+		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
+		if err != nil {
+			fmt.Println("unable to fetch user with this Token: ", err)
+			return c.Status(401).SendString("unable to fetch user with this Token!")
+		}
+		err = db.UpdateUserDataWithByteData(c.BodyRaw(), userID)
+		if err != nil {
+			fmt.Println("Error Setting the user data: ", err)
+			return fiber.ErrInternalServerError
+		}
+
+		return c.SendString("User Data updated Successfully!")
 	}
 }
