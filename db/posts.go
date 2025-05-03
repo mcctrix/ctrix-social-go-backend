@@ -243,3 +243,31 @@ func PostLikeToggler(postID string, userLikedID string, liked bool, likeType str
 
 	return nil
 }
+
+func CommentLikeToggler(commentID string, userLikedID string, liked bool, likeType string) error {
+	db, err := DBConnection()
+	if err != nil {
+		return err
+	}
+
+	if liked {
+		comment_like_data := models.User_comment_like{User_id: userLikedID, Comment_id: commentID, Like_type: "like"}
+		if db.Table("user_comment_like").Where("user_id = ?", userLikedID).Where("comment_id = ?", commentID).Updates(map[string]interface{}{
+			"like_type": likeType,
+		}).RowsAffected == 0 {
+			if err = db.Table("user_comment_like").Create(comment_like_data).Error; err != nil {
+				fmt.Println(err)
+				return errors.New("unable to create comment reaction")
+			}
+		}
+
+	} else {
+
+		if err = db.Table("user_comment_like").Where("comment_id = ?", commentID).Where("user_id = ?", userLikedID).Delete(&models.User_comment_like{}).Error; err != nil {
+			fmt.Println(err)
+			return errors.New("unable to remove comment reaction")
+		}
+	}
+
+	return nil
+}

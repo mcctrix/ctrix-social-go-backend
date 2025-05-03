@@ -18,7 +18,7 @@ func PostManagementRouter(router fiber.Router) {
 	router.Delete("/:postid", controllers.DeleteUserPost())
 
 	// Reactions
-	router.Patch("/:postid/liketoggler", controllers.LikeToggler())
+	router.Patch("/:postid/liketoggler", controllers.PostLikeToggler())
 
 	// Comment-related routes
 	router.Get("/:postid/comments", controllers.GetPostComments())
@@ -26,4 +26,7 @@ func PostManagementRouter(router fiber.Router) {
 	router.Get("/comments/:commentid", controllers.GetCommentByID())
 	router.Patch("/comments/:commentid", controllers.UpdatePostComment())
 	router.Delete("/comments/:commentid", controllers.DeletePostComment())
+
+	// Comment likes
+	router.Patch("/comments/:commentid/liketoggler", controllers.CommentLikeToggler())
 }

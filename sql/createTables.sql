@@ -79,5 +79,13 @@ CREATE TABLE IF NOT EXISTS user_post_comments (
     content text,
     pictures_attached TEXT[],
     nested_comments TEXT[],
-    liked_by TEXT[]
+);
+
+CREATE TABLE IF NOT EXISTS user_comment_like (
+    user_id VARCHAR(50),
+    FOREIGN KEY(user_id) REFERENCES user_auth(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    comment_id VARCHAR(50) NOT NULL,
+    FOREIGN KEY(comment_id) REFERENCES user_post_comments(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    like_type VARCHAR(20),
+    UNIQUE (comment_id, user_id)
 );

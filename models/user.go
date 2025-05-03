@@ -130,5 +130,10 @@ type User_post_Comments struct {
 	Content           string      `json:"content"`
 	Pictures_attached StringArray `json:"pictures_attached,omitempty"`
 	Nested_comments   StringArray `json:"nested_comments,omitempty"`
-	Liked_by          StringArray `json:"liked_by,omitempty"`
+}
+
+type User_comment_like struct {
+	User_id    string `json:"user_id"`
+	Comment_id string `json:"comment_id"`
+	Like_type  string `json:"like_type"`
 }

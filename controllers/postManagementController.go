@@ -199,7 +199,7 @@ func DeletePostComment() fiber.Handler {
 	}
 }
 
-func LikeToggler() fiber.Handler {
+func PostLikeToggler() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
 		if err != nil {
@@ -220,6 +220,34 @@ func LikeToggler() fiber.Handler {
 		}
 
 		if err = db.PostLikeToggler(c.Params("postid"), userID, bodyData.Toggle, bodyData.Like_type); err != nil {
+			fmt.Println(err)
+			return err
+		}
+
+		return c.Status(fiber.StatusOK).SendString("Like Updated Successfully!")
+	}
+}
+func CommentLikeToggler() fiber.Handler {
+	return func(c fiber.Ctx) error {
+		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
+		if err != nil {
+			fmt.Println("unable to fetch user with this Token: ", err)
+			return c.Status(401).SendString("unable to fetch user with this Token!")
+		}
+
+		bodyData := &struct {
+			Toggle    bool
+			Like_type string
+		}{}
+		rawData := c.Body()
+
+		err = json.Unmarshal(rawData, bodyData)
+		if err != nil {
+			fmt.Println(err)
+			return fiber.ErrInternalServerError
+		}
+
+		if err = db.CommentLikeToggler(c.Params("commentid"), userID, bodyData.Toggle, bodyData.Like_type); err != nil {
 			fmt.Println(err)
 			return err
 		}
