@@ -99,22 +99,6 @@ func GetAdditionalInfoProfileByID(id string) (*models.User_Additional_Info, erro
 	return userProfile, nil
 }
 
-func CreateAdditionalUserProfileWithByteData(newProfileByte []byte, userID string) error {
-	db, err := DBConnection()
-	if err != nil {
-		return err
-	}
-	var userProfile *models.User_Additional_Info = &models.User_Additional_Info{}
-	err = json.Unmarshal(newProfileByte, userProfile)
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-	userProfile.Id = userID
-
-	return db.Table("user_additional_info").Create(userProfile).Error
-}
-
 func UpdateAdditionalUserProfileWithByteData(newProfileByte []byte, userID string) error {
 	db, err := DBConnection()
 	if err != nil {
@@ -159,21 +143,6 @@ func GetUserSettingsByID(id string) (*models.User_Settings, error) {
 	return userSettingsData, nil
 }
 
-func CreateUserSettingsWithByteData(userSettingsByte []byte, userID string) error {
-	db, err := DBConnection()
-	if err != nil {
-		return err
-	}
-	var userSettings *models.User_Settings = &models.User_Settings{}
-	if err = json.Unmarshal(userSettingsByte, userSettings); err != nil {
-		fmt.Println(err)
-		return err
-	}
-	userSettings.Id = userID
-
-	return db.Table("user_settings").Create(userSettings).Error
-}
-
 func UpdateUserSettingsWithByteData(newProfileByte []byte, userID string) error {
 	db, err := DBConnection()
 	if err != nil {
@@ -203,21 +172,6 @@ func GetUserDataByID(id string) (*models.User_Data, error) {
 		return nil, err
 	}
 	return userData, nil
-}
-
-func CreateUserDataWithByteData(newUserDataByte []byte, userID string) error {
-	db, err := DBConnection()
-	if err != nil {
-		return err
-	}
-	var userData *models.User_Data = &models.User_Data{}
-	if err = json.Unmarshal(newUserDataByte, userData); err != nil {
-		fmt.Println(err)
-		return err
-	}
-	userData.Id = userID
-
-	return db.Table("user_data").Create(userData).Error
 }
 
 func UpdateUserDataWithByteData(newUserDataByte []byte, userID string) error {
