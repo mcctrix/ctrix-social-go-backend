@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS user_auth (
     email VARCHAR(50) UNIQUE NOT NULL,
     username VARCHAR(30) UNIQUE NOT NULL,
     password VARCHAR(50) NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW()
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS user_profile (
@@ -78,7 +79,7 @@ CREATE TABLE IF NOT EXISTS user_post_comments (
     created_at TIMESTAMP DEFAULT NOW(),
     content text,
     pictures_attached TEXT[],
-    nested_comments TEXT[],
+    nested_comments TEXT[]
 );
 
 CREATE TABLE IF NOT EXISTS user_comment_like (
@@ -88,4 +89,36 @@ CREATE TABLE IF NOT EXISTS user_comment_like (
     FOREIGN KEY(comment_id) REFERENCES user_post_comments(id) ON DELETE CASCADE ON UPDATE CASCADE,
     like_type VARCHAR(20),
     UNIQUE (comment_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS private_chats (
+    id VARCHAR(50) PRIMARY KEY,
+    created_at TIMESTAMP DEFAULT NOW(),
+    firstUserID VARCHAR(50) NOT NULL,
+    secondUserID VARCHAR(50) NOT NULL,
+    last_message VARCHAR(250),
+    last_message_time TIMESTAMP DEFAULT NOW(),
+    isDeleted BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (firstUserID) REFERENCES user_auth(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (secondUserID) REFERENCES user_auth(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    UNIQUE (firstUserID, secondUserID)
+);
+
+ CREATE TABLE IF NOT EXISTS private_chat_messages (
+    id VARCHAR(50) PRIMARY KEY DEFAULT uuid_generate_v4(),
+    created_at TIMESTAMP DEFAULT NOW(),
+    message VARCHAR(250) NOT NULL,
+    private_chat_id VARCHAR(50) NOT NULL,
+    FOREIGN KEY (private_chat_id) REFERENCES private_chats(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    user_id VARCHAR(50) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES user_auth(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS group_chats (
+    id VARCHAR(50) PRIMARY KEY,
+    created_at TIMESTAMP DEFAULT NOW(),
+    usersList TEXT[],
+    last_message VARCHAR(250),
+    last_message_time TIMESTAMP DEFAULT NOW(),
+    isDeleted BOOLEAN DEFAULT FALSE
 );
