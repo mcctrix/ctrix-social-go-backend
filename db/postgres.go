@@ -76,26 +76,21 @@ func ResetDB() {
 		fmt.Println("error here!1")
 		log.Fatal("Error connecting to db: ", err)
 	}
-	// if err := db.Exec("DROP DATABASE Ctrix_Social_DB"); err != nil {
-	// 	fmt.Println("error here!2")
 
-	// 	log.Fatal(err)
-	// }
-	// if err := db.Exec("CREATE DATABASE IF NOT EXISTS Ctrix_Social_DB"); err != nil {
-	// 	fmt.Println("error here!3")
-
-	// 	log.Fatal(err)
-	// }
-
-	sqlFile, err := os.ReadFile("./sql/resetDB.sql")
+	// Retrieve all table names
+	tables, err := db.Migrator().GetTables()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed to get tables: %v", err)
 	}
-	err = db.Exec(string(sqlFile)).Error
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println("DB Resetted Successfully!!!")
+
+	// Drop all tables
+	for _, table := range tables {
+		err := db.Migrator().DropTable(table)
+		if err != nil {
+			log.Printf("failed to drop table %s: %v", table, err)
+		} else {
+			log.Printf("dropped table %s successfully", table)
+		}
 	}
 
 }
