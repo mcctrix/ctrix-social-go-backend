@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -59,7 +60,12 @@ func SignUp() fiber.Handler {
 			Path:     "/",
 			HTTPOnly: true,
 			Secure:   true,
-			Domain:   "ctrix-social.vercel.app",
+			Domain: func() string {
+				if os.Getenv("APP_ENV") == "dev" {
+					return ""
+				}
+				return "ctrix-social.vercel.app"
+			}(),
 			SameSite: "None",
 			Expires:  expireTime,
 		})
@@ -123,7 +129,12 @@ func Login() fiber.Handler {
 			Path:     "/",
 			HTTPOnly: true,
 			Secure:   false,
-			// Domain:   "ctrix-social.vercel.app",
+			Domain: func() string {
+				if os.Getenv("APP_ENV") == "dev" {
+					return ""
+				}
+				return "ctrix-social.vercel.app"
+			}(),
 			SameSite: "Lax",
 			Expires:  expireTime,
 		})
