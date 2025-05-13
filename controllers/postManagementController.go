@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v3"
-	"github.com/mcctrix/ctrix-social-go-backend/db"
+	db "github.com/mcctrix/ctrix-social-go-backend/db/v1"
 	"github.com/mcctrix/ctrix-social-go-backend/utils"
 )
 
@@ -29,11 +29,6 @@ func GetUserPosts() fiber.Handler {
 
 func GetPostReactions() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		// userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
-		// if err != nil {
-		// 	fmt.Println("unable to fetch user with this Token: ", err)
-		// 	return c.Status(401).SendString("unable to fetch user with this Token!")
-		// }
 		postID := c.Params("postid")
 		reactions, err := db.GetAllPostReaction(postID)
 		if err != nil {
@@ -47,7 +42,6 @@ func GetPostReactions() fiber.Handler {
 
 func CreateUserPost() fiber.Handler {
 	return func(c fiber.Ctx) error {
-
 		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
 		if err != nil {
 			fmt.Println("unable to fetch user with this Token: ", err)
@@ -136,7 +130,6 @@ func CreatePostComment() fiber.Handler {
 		}
 
 		postID := c.Params("postid")
-		// Modify the byte data to include the post ID
 		commentData := c.BodyRaw()
 
 		err = db.CreatePostCommentWithByteData(commentData, userID, postID)
@@ -227,6 +220,7 @@ func PostLikeToggler() fiber.Handler {
 		return c.Status(fiber.StatusOK).SendString("Like Updated Successfully!")
 	}
 }
+
 func CommentLikeToggler() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))

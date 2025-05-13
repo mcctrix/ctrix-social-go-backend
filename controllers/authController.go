@@ -8,7 +8,7 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
-	"github.com/mcctrix/ctrix-social-go-backend/db"
+	db "github.com/mcctrix/ctrix-social-go-backend/db/v1"
 	"github.com/mcctrix/ctrix-social-go-backend/models"
 	"github.com/mcctrix/ctrix-social-go-backend/utils"
 	"gorm.io/gorm"

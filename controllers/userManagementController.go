@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v3"
-	"github.com/mcctrix/ctrix-social-go-backend/db"
+	db "github.com/mcctrix/ctrix-social-go-backend/db/v1"
 	"github.com/mcctrix/ctrix-social-go-backend/utils"
 )
 
@@ -35,6 +35,7 @@ func GetUserProfileWithParam() fiber.Handler {
 		return c.JSON(profile)
 	}
 }
+
 func SetCurrentUserProfile() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))

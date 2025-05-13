@@ -10,7 +10,7 @@ import (
 	"github.com/gofiber/fiber/v3/middleware/logger"
 	recoverer "github.com/gofiber/fiber/v3/middleware/recover"
 	"github.com/joho/godotenv"
-	"github.com/mcctrix/ctrix-social-go-backend/db"
+	db "github.com/mcctrix/ctrix-social-go-backend/db/v1"
 	"github.com/mcctrix/ctrix-social-go-backend/routes"
 	"github.com/mcctrix/ctrix-social-go-backend/utils"
 )
