@@ -24,10 +24,15 @@ func SignUp() fiber.Handler {
 			// return c.Redirect().To("/")
 			return c.SendString("User already logged in!")
 		}
+
+		email := strings.ToLower(c.FormValue("email"))
+		username := strings.ToLower(c.FormValue("username"))
+		password := c.FormValue("password")
+
 		user := &models.User_Auth{}
-		user.Email = strings.ToLower(c.FormValue("email"))
-		user.Username = strings.ToLower(c.FormValue("username"))
-		user.Password = c.FormValue("password")
+		user.Email = email
+		user.Username = username
+		user.Password = password
 		user.Id = uuid.New().String()
 		user.Created_at = time.Now()
 

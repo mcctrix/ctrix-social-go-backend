@@ -5,17 +5,11 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	db "github.com/mcctrix/ctrix-social-go-backend/db/v1"
-	"github.com/mcctrix/ctrix-social-go-backend/utils"
 )
 
 func GetCurrentUserProfile() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
-		if err != nil {
-			fmt.Println("unable to fetch user with this Token: ", err)
-			return c.Status(401).SendString("unable to fetch user with this Token!")
-		}
-		profile, err := db.GetUserProfileByID(userID)
+		profile, err := db.GetUserProfileByID(c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("unable to fetch profile: ", err)
 			return c.Status(fiber.StatusNotFound).SendString("unable to fetch user profile!")
@@ -38,13 +32,8 @@ func GetUserProfileWithParam() fiber.Handler {
 
 func SetCurrentUserProfile() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
-		if err != nil {
-			fmt.Println("unable to fetch user with this Token: ", err)
-			return c.Status(401).SendString("unable to fetch user with this Token!")
-		}
 
-		err = db.SetUserProfileWithByteData(c.BodyRaw(), userID)
+		err := db.SetUserProfileWithByteData(c.BodyRaw(), c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("Error Setting the profile: ", err)
 			return fiber.ErrInternalServerError
@@ -56,13 +45,8 @@ func SetCurrentUserProfile() fiber.Handler {
 
 func GetAdditionalUserInfo() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
-		if err != nil {
-			fmt.Println("unable to fetch user with this Token: ", err)
-			return c.Status(401).SendString("unable to fetch user with this Token!")
-		}
 
-		additional_profile, err := db.GetAdditionalInfoProfileByID(userID)
+		additional_profile, err := db.GetAdditionalInfoProfileByID(c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("error while fetching additional profile: ", err)
 			return c.Status(500).SendString("unable to fetch user additional profile!")
@@ -74,12 +58,7 @@ func GetAdditionalUserInfo() fiber.Handler {
 
 func UpdateAdditionalUserInfo() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
-		if err != nil {
-			fmt.Println("unable to fetch user with this Token: ", err)
-			return c.Status(401).SendString("unable to fetch user with this Token!")
-		}
-		err = db.UpdateAdditionalUserProfileWithByteData(c.BodyRaw(), userID)
+		err := db.UpdateAdditionalUserProfileWithByteData(c.BodyRaw(), c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("Error Setting the additional profile: ", err)
 			return fiber.ErrInternalServerError
@@ -90,13 +69,7 @@ func UpdateAdditionalUserInfo() fiber.Handler {
 
 func GetUserSettings() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
-		if err != nil {
-			fmt.Println("unable to fetch user with this Token: ", err)
-			return c.Status(401).SendString("unable to fetch user with this Token!")
-		}
-
-		additional_profile, err := db.GetUserSettingsByID(userID)
+		additional_profile, err := db.GetUserSettingsByID(c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("error while fetching additional profile: ", err)
 			return c.Status(500).SendString("unable to fetch user settings!")
@@ -108,12 +81,7 @@ func GetUserSettings() fiber.Handler {
 
 func UpdateUserSettings() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
-		if err != nil {
-			fmt.Println("unable to fetch user with this Token: ", err)
-			return c.Status(401).SendString("unable to fetch user with this Token!")
-		}
-		err = db.UpdateUserSettingsWithByteData(c.BodyRaw(), userID)
+		err := db.UpdateUserSettingsWithByteData(c.BodyRaw(), c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("Error Setting the additional profile: ", err)
 			return fiber.ErrInternalServerError
@@ -124,13 +92,8 @@ func UpdateUserSettings() fiber.Handler {
 
 func GetUserData() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
-		if err != nil {
-			fmt.Println("unable to fetch user with this Token: ", err)
-			return c.Status(401).SendString("unable to fetch user with this Token!")
-		}
 
-		additional_profile, err := db.GetUserDataByID(userID)
+		additional_profile, err := db.GetUserDataByID(c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("error while fetching additional profile: ", err)
 			return c.Status(500).SendString("unable to fetch user data!")
@@ -142,12 +105,8 @@ func GetUserData() fiber.Handler {
 
 func UpdateUserData() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
-		if err != nil {
-			fmt.Println("unable to fetch user with this Token: ", err)
-			return c.Status(401).SendString("unable to fetch user with this Token!")
-		}
-		err = db.UpdateUserDataWithByteData(c.BodyRaw(), userID)
+
+		err := db.UpdateUserDataWithByteData(c.BodyRaw(), c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("Error Setting the user data: ", err)
 			return fiber.ErrInternalServerError

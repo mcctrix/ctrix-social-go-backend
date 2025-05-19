@@ -6,18 +6,12 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	db "github.com/mcctrix/ctrix-social-go-backend/db/v1"
-	"github.com/mcctrix/ctrix-social-go-backend/utils"
 )
 
 func GetUserPosts() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
-		if err != nil {
-			fmt.Println("unable to fetch user with this Token: ", err)
-			return c.Status(401).SendString("unable to fetch user with this Token!")
-		}
 
-		posts, err := db.GetUserPostsByID(userID)
+		posts, err := db.GetUserPostsByID(c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("error while fetching user posts: ", err)
 			return c.Status(fiber.StatusNotFound).SendString("unable to fetch user posts!")
@@ -42,13 +36,8 @@ func GetPostReactions() fiber.Handler {
 
 func CreateUserPost() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
-		if err != nil {
-			fmt.Println("unable to fetch user with this Token: ", err)
-			return c.Status(401).SendString("unable to fetch user with this Token!")
-		}
 
-		err = db.CreateUserPostWithByteData(c.BodyRaw(), userID)
+		err := db.CreateUserPostWithByteData(c.BodyRaw(), c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("Error creating post: ", err)
 			return fiber.ErrInternalServerError
@@ -72,14 +61,9 @@ func GetPostByID() fiber.Handler {
 
 func UpdateUserPost() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
-		if err != nil {
-			fmt.Println("unable to fetch user with this Token: ", err)
-			return c.Status(401).SendString("unable to fetch user with this Token!")
-		}
 
 		postID := c.Params("postid")
-		err = db.UpdateUserPostWithByteData(postID, c.BodyRaw(), userID)
+		err := db.UpdateUserPostWithByteData(postID, c.BodyRaw(), c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("Error updating post: ", err)
 			return fiber.ErrInternalServerError
@@ -91,14 +75,9 @@ func UpdateUserPost() fiber.Handler {
 
 func DeleteUserPost() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
-		if err != nil {
-			fmt.Println("unable to fetch user with this Token: ", err)
-			return c.Status(401).SendString("unable to fetch user with this Token!")
-		}
 
 		postID := c.Params("postid")
-		err = db.DeleteUserPost(postID, userID)
+		err := db.DeleteUserPost(postID, c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("Error deleting post: ", err)
 			return fiber.ErrInternalServerError
@@ -123,16 +102,11 @@ func GetPostComments() fiber.Handler {
 
 func CreatePostComment() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
-		if err != nil {
-			fmt.Println("unable to fetch user with this Token: ", err)
-			return c.Status(401).SendString("unable to fetch user with this Token!")
-		}
 
 		postID := c.Params("postid")
 		commentData := c.BodyRaw()
 
-		err = db.CreatePostCommentWithByteData(commentData, userID, postID)
+		err := db.CreatePostCommentWithByteData(commentData, c.Locals("userID").(string), postID)
 		if err != nil {
 			fmt.Println("Error creating comment: ", err)
 			return fiber.ErrInternalServerError
@@ -156,14 +130,9 @@ func GetCommentByID() fiber.Handler {
 
 func UpdatePostComment() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
-		if err != nil {
-			fmt.Println("unable to fetch user with this Token: ", err)
-			return c.Status(401).SendString("unable to fetch user with this Token!")
-		}
 
 		commentID := c.Params("commentid")
-		err = db.UpdatePostCommentWithByteData(commentID, c.BodyRaw(), userID)
+		err := db.UpdatePostCommentWithByteData(commentID, c.BodyRaw(), c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("Error updating comment: ", err)
 			return fiber.ErrInternalServerError
@@ -175,14 +144,9 @@ func UpdatePostComment() fiber.Handler {
 
 func DeletePostComment() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
-		if err != nil {
-			fmt.Println("unable to fetch user with this Token: ", err)
-			return c.Status(401).SendString("unable to fetch user with this Token!")
-		}
 
 		commentID := c.Params("commentid")
-		err = db.DeletePostComment(commentID, userID)
+		err := db.DeletePostComment(commentID, c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("Error deleting comment: ", err)
 			return fiber.ErrInternalServerError
@@ -194,11 +158,6 @@ func DeletePostComment() fiber.Handler {
 
 func PostLikeToggler() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
-		if err != nil {
-			fmt.Println("unable to fetch user with this Token: ", err)
-			return c.Status(401).SendString("unable to fetch user with this Token!")
-		}
 
 		bodyData := &struct {
 			Toggle    bool
@@ -206,13 +165,13 @@ func PostLikeToggler() fiber.Handler {
 		}{}
 		rawData := c.Body()
 
-		err = json.Unmarshal(rawData, bodyData)
+		err := json.Unmarshal(rawData, bodyData)
 		if err != nil {
 			fmt.Println(err)
 			return fiber.ErrInternalServerError
 		}
 
-		if err = db.PostLikeToggler(c.Params("postid"), userID, bodyData.Toggle, bodyData.Like_type); err != nil {
+		if err = db.PostLikeToggler(c.Params("postid"), c.Locals("userID").(string), bodyData.Toggle, bodyData.Like_type); err != nil {
 			fmt.Println(err)
 			return err
 		}
@@ -223,11 +182,6 @@ func PostLikeToggler() fiber.Handler {
 
 func CommentLikeToggler() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		userID, err := utils.GetUserIDWithToken(c.Cookies("auth_token"))
-		if err != nil {
-			fmt.Println("unable to fetch user with this Token: ", err)
-			return c.Status(401).SendString("unable to fetch user with this Token!")
-		}
 
 		bodyData := &struct {
 			Toggle    bool
@@ -235,13 +189,13 @@ func CommentLikeToggler() fiber.Handler {
 		}{}
 		rawData := c.Body()
 
-		err = json.Unmarshal(rawData, bodyData)
+		err := json.Unmarshal(rawData, bodyData)
 		if err != nil {
 			fmt.Println(err)
 			return fiber.ErrInternalServerError
 		}
 
-		if err = db.CommentLikeToggler(c.Params("commentid"), userID, bodyData.Toggle, bodyData.Like_type); err != nil {
+		if err = db.CommentLikeToggler(c.Params("commentid"), c.Locals("userID").(string), bodyData.Toggle, bodyData.Like_type); err != nil {
 			fmt.Println(err)
 			return err
 		}

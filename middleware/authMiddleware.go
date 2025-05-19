@@ -27,6 +27,7 @@ func AuthMiddleware() fiber.Handler {
 				"error": "Invalid Token",
 			})
 		}
+		c.Locals("userID", utils.GetClaimData(jwtToken, "aud"))
 
 		err = c.Next()
 		if err != nil {
