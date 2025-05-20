@@ -31,11 +31,10 @@ func (v *validatorApp) HasSpecialChar() *validatorApp {
 				return v
 			}
 		}
-		v.errors = append(v.errors, validationError{
+		v.appendError(validationError{
 			Field:   v.fieldName,
 			Message: "must contain at least one special character",
 		})
-		v.foundErr = true
 	}
 	return v
 }
@@ -53,11 +52,10 @@ func (v *validatorApp) Email() *validatorApp {
 				return v
 			}
 		}
-		v.errors = append(v.errors, validationError{
+		v.appendError(validationError{
 			Field:   v.fieldName,
 			Message: "must be a valid email",
 		})
-		v.foundErr = true
 	}
 	return v
 }
@@ -71,27 +69,25 @@ func (v *validatorApp) Min(length int) *validatorApp {
 	switch v.data.(type) {
 	case string:
 		if len(v.data.(string)) <= length {
-			v.errors = append(v.errors, validationError{
+			v.appendError(validationError{
 				Field:   v.fieldName,
 				Message: "must be greater than or equal to " + strconv.Itoa(length),
 			})
-			v.foundErr = true
 		}
 	case int:
 		if v.data.(int) <= length {
-			v.errors = append(v.errors, validationError{
+			v.appendError(validationError{
 				Field:   v.fieldName,
 				Message: "must be greater than or equal to " + strconv.Itoa(length),
 			})
-			v.foundErr = true
+
 		}
 	case float64:
 		if v.data.(float64) <= float64(length) {
-			v.errors = append(v.errors, validationError{
+			v.appendError(validationError{
 				Field:   v.fieldName,
 				Message: "must be greater than or equal to " + strconv.Itoa(length),
 			})
-			v.foundErr = true
 		}
 	}
 	return v
@@ -103,27 +99,27 @@ func (v *validatorApp) Max(length int) *validatorApp {
 	switch v.data.(type) {
 	case string:
 		if len(v.data.(string)) >= length {
-			v.errors = append(v.errors, validationError{
+			v.appendError(validationError{
 				Field:   v.fieldName,
 				Message: "must be less than or equal to " + strconv.Itoa(length),
 			})
-			v.foundErr = true
+
 		}
 	case int:
 		if v.data.(int) >= length {
-			v.errors = append(v.errors, validationError{
+			v.appendError(validationError{
 				Field:   v.fieldName,
 				Message: "must be less than or equal to " + strconv.Itoa(length),
 			})
-			v.foundErr = true
+
 		}
 	case float64:
 		if v.data.(float64) >= float64(length) {
-			v.errors = append(v.errors, validationError{
+			v.appendError(validationError{
 				Field:   v.fieldName,
 				Message: "must be less than or equal to " + strconv.Itoa(length),
 			})
-			v.foundErr = true
+
 		}
 	}
 	return v
@@ -142,13 +138,18 @@ func (v *validatorApp) Url() *validatorApp {
 				return v
 			}
 		}
-		v.errors = append(v.errors, validationError{
+		v.appendError(validationError{
 			Field:   v.fieldName,
 			Message: "must be a valid url",
 		})
-		v.foundErr = true
+
 	}
 	return v
+}
+
+func (v *validatorApp) appendError(err validationError) {
+	v.errors = append(v.errors, err)
+	v.foundErr = true
 }
 
 func (v *validatorApp) NotRequired() *validatorApp {
