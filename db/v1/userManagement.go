@@ -156,8 +156,13 @@ func UpdateUserSettingsWithByteData(newProfileByte []byte, userID string) error 
 
 	if err = db.Table("user_settings").Where("id = ?", userID).First(userSettings).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			err = json.Unmarshal(newProfileByte, userSettings)
+			if err != nil {
+				return err
+			}
+			userSettings.Id = userID
 			fmt.Println("Additional Profile not found!")
-			db.Table("user_additional_info").Create(userSettings)
+			db.Table("user_settings").Create(userSettings)
 			return nil
 		} else {
 			fmt.Println(err)
@@ -192,8 +197,13 @@ func UpdateUserDataWithByteData(newUserDataByte []byte, userID string) error {
 
 	if err = db.Table("user_data").Where("id = ?", userID).First(userData).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			err = json.Unmarshal(newUserDataByte, userData)
+			if err != nil {
+				return err
+			}
+			userData.Id = userID
 			fmt.Println("Additional Profile not found!")
-			db.Table("user_additional_info").Create(userData)
+			db.Table("user_data").Create(userData)
 			return nil
 		} else {
 			fmt.Println(err)
