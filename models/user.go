@@ -75,7 +75,6 @@ type User_Profile struct {
 	First_name      string      `json:"first_name,omitempty"`
 	Last_name       string      `json:"last_name,omitempty"`
 	Profile_picture string      `json:"profile_profile,omitempty"`
-	Avatar          string      `json:"avatar,omitempty"`
 	Last_seen       time.Time   `json:"last_seen,omitempty"`
 	Post_count      int         `json:"post_count,omitempty"`
 	Followers       StringArray `json:"followers,omitempty" gorm:"type:text[]"`
@@ -87,6 +86,7 @@ type User_Additional_Info struct {
 	Hobbies         StringArray `json:"hobbies,omitempty" gorm:"type:text[]"`
 	Family_members  StringArray `json:"family_members,omitempty" gorm:"type:text[]"`
 	Relation_status string      `json:"relation_status,omitempty"`
+	Avatar          string      `json:"avatar,omitempty"`
 	Dob             time.Time   `json:"dob,omitempty"`
 	Bio             string      `json:"bio,omitempty"`
 	Gender          string      `json:"gender,omitempty"`

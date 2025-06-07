@@ -18,7 +18,6 @@ CREATE TABLE IF NOT EXISTS user_profile (
     first_name VARCHAR(30),
     last_name VARCHAR(30),
     profile_picture VARCHAR(200),
-    avatar VARCHAR(25),
     last_seen TIMESTAMP,
     post_count INT,
     followers TEXT[],
@@ -32,6 +31,7 @@ CREATE TABLE IF NOT EXISTS user_additional_info (
     hobbies TEXT[],
     family_members TEXT[],
     relation_status VARCHAR(12),
+    avatar VARCHAR(25),
     dob DATE,
     bio VARCHAR(250),
     gender VARCHAR(6)
