@@ -107,9 +107,11 @@ func UpdateAdditionalUserProfileWithByteData(newProfileByte []byte, userID strin
 	var userProfile *models.User_Additional_Info = &models.User_Additional_Info{}
 	if err = db.Table("user_additional_info").Where("id = ?", userID).First(userProfile).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			json.Unmarshal(newProfileByte, userProfile)
+			userProfile.Id = userID
 			fmt.Println("Additional Profile not found!")
-			db.Table("user_additional_info").Create(userProfile)
-			return nil
+			return db.Table("user_additional_info").Create(userProfile).Error
+
 		} else {
 			fmt.Println(err)
 		}
