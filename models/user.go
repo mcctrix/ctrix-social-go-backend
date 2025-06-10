@@ -63,11 +63,11 @@ func (a *StringArray) Scan(value interface{}) error {
 }
 
 type User_Auth struct {
-	Id         string
-	Email      string
-	Username   string
-	Password   string
-	Created_at time.Time
+	Id         string    `json:"id,omitempty"`
+	Email      string    `json:"email,omitempty"`
+	Username   string    `json:"username,omitempty"`
+	Password   string    `json:"password,omitempty"`
+	Created_at time.Time `json:"created_at,omitempty"`
 }
 
 type User_Profile struct {

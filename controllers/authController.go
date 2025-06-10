@@ -36,11 +36,11 @@ func SignUp() fiber.Handler {
 		user.Id = uuid.New().String()
 		user.Created_at = time.Now()
 
-		db, err := db.DBConnection()
+		dbInstance, err := db.DBConnection()
 		if err != nil {
 			return fiber.ErrInternalServerError
 		}
-		if err = db.Table("user_auth").Create(user).Error; err != nil {
+		if err = dbInstance.Table("user_auth").Create(user).Error; err != nil {
 			fmt.Println("Error in Creating New User:", err.Error())
 			if errors.Is(err, gorm.ErrDuplicatedKey) {
 				return c.Status(400).JSON(map[string]string{
@@ -74,6 +74,10 @@ func SignUp() fiber.Handler {
 			SameSite: "None",
 			Expires:  expireTime,
 		})
+
+		go func() {
+			db.InitNewUser(user.Id)
+		}()
 
 		return c.JSON(fiber.Map{"tokenValue": gnToken.StringToken, "Expires": expireTime})
 	}
@@ -147,7 +151,6 @@ func Login() fiber.Handler {
 		return c.JSON(fiber.Map{"tokenValue": gnToken.StringToken, "Expires": expireTime})
 	}
 }
-
 func Logout() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		c.ClearCookie("auth_token")

@@ -2,19 +2,19 @@ package v1
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 
 	"github.com/mcctrix/ctrix-social-go-backend/models"
-	"gorm.io/gorm"
 )
 
-func GetDataFromUserAuth(id string) (*user_auth_data, error) {
+type dataInterface interface{}
+
+func GetDataFromUserAuth(id string) (*models.User_Auth, error) {
 	db, err := DBConnection()
 	if err != nil {
 		return nil, err
 	}
-	var user_auth *user_auth_data = &user_auth_data{}
+	var user_auth *models.User_Auth = &models.User_Auth{}
 	if err = db.Table("user_auth").Select("username", "email").Where("id = ?", id).First(user_auth).Error; err != nil {
 		return nil, err
 	}
@@ -28,191 +28,123 @@ type user_profile_data struct {
 	Username string `json:"username"`
 }
 
-func GetUserProfileByID(id string) (*user_profile_data, error) {
+func GetUserData(id string, tableName string, fieldNames []string) (dataInterface, error) {
 
 	db, err := DBConnection()
 	if err != nil {
 		return nil, err
 	}
 
-	user_auth_data, err := GetDataFromUserAuth(id)
-	if err != nil {
-		return nil, err
+	var userData dataInterface
+
+	switch tableName {
+	case "user_auth":
+		userData = &models.User_Auth{}
+	case "user_profile":
+		userData = &models.User_Profile{}
+		// userProfile := &user_profile_data{}
+		// user_auth_data, err := GetDataFromUserAuth(id)
+		// if err != nil {
+		// 	return nil, err
+		// }
+		// if len(fieldNames) > 0 {
+		// 	if err = db.Table(tableName).Select(fieldNames).Where("id = ?", id).First(userProfile).Error; err != nil {
+		// 		return nil, err
+		// 	}
+		// } else {
+		// 	if err = db.Table(tableName).Where("id = ?", id).First(userProfile).Error; err != nil {
+		// 		return nil, err
+		// 	}
+		// }
+		// userProfile.Email = user_auth_data.Email
+		// userProfile.Username = user_auth_data.Username
+
+		// userData = userProfile
+
+		// return userData, nil
+	case "user_additional_info":
+		userData = &models.User_Additional_Info{}
+	case "user_settings":
+		userData = &models.User_Settings{}
+	case "user_data":
+		userData = &models.User_Data{}
+	default:
+		return nil, fmt.Errorf("unsupported table name for get: %s", tableName)
 	}
 
-	var userProfile *user_profile_data = &user_profile_data{}
-	if err = db.Table("user_profile").Where("id = ?", id).First(userProfile).Error; err != nil {
-		return nil, err
-	}
-	userProfile.Email = user_auth_data.Email
-	userProfile.Username = user_auth_data.Username
-	return userProfile, nil
-}
-
-func SetUserProfileWithByteData(newProfileByte []byte, userID string) error {
-	db, err := DBConnection()
-	if err != nil {
-		return err
-	}
-	var userProfile *models.User_Profile = &models.User_Profile{}
-
-	if err = db.Table("user_profile").Where("id = ?", userID).First(userProfile).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			newProfile := &models.User_Profile{}
-			err = json.Unmarshal(newProfileByte, newProfile)
-			if err != nil {
-				return err
-			}
-			newProfile.Id = userID
-			err = createUserProfile(newProfile)
-			if err != nil {
-				return err
-			}
-		} else {
-			return err
+	if len(fieldNames) > 0 {
+		if err = db.Table(tableName).Select(fieldNames).Where("id = ?", id).First(userData).Error; err != nil {
+			return nil, err
+		}
+	} else {
+		if err = db.Table(tableName).Where("id = ?", id).First(userData).Error; err != nil {
+			return nil, err
 		}
 	}
-	json.Unmarshal(newProfileByte, userProfile)
-	if err != nil {
-		return err
-	}
-	db.Table("user_profile").Save(userProfile)
 
-	return nil
-}
-
-type user_auth_data struct {
-	Username string
-	Email    string
-}
-
-func GetAdditionalInfoProfileByID(id string) (*models.User_Additional_Info, error) {
-
-	db, err := DBConnection()
-	if err != nil {
-		return nil, err
-	}
-	var userProfile *models.User_Additional_Info = &models.User_Additional_Info{}
-	if err = db.Table("user_additional_info").Where("id = ?", id).First(userProfile).Error; err != nil {
-		return nil, err
-	}
-	return userProfile, nil
-}
-
-func UpdateAdditionalUserProfileWithByteData(newProfileByte []byte, userID string) error {
-	db, err := DBConnection()
-	if err != nil {
-		return err
-	}
-	var userProfile *models.User_Additional_Info = &models.User_Additional_Info{}
-	if err = db.Table("user_additional_info").Where("id = ?", userID).First(userProfile).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			json.Unmarshal(newProfileByte, userProfile)
-			userProfile.Id = userID
-			fmt.Println("Additional Profile not found!")
-			return db.Table("user_additional_info").Create(userProfile).Error
-
-		} else {
-			fmt.Println(err)
-		}
-		return err
-	}
-	json.Unmarshal(newProfileByte, userProfile)
-	if err != nil {
-		fmt.Println("Error with the decode of json", err)
-		return err
-	}
-	return db.Table("user_additional_info").Save(userProfile).Error
-}
-
-func createUserProfile(profileData *models.User_Profile) error {
-	db, err := DBConnection()
-	if err != nil {
-		return err
-	}
-
-	return db.Table("user_profile").Create(profileData).Error
-}
-
-func GetUserSettingsByID(id string) (*models.User_Settings, error) {
-
-	db, err := DBConnection()
-	if err != nil {
-		return nil, err
-	}
-	var userSettingsData *models.User_Settings = &models.User_Settings{}
-	if err = db.Table("user_settings").Select("hide_post", "hide_story", "block_user", "show_online").Where("id = ?", id).First(userSettingsData).Error; err != nil {
-		return nil, err
-	}
-	return userSettingsData, nil
-}
-
-func UpdateUserSettingsWithByteData(newProfileByte []byte, userID string) error {
-	db, err := DBConnection()
-	if err != nil {
-		return err
-	}
-	var userSettings *models.User_Settings = &models.User_Settings{}
-
-	if err = db.Table("user_settings").Where("id = ?", userID).First(userSettings).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			err = json.Unmarshal(newProfileByte, userSettings)
-			if err != nil {
-				return err
-			}
-			userSettings.Id = userID
-			fmt.Println("Additional Profile not found!")
-			db.Table("user_settings").Create(userSettings)
-			return nil
-		} else {
-			fmt.Println(err)
-		}
-	}
-	err = json.Unmarshal(newProfileByte, userSettings)
-	if err != nil {
-		return err
-	}
-	return db.Table("user_settings").Save(userSettings).Error
-}
-
-func GetUserDataByID(id string) (*models.User_Data, error) {
-
-	db, err := DBConnection()
-	if err != nil {
-		return nil, err
-	}
-	var userData *models.User_Data = &models.User_Data{}
-	if err = db.Table("user_data").Select("posts", "stories", "notes").Where("id = ?", id).First(userData).Error; err != nil {
-		return nil, err
-	}
 	return userData, nil
 }
 
-func UpdateUserDataWithByteData(newUserDataByte []byte, userID string) error {
+func UpdateTableWithByteData(NewProfileData []byte, userID string, tableName string) error {
 	db, err := DBConnection()
 	if err != nil {
 		return err
 	}
-	var userData *models.User_Data = &models.User_Data{}
+	var userProfile dataInterface
 
-	if err = db.Table("user_data").Where("id = ?", userID).First(userData).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			err = json.Unmarshal(newUserDataByte, userData)
-			if err != nil {
-				return err
-			}
-			userData.Id = userID
-			fmt.Println("Additional Profile not found!")
-			db.Table("user_data").Create(userData)
-			return nil
-		} else {
-			fmt.Println(err)
-		}
+	switch tableName {
+	case "user_profile":
+		userProfile = &models.User_Profile{}
+	case "user_additional_info":
+		userProfile = &models.User_Additional_Info{}
+	case "user_settings":
+		userProfile = &models.User_Settings{}
+	case "user_data":
+		userProfile = &models.User_Data{}
+	default:
+		return fmt.Errorf("unsupported table name for update: %s", tableName)
 	}
 
-	err = json.Unmarshal(newUserDataByte, userData)
+	if err = db.Table(tableName).Where("id = ?", userID).First(&userProfile).Error; err != nil {
+		return err
+	}
+
+	if err = json.Unmarshal(NewProfileData, userProfile); err != nil {
+		return err
+	}
+	return db.Table(tableName).Save(userProfile).Error
+}
+
+func InitNewUser(userid string) error {
+	db, err := DBConnection()
 	if err != nil {
 		return err
 	}
-	return db.Table("user_data").Save(userData).Error
+	type base struct {
+		Id string
+	}
+
+	data := base{Id: userid}
+
+	if err = db.Table("user_profile").Create(data).Error; err != nil {
+		return err
+	}
+	if err = db.Table("user_additional_info").Create(data).Error; err != nil {
+		return err
+	}
+	if err = db.Table("user_data").Create(data).Error; err != nil {
+		return err
+	}
+	userSetting := struct {
+		Id          string
+		Show_online bool
+	}{
+		Id:          userid,
+		Show_online: true,
+	}
+
+	if err = db.Table("user_settings").Create(userSetting).Error; err != nil {
+		return err
+	}
+	return nil
 }

@@ -5,35 +5,56 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	db "github.com/mcctrix/ctrix-social-go-backend/db/v1"
+	"github.com/mcctrix/ctrix-social-go-backend/utils"
 )
 
 func GetCurrentUserProfile() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		profile, err := db.GetUserProfileByID(c.Locals("userID").(string))
+		profile, err := db.GetUserData(c.Locals("userID").(string), "user_profile", []string{"first_name", "last_name", "last_seen", "post_count", "followers", "followings"})
 		if err != nil {
 			fmt.Println("unable to fetch profile: ", err)
 			return c.Status(fiber.StatusNotFound).SendString("unable to fetch user profile!")
 		}
-		return c.JSON(profile)
+		userAuth, err := db.GetUserData(c.Locals("userID").(string), "user_auth", []string{"email", "username"})
+		if err != nil {
+			fmt.Println("unable to fetch user Auth: ", err)
+			return c.Status(fiber.StatusNotFound).SendString("unable to fetch user auth!")
+		}
+		merged, err := utils.MergeStructs(profile, userAuth)
+		if err != nil {
+			fmt.Println("unable to merge structs: ", err)
+			return c.Status(fiber.StatusNotFound).SendString("unable to merge structs!")
+		}
+		return c.JSON(merged)
 	}
 }
 
 func GetUserProfileWithParam() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		userID := c.Params("userid")
-		profile, err := db.GetUserProfileByID(userID)
+		profile, err := db.GetUserData(userID, "user_profile", []string{"first_name", "last_name", "last_seen", "post_count", "followers", "followings"})
 		if err != nil {
 			fmt.Println("unable to fetch profile: ", err)
-			return c.Status(500).SendString("unable to fetch user profile!")
+			return c.Status(fiber.StatusNotFound).SendString("unable to fetch user profile!")
 		}
-		return c.JSON(profile)
+		userAuth, err := db.GetUserData(userID, "user_auth", []string{"email", "username"})
+		if err != nil {
+			fmt.Println("unable to fetch user Auth: ", err)
+			return c.Status(fiber.StatusNotFound).SendString("unable to fetch user auth!")
+		}
+		merged, err := utils.MergeStructs(profile, userAuth)
+		if err != nil {
+			fmt.Println("unable to merge structs: ", err)
+			return c.Status(fiber.StatusNotFound).SendString("unable to merge structs!")
+		}
+		return c.JSON(merged)
 	}
 }
 
-func SetCurrentUserProfile() fiber.Handler {
+func UpdateCurrentUserProfile() fiber.Handler {
 	return func(c fiber.Ctx) error {
 
-		err := db.SetUserProfileWithByteData(c.BodyRaw(), c.Locals("userID").(string))
+		err := db.UpdateTableWithByteData(c.BodyRaw(), c.Locals("userID").(string), "user_profile")
 		if err != nil {
 			fmt.Println("Error Setting the profile: ", err)
 			return fiber.ErrInternalServerError
@@ -46,7 +67,7 @@ func SetCurrentUserProfile() fiber.Handler {
 func GetAdditionalUserInfo() fiber.Handler {
 	return func(c fiber.Ctx) error {
 
-		additional_profile, err := db.GetAdditionalInfoProfileByID(c.Locals("userID").(string))
+		additional_profile, err := db.GetUserData(c.Locals("userID").(string), "user_additional_info", []string{})
 		if err != nil {
 			fmt.Println("error while fetching additional profile: ", err)
 			return c.Status(500).SendString("unable to fetch user additional profile!")
@@ -58,7 +79,7 @@ func GetAdditionalUserInfo() fiber.Handler {
 
 func UpdateAdditionalUserInfo() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		err := db.UpdateAdditionalUserProfileWithByteData(c.BodyRaw(), c.Locals("userID").(string))
+		err := db.UpdateTableWithByteData(c.BodyRaw(), c.Locals("userID").(string), "user_additional_info")
 		if err != nil {
 			fmt.Println("Error Setting the additional profile: ", err)
 			return fiber.ErrInternalServerError
@@ -69,7 +90,7 @@ func UpdateAdditionalUserInfo() fiber.Handler {
 
 func GetUserSettings() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		additional_profile, err := db.GetUserSettingsByID(c.Locals("userID").(string))
+		additional_profile, err := db.GetUserData(c.Locals("userID").(string), "user_settings", []string{"hide_post", "hide_story", "block_user", "show_online"})
 		if err != nil {
 			fmt.Println("error while fetching additional profile: ", err)
 			return c.Status(500).SendString("unable to fetch user settings!")
@@ -81,7 +102,7 @@ func GetUserSettings() fiber.Handler {
 
 func UpdateUserSettings() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		err := db.UpdateUserSettingsWithByteData(c.BodyRaw(), c.Locals("userID").(string))
+		err := db.UpdateTableWithByteData(c.BodyRaw(), c.Locals("userID").(string), "user_settings")
 		if err != nil {
 			fmt.Println("Error Setting the additional profile: ", err)
 			return fiber.ErrInternalServerError
@@ -93,7 +114,7 @@ func UpdateUserSettings() fiber.Handler {
 func GetUserData() fiber.Handler {
 	return func(c fiber.Ctx) error {
 
-		additional_profile, err := db.GetUserDataByID(c.Locals("userID").(string))
+		additional_profile, err := db.GetUserData(c.Locals("userID").(string), "user_data", []string{"posts", "stories", "notes"})
 		if err != nil {
 			fmt.Println("error while fetching additional profile: ", err)
 			return c.Status(500).SendString("unable to fetch user data!")
@@ -106,7 +127,7 @@ func GetUserData() fiber.Handler {
 func UpdateUserData() fiber.Handler {
 	return func(c fiber.Ctx) error {
 
-		err := db.UpdateUserDataWithByteData(c.BodyRaw(), c.Locals("userID").(string))
+		err := db.UpdateTableWithByteData(c.BodyRaw(), c.Locals("userID").(string), "user_data")
 		if err != nil {
 			fmt.Println("Error Setting the user data: ", err)
 			return fiber.ErrInternalServerError
