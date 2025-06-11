@@ -132,10 +132,12 @@ func UploadMediaHandler(c fiber.Ctx) (models.StringArray, error) {
 			uploadedImageResults = append(uploadedImageResults, fiber.Map{
 				"filename":  file.Filename,
 				"public_id": uploadResult.PublicID,
-				"url":       uploadResult.SecureURL,
+				"url":       uploadResult.URL,
 				"status":    "success",
 			})
 		}
+		fmt.Println(urlList)
+		fmt.Println("uploadedImageResults: ", uploadedImageResults)
 
 		return urlList, nil
 	}
@@ -153,7 +155,7 @@ func UploadMediaHandler(c fiber.Ctx) (models.StringArray, error) {
 		}
 		defer fileContent.Close()
 
-		publicID := fmt.Sprintf("ctrix-social/posts/videos/%s_%s", strings.TrimSuffix(videoFile.Filename, "."), string(req.Header.UserAgent()))
+		publicID := fmt.Sprintf("ctrix-social/posts/videos/%s_%s", strings.TrimSuffix(videoFile.Filename[0:15], "."), string(req.Header.UserAgent()))
 		uploadResult, err := cld.Upload.Upload(ctx, fileContent, uploader.UploadParams{
 			PublicID:     publicID,
 			Folder:       "ctrix-social/posts/videos",
@@ -164,9 +166,8 @@ func UploadMediaHandler(c fiber.Ctx) (models.StringArray, error) {
 			log.Printf("Error uploading video %s to Cloudinary: %v", videoFile.Filename, err)
 			return nil, fmt.Errorf("failed to upload video to Cloudinary: %v", err.Error())
 		}
-
+		fmt.Println(uploadResult)
 		urlList = append(urlList, uploadResult.URL)
-
 		return urlList, nil
 	}
 
