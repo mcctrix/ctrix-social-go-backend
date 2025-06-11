@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS user_profile (
     FOREIGN KEY (id) REFERENCES user_auth(id) ON DELETE CASCADE ON UPDATE CASCADE,
     first_name VARCHAR(30),
     last_name VARCHAR(30),
+    avatar VARCHAR(25),
     profile_picture VARCHAR(200),
     last_seen TIMESTAMP,
     post_count INT,
@@ -31,7 +32,6 @@ CREATE TABLE IF NOT EXISTS user_additional_info (
     hobbies TEXT[],
     family_members TEXT[],
     relation_status VARCHAR(12),
-    avatar VARCHAR(25),
     dob DATE,
     bio VARCHAR(250),
     gender VARCHAR(6)
