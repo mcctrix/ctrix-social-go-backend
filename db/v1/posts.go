@@ -10,12 +10,12 @@ import (
 )
 
 // Posts Database Functions
-func GetUserPostsByID(id string) ([]models.User_Posts, error) {
+func GetUserPostsByID(id string) ([]models.User_Post, error) {
 	db, err := DBConnection()
 	if err != nil {
 		return nil, err
 	}
-	var userPosts []models.User_Posts
+	var userPosts []models.User_Post
 	if err = db.Table("user_posts").Order("created_at desc").Where("creator_id = ?", id).Find(&userPosts).Error; err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func CreateUserPostWithByteData(newPostByte []byte, userID string) error {
 	}
 
 	// Create a new post
-	newPost := &models.User_Posts{}
+	newPost := &models.User_Post{}
 	if err = json.Unmarshal(newPostByte, newPost); err != nil {
 		return err
 	}
@@ -46,12 +46,12 @@ func CreateUserPostWithByteData(newPostByte []byte, userID string) error {
 	return nil
 }
 
-func GetPostByID(postID string) (*models.User_Posts, error) {
+func GetPostByID(postID string) (*models.User_Post, error) {
 	db, err := DBConnection()
 	if err != nil {
 		return nil, err
 	}
-	var post *models.User_Posts = &models.User_Posts{}
+	var post *models.User_Post = &models.User_Post{}
 	if err = db.Table("user_posts").Where("id = ?", postID).First(post).Error; err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func UpdateUserPostWithByteData(postID string, updatedPostByte []byte, userID st
 	}
 
 	// Find the existing post
-	var existingPost *models.User_Posts = &models.User_Posts{}
+	var existingPost *models.User_Post = &models.User_Post{}
 	if err = db.Table("user_posts").Where("id = ? AND creator_id = ?", postID, userID).First(existingPost).Error; err != nil {
 		return err
 	}
@@ -167,7 +167,7 @@ func DeleteUserPost(postID string, userID string) error {
 	}
 
 	// Delete the post, ensuring it belongs to the user
-	result := db.Table("user_posts").Where("id = ? AND creator_id = ?", postID, userID).Delete(&models.User_Posts{})
+	result := db.Table("user_posts").Where("id = ? AND creator_id = ?", postID, userID).Delete(&models.User_Post{})
 	if result.Error != nil {
 		return result.Error
 	}

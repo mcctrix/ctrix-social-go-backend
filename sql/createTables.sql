@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS user_posts (
     created_at TIMESTAMP DEFAULT NOW(),
     group_id VARCHAR(50),
     text_content TEXT,
-    pictures_attached TEXT[],
+    media_attached TEXT[],
     comments TEXT[]
 );
 

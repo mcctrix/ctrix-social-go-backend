@@ -3,9 +3,14 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/google/uuid"
 	db "github.com/mcctrix/ctrix-social-go-backend/db/v1"
+	"github.com/mcctrix/ctrix-social-go-backend/models"
+	"github.com/mcctrix/ctrix-social-go-backend/utils"
+	"github.com/mcctrix/ctrix-social-go-backend/utils/cloudinary"
 )
 
 func GetUserPosts() fiber.Handler {
@@ -37,7 +42,30 @@ func GetPostReactions() fiber.Handler {
 func CreateUserPost() fiber.Handler {
 	return func(c fiber.Ctx) error {
 
-		err := db.CreateUserPostWithByteData(c.BodyRaw(), c.Locals("userID").(string))
+		postData := &models.User_Post{}
+
+		cloudinaryURLs, err := cloudinary.UploadMediaHandler(c)
+		if err != nil {
+			fmt.Println("Error uploading media: ", err)
+			return fiber.ErrInternalServerError
+		}
+		if len(cloudinaryURLs) > 0 {
+			postData.Media_attached = cloudinaryURLs
+		}
+
+		formData := c.FormValue("post_data")
+
+		postData.Id = uuid.NewString()
+		postData.Created_at = time.Now()
+		postData.Creator_id = c.Locals("userID").(string)
+
+		bodyData, err := utils.ClearStruct(postData, []byte(formData))
+		if err != nil {
+			fmt.Println("Error clearing struct: ", err)
+			return fiber.ErrInternalServerError
+		}
+
+		err = db.CreateUserPostWithByteData(bodyData, c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("Error creating post: ", err)
 			return fiber.ErrInternalServerError
