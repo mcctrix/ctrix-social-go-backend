@@ -2,9 +2,11 @@ package controllers
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/gofiber/fiber/v3"
 	db "github.com/mcctrix/ctrix-social-go-backend/db/v1"
+	"github.com/mcctrix/ctrix-social-go-backend/models"
 	"github.com/mcctrix/ctrix-social-go-backend/utils"
 )
 
@@ -53,8 +55,19 @@ func GetUserProfileWithParam() fiber.Handler {
 
 func UpdateCurrentUserProfile() fiber.Handler {
 	return func(c fiber.Ctx) error {
+		dataInterface := &struct {
+			First_name      string `json:"first_name,omitempty"`
+			Last_name       string `json:"last_name,omitempty"`
+			Profile_picture string `json:"profile_profile,omitempty"`
+		}{}
 
-		err := db.UpdateTableWithByteData(c.BodyRaw(), c.Locals("userID").(string), "user_profile")
+		rawForm, err := utils.ClearStruct(dataInterface, c.BodyRaw())
+		if err != nil {
+			fmt.Println("Error Marshalling the data: ", err)
+			return fiber.ErrInternalServerError
+		}
+
+		err = db.UpdateTableWithByteData(rawForm, c.Locals("userID").(string), "user_profile")
 		if err != nil {
 			fmt.Println("Error Setting the profile: ", err)
 			return fiber.ErrInternalServerError
@@ -79,7 +92,23 @@ func GetAdditionalUserInfo() fiber.Handler {
 
 func UpdateAdditionalUserInfo() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		err := db.UpdateTableWithByteData(c.BodyRaw(), c.Locals("userID").(string), "user_additional_info")
+		dataInterface := &struct {
+			Hobbies         models.StringArray `json:"hobbies,omitempty" gorm:"type:text[]"`
+			Family_members  models.StringArray `json:"family_members,omitempty" gorm:"type:text[]"`
+			Relation_status string             `json:"relation_status,omitempty"`
+			Avatar          string             `json:"avatar,omitempty"`
+			Dob             time.Time          `json:"dob,omitempty"`
+			Bio             string             `json:"bio,omitempty"`
+			Gender          string             `json:"gender,omitempty"`
+		}{}
+
+		rawForm, err := utils.ClearStruct(dataInterface, c.BodyRaw())
+		if err != nil {
+			fmt.Println("Error Marshalling the data: ", err)
+			return fiber.ErrInternalServerError
+		}
+
+		err = db.UpdateTableWithByteData(rawForm, c.Locals("userID").(string), "user_additional_info")
 		if err != nil {
 			fmt.Println("Error Setting the additional profile: ", err)
 			return fiber.ErrInternalServerError
@@ -102,7 +131,20 @@ func GetUserSettings() fiber.Handler {
 
 func UpdateUserSettings() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		err := db.UpdateTableWithByteData(c.BodyRaw(), c.Locals("userID").(string), "user_settings")
+		dataInterface := &struct {
+			Hide_post   models.StringArray `json:"hide_post,omitempty" gorm:"type:text[]"`
+			Hide_story  models.StringArray `json:"hide_story,omitempty" gorm:"type:text[]"`
+			Block_user  models.StringArray `json:"block_user,omitempty" gorm:"type:text[]"`
+			Show_online bool               `json:"show_online" gorm:"type:text[]"`
+		}{}
+
+		rawForm, err := utils.ClearStruct(dataInterface, c.BodyRaw())
+		if err != nil {
+			fmt.Println("Error Marshalling the data: ", err)
+			return fiber.ErrInternalServerError
+		}
+
+		err = db.UpdateTableWithByteData(rawForm, c.Locals("userID").(string), "user_settings")
 		if err != nil {
 			fmt.Println("Error Setting the additional profile: ", err)
 			return fiber.ErrInternalServerError
@@ -127,7 +169,19 @@ func GetUserData() fiber.Handler {
 func UpdateUserData() fiber.Handler {
 	return func(c fiber.Ctx) error {
 
-		err := db.UpdateTableWithByteData(c.BodyRaw(), c.Locals("userID").(string), "user_data")
+		dataInterface := &struct {
+			Posts   models.StringArray `json:"posts,omitempty" gorm:"type:text[]"`
+			Stories models.StringArray `json:"stories,omitempty" gorm:"type:text[]"`
+			Notes   models.StringArray `json:"notes,omitempty" gorm:"type:text[]"`
+		}{}
+
+		rawForm, err := utils.ClearStruct(dataInterface, c.BodyRaw())
+		if err != nil {
+			fmt.Println("Error Marshalling the data: ", err)
+			return fiber.ErrInternalServerError
+		}
+
+		err = db.UpdateTableWithByteData(rawForm, c.Locals("userID").(string), "user_data")
 		if err != nil {
 			fmt.Println("Error Setting the user data: ", err)
 			return fiber.ErrInternalServerError
