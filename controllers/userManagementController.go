@@ -10,9 +10,41 @@ import (
 	"github.com/mcctrix/ctrix-social-go-backend/utils"
 )
 
+func ProfileSetup() fiber.Handler {
+	return func(c fiber.Ctx) error {
+		// avatar,bio,gender,dob
+		dataInterface := &struct {
+			Avatar string    `json:"avatar,omitempty"`
+			Dob    time.Time `json:"dob,omitempty"`
+			Bio    string    `json:"bio,omitempty"`
+			Gender string    `json:"gender,omitempty"`
+		}{}
+
+		rawForm, err := utils.ClearStruct(dataInterface, c.BodyRaw())
+		if err != nil {
+			fmt.Println("Error Marshalling the data: ", err)
+			return fiber.ErrInternalServerError
+		}
+
+		err = db.UpdateTableWithByteData(rawForm, c.Locals("userID").(string), "user_additional_info")
+		if err != nil {
+			fmt.Println("Error Setting the additional profile: ", err)
+			return fiber.ErrInternalServerError
+		}
+
+		err = db.UpdateTableWithByteData(rawForm, c.Locals("userID").(string), "user_profile")
+		if err != nil {
+			fmt.Println("Error Setting the user profile: ", err)
+			return fiber.ErrInternalServerError
+		}
+
+		return c.SendString("Profile Setup Page")
+	}
+}
+
 func GetCurrentUserProfile() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		profile, err := db.GetUserData(c.Locals("userID").(string), "user_profile", []string{"first_name", "last_name", "last_seen", "post_count", "followers", "followings"})
+		profile, err := db.GetUserData(c.Locals("userID").(string), "user_profile", []string{"first_name", "last_name", "avatar", "last_seen", "post_count", "followers", "followings"})
 		if err != nil {
 			fmt.Println("unable to fetch profile: ", err)
 			return c.Status(fiber.StatusNotFound).SendString("unable to fetch user profile!")
@@ -34,7 +66,7 @@ func GetCurrentUserProfile() fiber.Handler {
 func GetUserProfileWithParam() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		userID := c.Params("userid")
-		profile, err := db.GetUserData(userID, "user_profile", []string{"first_name", "last_name", "last_seen", "post_count", "followers", "followings"})
+		profile, err := db.GetUserData(userID, "user_profile", []string{"first_name", "last_name", "avatar", "last_seen", "post_count", "followers", "followings"})
 		if err != nil {
 			fmt.Println("unable to fetch profile: ", err)
 			return c.Status(fiber.StatusNotFound).SendString("unable to fetch user profile!")
@@ -80,7 +112,7 @@ func UpdateCurrentUserProfile() fiber.Handler {
 func GetAdditionalUserInfo() fiber.Handler {
 	return func(c fiber.Ctx) error {
 
-		additional_profile, err := db.GetUserData(c.Locals("userID").(string), "user_additional_info", []string{"hobbies", "family_members", "relation_status", "avatar", "dob", "bio", "gender"})
+		additional_profile, err := db.GetUserData(c.Locals("userID").(string), "user_additional_info", []string{"hobbies", "family_members", "relation_status", "dob", "bio", "gender"})
 		if err != nil {
 			fmt.Println("error while fetching additional profile: ", err)
 			return c.Status(500).SendString("unable to fetch user additional profile!")
