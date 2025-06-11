@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
@@ -74,4 +75,26 @@ func MergeStructs(s1, s2 interface{}) (map[string]interface{}, error) {
 	}
 
 	return merged, nil
+}
+
+/*Make sure to pass a pointer to the struct you want to clear*/
+func ClearStruct(formatStruct interface{}, rawBody []byte) ([]byte, error) {
+
+	// 1. Validate that formatStruct is a pointer to a struct
+	val := reflect.ValueOf(formatStruct)
+	if val.Kind() != reflect.Ptr || val.IsNil() || val.Elem().Kind() != reflect.Struct {
+		return nil, fmt.Errorf("ClearStruct: formatStruct must be a non-nil pointer to a struct")
+	}
+
+	err := json.Unmarshal(rawBody, &formatStruct)
+	if err != nil {
+		fmt.Println("Error Unmarshalling the data: ", err)
+		return nil, err
+	}
+	rawForm, err := json.Marshal(formatStruct)
+	if err != nil {
+		fmt.Println("Error Marshalling the data: ", err)
+		return nil, err
+	}
+	return rawForm, nil
 }
