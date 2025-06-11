@@ -80,7 +80,7 @@ func UpdateCurrentUserProfile() fiber.Handler {
 func GetAdditionalUserInfo() fiber.Handler {
 	return func(c fiber.Ctx) error {
 
-		additional_profile, err := db.GetUserData(c.Locals("userID").(string), "user_additional_info", []string{})
+		additional_profile, err := db.GetUserData(c.Locals("userID").(string), "user_additional_info", []string{"hobbies", "family_members", "relation_status", "avatar", "dob", "bio", "gender"})
 		if err != nil {
 			fmt.Println("error while fetching additional profile: ", err)
 			return c.Status(500).SendString("unable to fetch user additional profile!")
