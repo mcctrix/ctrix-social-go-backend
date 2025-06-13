@@ -222,3 +222,48 @@ func UpdateUserData() fiber.Handler {
 		return c.SendString("User Data updated Successfully!")
 	}
 }
+
+func FollowUser() fiber.Handler {
+	return func(c fiber.Ctx) error {
+		follow_id := c.Params("userid")
+		following_id := c.Locals("userID").(string)
+
+		err := db.FollowUser(follow_id, following_id)
+		if err != nil {
+			fmt.Println("Error while following user: ", err)
+			return fiber.ErrInternalServerError
+		}
+
+		return c.SendString("User Followed Successfully!")
+	}
+}
+
+func UnfollowUser() fiber.Handler {
+	return func(c fiber.Ctx) error {
+		follow_id := c.Params("userid")
+		following_id := c.Locals("userID").(string)
+
+		err := db.UnfollowUser(follow_id, following_id)
+		if err != nil {
+			fmt.Println("Error while unfollowing user: ", err)
+			return fiber.ErrInternalServerError
+		}
+
+		return c.SendString("User Unfollowed Successfully!")
+	}
+}
+
+func CheckFollowing() fiber.Handler {
+	return func(c fiber.Ctx) error {
+		follow_id := c.Params("userid")
+		following_id := c.Locals("userID").(string)
+
+		follow, err := db.CheckFollowing(follow_id, following_id)
+		if err != nil {
+			fmt.Println("Error while checking following: ", err)
+			return fiber.ErrInternalServerError
+		}
+
+		return c.Status(fiber.StatusOK).JSON(follow)
+	}
+}

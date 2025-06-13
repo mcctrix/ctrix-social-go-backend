@@ -11,7 +11,13 @@ func UserManagementRouter(router fiber.Router) {
 
 	router.Get("/", controllers.GetCurrentUserProfile())
 	router.Patch("/", controllers.UpdateCurrentUserProfile())
+
 	router.Get("/:userid", controllers.GetUserProfileWithParam())
+
+	// follow user
+	router.Post("/:userid/follow", controllers.FollowUser())
+	router.Delete("/:userid/follow", controllers.UnfollowUser())
+	router.Get("/:userid/follow", controllers.CheckFollowing())
 
 	router.Get("/additional_info", controllers.GetAdditionalUserInfo())
 	router.Patch("/additional_info", controllers.UpdateAdditionalUserInfo())
@@ -23,4 +29,5 @@ func UserManagementRouter(router fiber.Router) {
 	router.Patch("/user_data", controllers.UpdateUserData())
 
 	router.Post("/profile-setup", controllers.ProfileSetup())
+
 }

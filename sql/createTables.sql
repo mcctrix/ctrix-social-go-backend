@@ -19,11 +19,17 @@ CREATE TABLE IF NOT EXISTS user_profile (
     last_name VARCHAR(30),
     avatar VARCHAR(25),
     profile_picture VARCHAR(200),
-    last_seen TIMESTAMP,
-    followers TEXT[],
-    followings TEXT[]
+    last_seen TIMESTAMP
 );
 
+CREATE TABLE follows (
+    follower_id text NOT NULL,  
+    following_id text NOT NULL, 
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (follower_id, following_id),
+    FOREIGN KEY (follower_id) REFERENCES user_auth(id),
+    FOREIGN KEY (following_id) REFERENCES user_auth(id)
+);
 
 CREATE TABLE IF NOT EXISTS user_additional_info (
     id VARCHAR(50) PRIMARY KEY,

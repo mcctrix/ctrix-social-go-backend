@@ -98,3 +98,9 @@ type User_Settings struct {
 	Block_user  StringArray `json:"block_user,omitempty" gorm:"type:text[]"`
 	Show_online bool        `json:"show_online" gorm:"type:text[]"`
 }
+
+type Follows struct {
+	Follower_id  string    `json:"follower_id"`
+	Following_id string    `json:"following_id"`
+	Created_at   time.Time `json:"created_at"`
+}

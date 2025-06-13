@@ -3,6 +3,7 @@ package v1
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/mcctrix/ctrix-social-go-backend/models"
 )
@@ -66,8 +67,6 @@ func GetUserData(id string, tableName string, fieldNames []string) (dataInterfac
 		userData = &models.User_Additional_Info{}
 	case "user_settings":
 		userData = &models.User_Settings{}
-	case "user_data":
-		userData = &models.User_Data{}
 	default:
 		return nil, fmt.Errorf("unsupported table name for get: %s", tableName)
 	}
@@ -99,8 +98,6 @@ func UpdateTableWithByteData(NewProfileData []byte, userID string, tableName str
 		userProfile = &models.User_Additional_Info{}
 	case "user_settings":
 		userProfile = &models.User_Settings{}
-	case "user_data":
-		userProfile = &models.User_Data{}
 	default:
 		return fmt.Errorf("unsupported table name for update: %s", tableName)
 	}
@@ -147,4 +144,48 @@ func InitNewUser(userid string) error {
 		return err
 	}
 	return nil
+}
+
+func FollowUser(follow_id string, following_id string) error {
+	db, err := DBConnection()
+	if err != nil {
+		return err
+	}
+
+	if err = db.Table("follows").Create(&models.Follows{
+		Follower_id:  follow_id,
+		Following_id: following_id,
+		Created_at:   time.Now(),
+	}).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func UnfollowUser(follow_id string, following_id string) error {
+	db, err := DBConnection()
+	if err != nil {
+		return err
+	}
+
+	if err = db.Table("follows").Where("follower_id = ? AND following_id = ?", follow_id, following_id).Delete(&models.Follows{}).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func CheckFollowing(follow_id string, following_id string) ([]models.Follows, error) {
+	db, err := DBConnection()
+	if err != nil {
+		return nil, err
+	}
+
+	var follows []models.Follows
+	if err = db.Table("follows").Select("created_at").Where("follower_id = ? AND following_id = ?", follow_id, following_id).Find(&follows).Error; err != nil {
+		return nil, err
+	}
+
+	return follows, nil
 }
