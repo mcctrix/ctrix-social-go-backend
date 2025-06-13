@@ -18,6 +18,7 @@ import (
 func main() {
 
 	loadEnvironment()
+	CheckArgs()
 
 	port := os.Getenv("PORT")
 
@@ -41,6 +42,22 @@ func main() {
 	}
 }
 
+func CheckArgs() {
+	if len(os.Args) == 0 {
+		return
+	}
+	if utils.ContainsString(os.Args, "--reset") {
+		db.ResetDB()
+	}
+	if utils.ContainsString(os.Args, "--init-db") {
+		db.CreateInitialDBStructure()
+		fmt.Println("Created Initial Database Structure")
+	}
+	if utils.ContainsString(os.Args, "--populate-db") {
+		fmt.Println("Still not implemented")
+	}
+}
+
 func loadEnvironment() {
 	// Load the .env file in the current directory
 	godotenv.Load()
@@ -51,7 +68,7 @@ func loadEnvironment() {
 		utils.GenerateEcdsaPrivateKey()
 	}
 	// db.ResetDB()
-	db.CreateInitialDBStructure()
+	// db.CreateInitialDBStructure()
 }
 
 func makeRouter() *fiber.App {

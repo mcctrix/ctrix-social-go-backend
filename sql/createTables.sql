@@ -22,13 +22,13 @@ CREATE TABLE IF NOT EXISTS user_profile (
     last_seen TIMESTAMP
 );
 
-CREATE TABLE follows (
+CREATE TABLE IF NOT EXISTS follows (
     follower_id text NOT NULL,  
     following_id text NOT NULL, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (follower_id, following_id),
-    FOREIGN KEY (follower_id) REFERENCES user_auth(id),
-    FOREIGN KEY (following_id) REFERENCES user_auth(id)
+    UNIQUE (follower_id, following_id),
+    FOREIGN KEY (follower_id) REFERENCES user_auth(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (following_id) REFERENCES user_auth(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS user_additional_info (

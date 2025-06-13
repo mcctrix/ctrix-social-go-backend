@@ -59,7 +59,6 @@ func CreateUserPost() fiber.Handler {
 		postData.Created_at = time.Now()
 		postData.Updated_at = time.Now()
 		postData.Creator_id = c.Locals("userID").(string)
-		postData.Comments = nil
 
 		bodyData, err := utils.ClearStruct(postData, []byte(formData))
 		if err != nil {
