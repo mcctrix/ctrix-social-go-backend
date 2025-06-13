@@ -46,15 +46,17 @@ func CheckArgs() {
 	if len(os.Args) == 0 {
 		return
 	}
-	if utils.ContainsString(os.Args, "--reset") {
+	if utils.ContainsString(os.Args, "reset") {
 		db.ResetDB()
 	}
-	if utils.ContainsString(os.Args, "--init-db") {
+	if utils.ContainsString(os.Args, "init-db") {
 		db.CreateInitialDBStructure()
 		fmt.Println("Created Initial Database Structure")
 	}
-	if utils.ContainsString(os.Args, "--populate-db") {
-		fmt.Println("Still not implemented")
+	if utils.ContainsString(os.Args, "populate-db") {
+		db.PopulateDB()
+		fmt.Println("Populated Database!!")
+		os.Exit(0)
 	}
 }
 

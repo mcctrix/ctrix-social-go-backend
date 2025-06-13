@@ -97,14 +97,11 @@ CREATE TABLE IF NOT EXISTS user_post_comment_like (
 -- Posts End
 
 -- Messenger
-
 CREATE TABLE IF NOT EXISTS private_chats (
     id VARCHAR(50) PRIMARY KEY,
     created_at TIMESTAMP DEFAULT NOW(),
     firstUserID VARCHAR(50) NOT NULL,
     secondUserID VARCHAR(50) NOT NULL,
-    last_message VARCHAR(250),
-    last_message_time TIMESTAMP DEFAULT NOW(),
     isDeleted BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (firstUserID) REFERENCES user_auth(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (secondUserID) REFERENCES user_auth(id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -114,9 +111,11 @@ CREATE TABLE IF NOT EXISTS private_chats (
  CREATE TABLE IF NOT EXISTS private_chat_messages (
     id VARCHAR(50) PRIMARY KEY DEFAULT uuid_generate_v4(),
     private_chat_id VARCHAR(50) NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    message VARCHAR(250) NOT NULL,
     user_id VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    message_type VARCHAR(20),
+    message VARCHAR(250) NOT NULL,
+    isDeleted BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (private_chat_id) REFERENCES private_chats(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (user_id) REFERENCES user_auth(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -125,16 +124,20 @@ CREATE TABLE IF NOT EXISTS group_chats (
     id VARCHAR(50) PRIMARY KEY,
     created_at TIMESTAMP DEFAULT NOW(),
     usersList TEXT[],
-    last_message VARCHAR(250),
-    last_message_time TIMESTAMP DEFAULT NOW(),
-    isDeleted BOOLEAN DEFAULT FALSE
+    adminList TEXT[],
+    owner_id VARCHAR(50) NOT NULL,
+    isDeleted BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (owner_id) REFERENCES user_auth(id)
 );
 
 CREATE TABLE IF NOT EXISTS group_chat_messages (
     id VARCHAR(50) PRIMARY KEY DEFAULT uuid_generate_v4(),
     group_chat_id VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    message_type VARCHAR(20),
     message VARCHAR(250) NOT NULL,
+    isDeleted BOOLEAN DEFAULT FALSE,
     user_id VARCHAR(50) NOT NULL,
     FOREIGN KEY (group_chat_id) REFERENCES group_chats(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (user_id) REFERENCES user_auth(id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -148,5 +151,22 @@ CREATE TABLE IF NOT EXISTS group_chat_member_requests (
     FOREIGN KEY (user_id) REFERENCES user_auth(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS message_reaction (
+    id VARCHAR(50) PRIMARY KEY DEFAULT uuid_generate_v4(),
+    message_id VARCHAR(50) NOT NULL,
+    user_id VARCHAR(50) NOT NULL,
+    reaction VARCHAR(20),
+    created_at TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (message_id) REFERENCES group_chat_messages(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES user_auth(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS group_chat_join_requests (
+    id VARCHAR(50) PRIMARY KEY DEFAULT uuid_generate_v4(),
+    group_chat_id VARCHAR(50) NOT NULL,
+    user_id VARCHAR(50) NOT NULL,
+    FOREIGN KEY (group_chat_id) REFERENCES group_chats(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES user_auth(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
 -- Messenger End
 
