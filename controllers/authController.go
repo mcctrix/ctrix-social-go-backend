@@ -38,14 +38,13 @@ func SignUp() fiber.Handler {
 
 		dbInstance, err := db.DBConnection()
 		if err != nil {
+			fmt.Println(err)
 			return fiber.ErrInternalServerError
 		}
 		if err = dbInstance.Table("user_auth").Create(user).Error; err != nil {
 			fmt.Println("Error in Creating New User:", err.Error())
 			if errors.Is(err, gorm.ErrDuplicatedKey) {
-				return c.Status(400).JSON(map[string]string{
-					"error": "Duplicate Email or Username.",
-				})
+				return c.Status(400).SendString("Duplicate Email or Username.")
 			}
 
 			return fiber.ErrInternalServerError
@@ -94,6 +93,7 @@ func Login() fiber.Handler {
 
 		dbConn, err := db.DBConnection()
 		if err != nil {
+			fmt.Println(err)
 			return fiber.ErrInternalServerError
 		}
 		username := strings.ToLower(c.FormValue("username"))

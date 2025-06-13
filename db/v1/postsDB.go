@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gofiber/fiber/v3"
 	"github.com/mcctrix/ctrix-social-go-backend/models"
 )
 
@@ -184,7 +185,8 @@ func DeleteUserPost(postID string, userID string) error {
 func DeletePostComment(commentID string, userID string) error {
 	db, err := DBConnection()
 	if err != nil {
-		return err
+		fmt.Println(err)
+		return fiber.ErrInternalServerError
 	}
 
 	// Delete the comment, ensuring it belongs to the user
@@ -220,7 +222,8 @@ func GetAllPostReaction(postID string) ([]models.User_Post_Like_Table, error) {
 func PostLikeToggler(postID string, userLikedID string, liked bool, likeType string) error {
 	db, err := DBConnection()
 	if err != nil {
-		return err
+		fmt.Println(err)
+		return fiber.ErrInternalServerError
 	}
 
 	if liked {
@@ -248,7 +251,8 @@ func PostLikeToggler(postID string, userLikedID string, liked bool, likeType str
 func CommentLikeToggler(commentID string, userLikedID string, liked bool, likeType string) error {
 	db, err := DBConnection()
 	if err != nil {
-		return err
+		fmt.Println(err)
+		return fiber.ErrInternalServerError
 	}
 
 	if liked {

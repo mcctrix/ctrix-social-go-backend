@@ -16,7 +16,7 @@ func GetCommentByID() fiber.Handler {
 		comment, err := db.GetCommentByID(commentID)
 		if err != nil {
 			fmt.Println("unable to fetch comment: ", err)
-			return c.Status(500).SendString("unable to fetch comment!")
+			return c.Status(fiber.StatusNotFound).SendString("unable to find comment!")
 		}
 		return c.JSON(comment)
 	}
@@ -42,7 +42,7 @@ func UpdatePostComment() fiber.Handler {
 		err = db.UpdatePostCommentWithByteData(commentID, rawData, c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("Error updating comment: ", err)
-			return fiber.ErrInternalServerError
+			return c.Status(fiber.StatusBadRequest).SendString("Unable to update comment!")
 		}
 
 		return c.SendString("Comment updated successfully!")

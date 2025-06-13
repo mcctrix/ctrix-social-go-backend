@@ -47,7 +47,7 @@ func CreateUserPost() fiber.Handler {
 		cloudinaryURLs, err := cloudinary.UploadMediaHandler(c)
 		if err != nil {
 			fmt.Println("Error uploading media: ", err)
-			return fiber.ErrInternalServerError
+			return c.Status(fiber.StatusRequestTimeout).SendString("Unable to upload media!")
 		}
 		if len(cloudinaryURLs) > 0 {
 			postData.Media_attached = cloudinaryURLs
@@ -69,7 +69,7 @@ func CreateUserPost() fiber.Handler {
 		err = db.CreateUserPostWithByteData(bodyData, c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("Error creating post: ", err)
-			return fiber.ErrInternalServerError
+			return c.Status(fiber.StatusInternalServerError).SendString("Unable to create post!")
 		}
 
 		return c.Status(fiber.StatusCreated).SendString("Post created successfully!")
@@ -82,7 +82,7 @@ func GetPostByID() fiber.Handler {
 		post, err := db.GetPostByID(postID)
 		if err != nil {
 			fmt.Println("unable to fetch post: ", err)
-			return c.Status(500).SendString("unable to fetch post!")
+			return c.Status(fiber.StatusNotFound).SendString("unable to fetch post!")
 		}
 		return c.JSON(post)
 	}
@@ -99,7 +99,7 @@ func UpdateUserPost() fiber.Handler {
 		cloudinaryURLs, err := cloudinary.UploadMediaHandler(c)
 		if err != nil {
 			fmt.Println("Error uploading media: ", err)
-			return fiber.ErrInternalServerError
+			return c.Status(fiber.StatusInternalServerError).SendString("Unable to upload media!")
 		}
 		if len(cloudinaryURLs) > 0 {
 			bodyData.Media_attached = cloudinaryURLs
@@ -119,7 +119,7 @@ func UpdateUserPost() fiber.Handler {
 		err = db.UpdateUserPostWithByteData(postID, rawData, c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("Error updating post: ", err)
-			return fiber.ErrInternalServerError
+			return c.Status(fiber.StatusBadRequest).SendString("Unable to update post!")
 		}
 
 		return c.SendString("Post updated successfully!")
@@ -146,7 +146,7 @@ func GetPostComments() fiber.Handler {
 		comments, err := db.GetPostCommentsByPostID(postID)
 		if err != nil {
 			fmt.Println("error while fetching post comments: ", err)
-			return c.Status(500).SendString("unable to fetch post comments!")
+			return c.Status(fiber.StatusBadRequest).SendString("unable to fetch post comments!")
 		}
 
 		return c.JSON(comments)
@@ -162,7 +162,7 @@ func CreatePostComment() fiber.Handler {
 		err := db.CreatePostCommentWithByteData(commentData, c.Locals("userID").(string), postID)
 		if err != nil {
 			fmt.Println("Error creating comment: ", err)
-			return fiber.ErrInternalServerError
+			return c.Status(fiber.StatusBadRequest).SendString("Unable to create comment!")
 		}
 
 		return c.SendString("Comment created successfully!")
