@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS user_profile (
     last_name VARCHAR(30),
     avatar VARCHAR(25),
     profile_picture VARCHAR(200),
-    last_seen TIMESTAMP
+    last_seen TIMESTAMP,
+    verified_user BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS follows (

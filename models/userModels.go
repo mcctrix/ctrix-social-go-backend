@@ -77,6 +77,7 @@ type User_Profile struct {
 	Avatar          string    `json:"avatar,omitempty"`
 	Profile_picture string    `json:"profile_profile,omitempty"`
 	Last_seen       time.Time `json:"last_seen,omitempty"`
+	Verified_user   bool      `json:"verified_user"`
 }
 
 type User_Additional_Info struct {

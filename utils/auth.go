@@ -25,7 +25,7 @@ func GenerateJwtToken(user *models.User_Auth) (*gnData, error) {
 
 	returnData := &gnData{}
 
-	returnData.Exp_Time = time.Now().Add(time.Hour * 24).Unix()
+	returnData.Exp_Time = time.Now().Add(time.Hour * 24 * 60).Unix()
 
 	claim := jwt.MapClaims{
 		"iss":   "ctrix-social-golang-backend",

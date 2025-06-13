@@ -44,13 +44,13 @@ func ProfileSetup() fiber.Handler {
 
 func GetCurrentUserProfile() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		fmt.Println(c.Locals("userID"))
-		profile, err := db.GetUserData(c.Locals("userID").(string), "user_profile", []string{"first_name", "last_name", "avatar", "last_seen"})
+
+		profile, err := db.GetUserData(c.Locals("userID").(string), "user_profile", []string{"first_name", "last_name", "avatar", "last_seen", "verified_user"})
 		if err != nil {
 			fmt.Println("unable to fetch profile: ", err)
 			return c.Status(fiber.StatusNotFound).SendString("unable to fetch user profile!")
 		}
-		userAuth, err := db.GetUserData(c.Locals("userID").(string), "user_auth", []string{"email", "username"})
+		userAuth, err := db.GetUserData(c.Locals("userID").(string), "user_auth", []string{"email", "username", "created_at"})
 		if err != nil {
 			fmt.Println("unable to fetch user Auth: ", err)
 			return c.Status(fiber.StatusNotFound).SendString("unable to fetch user auth!")

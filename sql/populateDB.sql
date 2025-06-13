@@ -28,17 +28,17 @@ INSERT INTO user_auth (id, email, username, password, created_at, updated_at) VA
 ('u10', 'anna@example.com', 'anna_white', 'password123', '2023-09-05 14:15:00', '2023-09-05 14:15:00');
 
 -- Insert User Profiles
-INSERT INTO user_profile (id, first_name, last_name, avatar, profile_picture, last_seen) VALUES
-('u1', 'Ctrix', 'Developer', 'itachi', '', NOW() - INTERVAL '2 hours'), -- Active recently
-('u2', 'Anmol', 'Sharma', 'kakashi', '', NOW() - INTERVAL '2 days'), -- Active few days ago
-('u3', 'John', 'Doe', 'crawk', '', NOW() - INTERVAL '2 months'), -- Active few months ago
-('u4', 'Sarah', 'Smith', 'sasuke', '', NOW() - INTERVAL '1 year'), -- Active last year
-('u5', 'Mike', 'Wilson', 'gojo', '', NOW() - INTERVAL '3 hours'), -- Active recently
-('u6', 'Emma', 'Brown', 'zoro', '', NOW() - INTERVAL '1 month'), -- Active last month
-('u7', 'David', 'Jones', 'itachi', '', NOW() - INTERVAL '6 months'), -- Active half year ago
-('u8', 'Lisa', 'Taylor', 'kakashi', '', NOW() - INTERVAL '4 hours'), -- Active recently
-('u9', 'James', 'Miller', 'crawk', '', NOW() - INTERVAL '3 months'), -- Active few months ago
-('u10', 'Anna', 'White', 'sasuke', '', NOW() - INTERVAL '2 weeks'); -- Active few weeks ago
+INSERT INTO user_profile (id, first_name, last_name, avatar, profile_picture, last_seen, verified_user) VALUES
+('u1', 'Ctrix', 'Developer', 'itachi', '', NOW() - INTERVAL '2 hours',true), -- Active recently
+('u2', 'Anmol', 'Sharma', 'kakashi', '', NOW() - INTERVAL '2 days',false), -- Active few days ago
+('u3', 'John', 'Doe', 'crawk', '', NOW() - INTERVAL '2 months',false), -- Active few months ago
+('u4', 'Sarah', 'Smith', 'sasuke', '', NOW() - INTERVAL '1 year',false), -- Active last year
+('u5', 'Mike', 'Wilson', 'gojo', '', NOW() - INTERVAL '3 hours',false), -- Active recently
+('u6', 'Emma', 'Brown', 'zoro', '', NOW() - INTERVAL '1 month',false), -- Active last month
+('u7', 'David', 'Jones', 'itachi', '', NOW() - INTERVAL '6 months',false), -- Active half year ago
+('u8', 'Lisa', 'Taylor', 'kakashi', '', NOW() - INTERVAL '4 hours',false), -- Active recently
+('u9', 'James', 'Miller', 'crawk', '', NOW() - INTERVAL '3 months',false), -- Active few months ago
+('u10', 'Anna', 'White', 'sasuke', '', NOW() - INTERVAL '2 weeks',false); -- Active few weeks ago
 
 -- Insert User Additional Info
 INSERT INTO user_additional_info (id, hobbies, relation_status, dob, bio, gender) VALUES
