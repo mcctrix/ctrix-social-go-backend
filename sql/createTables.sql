@@ -35,7 +35,6 @@ CREATE TABLE IF NOT EXISTS user_additional_info (
     id VARCHAR(50) PRIMARY KEY,
     FOREIGN KEY (id) REFERENCES user_auth ON DELETE CASCADE ON UPDATE CASCADE,
     hobbies TEXT[],
-    family_members TEXT[],
     relation_status VARCHAR(12),
     dob DATE,
     bio VARCHAR(250),

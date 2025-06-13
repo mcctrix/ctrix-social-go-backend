@@ -41,17 +41,17 @@ INSERT INTO user_profile (id, first_name, last_name, avatar, profile_picture, la
 ('u10', 'Anna', 'White', 'sasuke', '', NOW() - INTERVAL '2 weeks'); -- Active few weeks ago
 
 -- Insert User Additional Info
-INSERT INTO user_additional_info (id, hobbies, family_members, relation_status, dob, bio, gender) VALUES
-('u1', ARRAY['Coding', 'Gaming', 'Photography'], ARRAY['Mom', 'Dad'], 'Single', '1995-01-01', 'Full-stack developer and tech enthusiast', 'Male'),
-('u2', ARRAY['Reading', 'Travel', 'Music'], ARRAY['Sister', 'Brother'], 'Single', '1996-02-02', 'Software engineer and music lover', 'Male'),
-('u3', ARRAY['Sports', 'Cooking'], ARRAY['Wife', 'Son'], 'Married', '1990-03-03', 'Sports enthusiast and family man', 'Male'),
-('u4', ARRAY['Dancing', 'Painting'], ARRAY['Husband', 'Daughter'], 'Married', '1991-04-04', 'Artist and dancer', 'Female'),
-('u5', ARRAY['Fishing', 'Hiking'], ARRAY['Parents'], 'Single', '1992-05-05', 'Nature lover and adventurer', 'Male'),
-('u6', ARRAY['Yoga', 'Meditation'], ARRAY['Parents', 'Sister'], 'Single', '1993-06-06', 'Yoga instructor and wellness coach', 'Female'),
-('u7', ARRAY['Photography', 'Travel'], ARRAY['Wife'], 'Married', '1994-07-07', 'Travel photographer', 'Male'),
-('u8', ARRAY['Cooking', 'Baking'], ARRAY['Husband', 'Son'], 'Married', '1995-08-08', 'Professional chef', 'Female'),
-('u9', ARRAY['Gaming', 'Coding'], ARRAY['Parents'], 'Single', '1996-09-09', 'Game developer', 'Male'),
-('u10', ARRAY['Dancing', 'Singing'], ARRAY['Parents', 'Brother'], 'Single', '1997-10-10', 'Professional dancer', 'Female');
+INSERT INTO user_additional_info (id, hobbies, relation_status, dob, bio, gender) VALUES
+('u1', ARRAY['Coding', 'Gaming', 'Photography'], 'Single', '1995-01-01', 'Full-stack developer and tech enthusiast', 'Male'),
+('u2', ARRAY['Reading', 'Travel', 'Music'], 'Single', '1996-02-02', 'Software engineer and music lover', 'Male'),
+('u3', ARRAY['Sports', 'Cooking'], 'Married', '1990-03-03', 'Sports enthusiast and family man', 'Male'),
+('u4', ARRAY['Dancing', 'Painting'], 'Married', '1991-04-04', 'Artist and dancer', 'Female'),
+('u5', ARRAY['Fishing', 'Hiking'], 'Single', '1992-05-05', 'Nature lover and adventurer', 'Male'),
+('u6', ARRAY['Yoga', 'Meditation'], 'Single', '1993-06-06', 'Yoga instructor and wellness coach', 'Female'),
+('u7', ARRAY['Photography', 'Travel'], 'Married', '1994-07-07', 'Travel photographer', 'Male'),
+('u8', ARRAY['Cooking', 'Baking'], 'Married', '1995-08-08', 'Professional chef', 'Female'),
+('u9', ARRAY['Gaming', 'Coding'], 'Single', '1996-09-09', 'Game developer', 'Male'),
+('u10', ARRAY['Dancing', 'Singing'], 'Single', '1997-10-10', 'Professional dancer', 'Female');
 
 -- Insert User Settings with varying configurations
 INSERT INTO user_settings (id, hide_post, hide_story, block_user, show_online) VALUES
@@ -267,9 +267,9 @@ INSERT INTO private_chat_messages (id, private_chat_id, user_id, created_at, mes
 ('pcm2', 'pc1', 'u2', '2020-02-01 10:01:00', 'text', 'Hi Ctrix!', false),
 ('pcm3', 'pc1', 'u1', '2020-02-01 10:02:00', 'text', 'How are you?', false),
 ('pcm4', 'pc1', 'u2', '2020-02-01 10:03:00', 'text', 'I''m good, thanks!', false),
-('pcm5', 'pc1', 'u1', '2020-02-01 10:04:00', 'media', 'https://example.com/image1.jpg', false),
+('pcm5', 'pc1', 'u1', '2020-02-01 10:04:00', 'media', 'https://i.pinimg.com/736x/d4/83/56/d48356c7b841e2f58525c86eebbc46e8.jpg', false),
 ('pcm6', 'pc1', 'u2', '2020-02-01 10:05:00', 'text', 'Nice picture!', false),
-('pcm7', 'pc1', 'u1', '2020-02-01 10:06:00', 'giff', 'https://example.com/gif1.gif', false),
+('pcm7', 'pc1', 'u1', '2020-02-01 10:06:00', 'giff', 'https://i.pinimg.com/736x/81/c0/0f/81c00ffa83ba2e80ee984ddffde27599.jpg', false),
 ('pcm8', 'pc1', 'u2', '2020-02-01 10:07:00', 'text', 'Haha, that''s funny!', false),
 
 -- Ctrix-John chat messages
@@ -277,7 +277,7 @@ INSERT INTO private_chat_messages (id, private_chat_id, user_id, created_at, mes
 ('pcm10', 'pc2', 'u3', '2020-03-15 14:31:00', 'text', 'Hi Ctrix!', false),
 ('pcm11', 'pc2', 'u1', '2020-03-15 14:32:00', 'text', 'How''s the project going?', false),
 ('pcm12', 'pc2', 'u3', '2020-03-15 14:33:00', 'text', 'Going well, thanks!', false),
-('pcm13', 'pc2', 'u1', '2020-03-15 14:34:00', 'media', 'https://example.com/image2.jpg', false),
+('pcm13', 'pc2', 'u1', '2020-03-15 14:34:00', 'media', 'https://i.pinimg.com/736x/d4/83/56/d48356c7b841e2f58525c86eebbc46e8.jpg', false),
 ('pcm14', 'pc2', 'u3', '2020-03-15 14:35:00', 'text', 'Looking good!', false);
 
 -- Insert Group Chats (1-4 per user)
@@ -302,14 +302,14 @@ INSERT INTO group_chat_messages (id, group_chat_id, created_at, updated_at, mess
 ('gcm2', 'gc1', '2020-02-01 10:01:00', '2020-02-01 10:01:00', 'text', 'Thanks for having me!', false, 'u2'),
 ('gcm3', 'gc1', '2020-02-01 10:02:00', '2020-02-01 10:02:00', 'text', 'Excited to work with everyone!', false, 'u3'),
 ('gcm4', 'gc1', '2020-02-01 10:03:00', '2020-02-01 10:03:00', 'text', 'Let''s make it great!', false, 'u4'),
-('gcm5', 'gc1', '2020-02-01 10:04:00', '2020-02-01 10:04:00', 'media', 'https://example.com/team.jpg', false, 'u1'),
+('gcm5', 'gc1', '2020-02-01 10:04:00', '2020-02-01 10:04:00', 'media', 'https://i.pinimg.com/736x/d4/83/56/d48356c7b841e2f58525c86eebbc46e8.jpg', false, 'u1'),
 ('gcm6', 'gc1', '2020-02-01 10:05:00', '2020-02-01 10:05:00', 'text', 'Great team photo!', false, 'u2'),
 
 -- Project Alpha Group messages
 ('gcm7', 'gc2', '2020-03-15 14:30:00', '2020-03-15 14:30:00', 'text', 'Project Alpha kickoff!', false, 'u1'),
 ('gcm8', 'gc2', '2020-03-15 14:31:00', '2020-03-15 14:31:00', 'text', 'Ready to start!', false, 'u2'),
 ('gcm9', 'gc2', '2020-03-15 14:32:00', '2020-03-15 14:32:00', 'text', 'Let''s do this!', false, 'u5'),
-('gcm10', 'gc2', '2020-03-15 14:33:00', '2020-03-15 14:33:00', 'giff', 'https://example.com/excited.gif', false, 'u6');
+('gcm10', 'gc2', '2020-03-15 14:33:00', '2020-03-15 14:33:00', 'giff', 'https://i.pinimg.com/736x/81/c0/0f/81c00ffa83ba2e80ee984ddffde27599.jpg', false, 'u6');
 
 -- Insert Message Reactions (only for group chat messages)
 INSERT INTO message_reaction (id, message_id, user_id, reaction) VALUES
