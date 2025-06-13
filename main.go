@@ -51,11 +51,9 @@ func CheckArgs() {
 	}
 	if utils.ContainsString(os.Args, "init-db") {
 		db.CreateInitialDBStructure()
-		fmt.Println("Created Initial Database Structure")
 	}
 	if utils.ContainsString(os.Args, "populate-db") {
 		db.PopulateDB()
-		fmt.Println("Populated Database!!")
 		os.Exit(0)
 	}
 }
