@@ -57,7 +57,9 @@ func CreateUserPost() fiber.Handler {
 
 		postData.Id = uuid.NewString()
 		postData.Created_at = time.Now()
+		postData.Updated_at = time.Now()
 		postData.Creator_id = c.Locals("userID").(string)
+		postData.Comments = nil
 
 		bodyData, err := utils.ClearStruct(postData, []byte(formData))
 		if err != nil {
@@ -89,9 +91,33 @@ func GetPostByID() fiber.Handler {
 
 func UpdateUserPost() fiber.Handler {
 	return func(c fiber.Ctx) error {
+		bodyData := &struct {
+			Updated_at     time.Time          `json:"updated_at"`
+			Text_content   string             `json:"text_content"`
+			Media_attached models.StringArray `json:"pictures_attached" gorm:"type:text[]"`
+		}{}
+
+		cloudinaryURLs, err := cloudinary.UploadMediaHandler(c)
+		if err != nil {
+			fmt.Println("Error uploading media: ", err)
+			return fiber.ErrInternalServerError
+		}
+		if len(cloudinaryURLs) > 0 {
+			bodyData.Media_attached = cloudinaryURLs
+		}
+
+		formData := c.FormValue("post_data")
+
+		bodyData.Updated_at = time.Now()
+
+		rawData, err := utils.ClearStruct(bodyData, []byte(formData))
+		if err != nil {
+			fmt.Println("Error clearing struct: ", err)
+			return fiber.ErrInternalServerError
+		}
 
 		postID := c.Params("postid")
-		err := db.UpdateUserPostWithByteData(postID, c.BodyRaw(), c.Locals("userID").(string))
+		err = db.UpdateUserPostWithByteData(postID, rawData, c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("Error updating post: ", err)
 			return fiber.ErrInternalServerError
@@ -158,9 +184,22 @@ func GetCommentByID() fiber.Handler {
 
 func UpdatePostComment() fiber.Handler {
 	return func(c fiber.Ctx) error {
+		commentData := &struct {
+			Updated_at time.Time `json:"updated_at"`
+			Content    string    `json:"content"`
+			Giff       string    `json:"giff"`
+		}{}
+
+		commentData.Updated_at = time.Now()
+
+		rawData, err := utils.ClearStruct(commentData, c.BodyRaw())
+		if err != nil {
+			fmt.Println("Error clearing struct: ", err)
+			return fiber.ErrInternalServerError
+		}
 
 		commentID := c.Params("commentid")
-		err := db.UpdatePostCommentWithByteData(commentID, c.BodyRaw(), c.Locals("userID").(string))
+		err = db.UpdatePostCommentWithByteData(commentID, rawData, c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("Error updating comment: ", err)
 			return fiber.ErrInternalServerError

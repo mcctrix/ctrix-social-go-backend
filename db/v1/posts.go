@@ -65,7 +65,7 @@ func GetPostCommentsByPostID(postID string) ([]*models.User_post_Comments, error
 		return nil, err
 	}
 	var postComments []*models.User_post_Comments
-	if err = db.Table("user_post_comments").Order("created_at desc").Where("post_id = ?", postID).Find(&postComments).Error; err != nil {
+	if err = db.Table("user_post_comments").Order("updated_at desc").Where("post_id = ?", postID).Find(&postComments).Error; err != nil {
 		return nil, err
 	}
 	return postComments, nil

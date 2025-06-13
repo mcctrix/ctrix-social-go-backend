@@ -61,10 +61,10 @@ CREATE TABLE IF NOT EXISTS user_posts (
     id VARCHAR(50) PRIMARY KEY DEFAULT uuid_generate_v4(),
     creator_id VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
     group_id VARCHAR(50),
     text_content TEXT,
     media_attached TEXT[],
-    comments TEXT[]
 );
 
 CREATE TABLE IF NOT EXISTS user_post_like (
@@ -82,8 +82,9 @@ CREATE TABLE IF NOT EXISTS user_post_comments (
     FOREIGN KEY(post_id) REFERENCES user_posts(id) ON DELETE CASCADE ON UPDATE CASCADE,
     creator_id VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
     content text,
-    pictures_attached TEXT[],
+    giff text,
     nested_comments TEXT[]
 );
 
