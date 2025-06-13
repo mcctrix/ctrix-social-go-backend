@@ -229,7 +229,7 @@ func PostLikeToggler() fiber.Handler {
 			Toggle    bool
 			Like_type string
 		}{}
-		rawData := c.Body()
+		rawData := c.BodyRaw()
 
 		err := json.Unmarshal(rawData, bodyData)
 		if err != nil {

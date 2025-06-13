@@ -85,6 +85,7 @@ func CreatePostCommentWithByteData(newCommentByte []byte, userID string, postID 
 
 	// Set the creator ID to the authenticated user
 	newComment.Created_at = time.Now()
+	newComment.Updated_at = time.Now()
 	newComment.Creator_id = userID
 	newComment.Post_id = postID
 

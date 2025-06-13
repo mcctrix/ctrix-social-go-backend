@@ -18,8 +18,8 @@ func PostManagementRouter(router fiber.Router) {
 	router.Delete("/:postid", controllers.DeleteUserPost())
 
 	// Comment-related routes
-	router.Get("/:postid/comments", controllers.GetPostComments())
-	router.Post("/:postid/comments", controllers.CreatePostComment())
+	router.Get("/comments/:postid", controllers.GetPostComments())
+	router.Post("/comments/:postid", controllers.CreatePostComment())
 	router.Get("/comments/:commentid", controllers.GetCommentByID())
 	router.Patch("/comments/:commentid", controllers.UpdatePostComment())
 	router.Delete("/comments/:commentid", controllers.DeletePostComment())

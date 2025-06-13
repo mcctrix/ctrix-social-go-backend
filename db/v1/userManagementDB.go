@@ -43,26 +43,6 @@ func GetUserData(id string, tableName string, fieldNames []string) (dataInterfac
 		userData = &models.User_Auth{}
 	case "user_profile":
 		userData = &models.User_Profile{}
-		// userProfile := &user_profile_data{}
-		// user_auth_data, err := GetDataFromUserAuth(id)
-		// if err != nil {
-		// 	return nil, err
-		// }
-		// if len(fieldNames) > 0 {
-		// 	if err = db.Table(tableName).Select(fieldNames).Where("id = ?", id).First(userProfile).Error; err != nil {
-		// 		return nil, err
-		// 	}
-		// } else {
-		// 	if err = db.Table(tableName).Where("id = ?", id).First(userProfile).Error; err != nil {
-		// 		return nil, err
-		// 	}
-		// }
-		// userProfile.Email = user_auth_data.Email
-		// userProfile.Username = user_auth_data.Username
-
-		// userData = userProfile
-
-		// return userData, nil
 	case "user_additional_info":
 		userData = &models.User_Additional_Info{}
 	case "user_settings":

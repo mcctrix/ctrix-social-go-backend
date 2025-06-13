@@ -6,7 +6,7 @@ meta {
 
 post {
   url: {{baseURL}}/api/post
-  body: json
+  body: multipartForm
   auth: inherit
 }
 
@@ -14,4 +14,8 @@ body:json {
   {
     "text_content": "This is first post made with bruno app"
   }
+}
+
+body:multipart-form {
+  post_data: {"text_content": "made with bruno"}
 }

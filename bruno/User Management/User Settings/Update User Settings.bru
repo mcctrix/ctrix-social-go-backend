@@ -5,7 +5,7 @@ meta {
 }
 
 patch {
-  url: {{baseURL}}/api/user/user_settings
+  url: {{baseURL}}/api/profile/user_settings
   body: json
   auth: inherit
 }
@@ -13,8 +13,8 @@ patch {
 body:json {
   {
   //   "Hide_post": [],
-  //   "Hide_story": [],
+    "Hide_story": ["p11"],
   //   "Block_user": [],
-    "Show_online": true
+    "Show_online": false
   }
 }
