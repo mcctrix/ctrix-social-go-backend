@@ -10,7 +10,6 @@ type User_Post struct {
 	Updated_at     time.Time   `json:"updated_at"`
 	Text_content   string      `json:"text_content"`
 	Media_attached StringArray `json:"media_attached" gorm:"type:text[]"`
-	Comments       StringArray `json:"comments" gorm:"type:text[]"`
 }
 
 type User_Post_Like_Table struct {

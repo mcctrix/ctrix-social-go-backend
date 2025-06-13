@@ -9,9 +9,9 @@ import (
 func UserManagementRouter(router fiber.Router) {
 	router.Use(middleware.AuthMiddleware())
 
-	router.Get("/profile/:userid", controllers.GetUserProfileWithParam())
-	router.Get("/profile", controllers.GetCurrentUserProfile())
-	router.Patch("/profile", controllers.UpdateCurrentUserProfile())
+	router.Get("/", controllers.GetCurrentUserProfile())
+	router.Patch("/", controllers.UpdateCurrentUserProfile())
+	router.Get("/:userid", controllers.GetUserProfileWithParam())
 
 	router.Get("/additional_info", controllers.GetAdditionalUserInfo())
 	router.Patch("/additional_info", controllers.UpdateAdditionalUserInfo())

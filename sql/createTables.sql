@@ -20,7 +20,6 @@ CREATE TABLE IF NOT EXISTS user_profile (
     avatar VARCHAR(25),
     profile_picture VARCHAR(200),
     last_seen TIMESTAMP,
-    post_count INT,
     followers TEXT[],
     followings TEXT[]
 );
@@ -46,14 +45,6 @@ CREATE TABLE IF NOT EXISTS user_settings (
     show_online BOOLEAN
 );
 
-CREATE TABLE IF NOT EXISTS user_data (
-    id VARCHAR(50) PRIMARY KEY,
-    FOREIGN KEY (id) REFERENCES user_auth ON DELETE CASCADE ON UPDATE CASCADE,
-    posts TEXT[],
-    stories TEXT[],
-    notes TEXT[]
-);
-
 -- User End
 
 -- Posts
@@ -64,7 +55,7 @@ CREATE TABLE IF NOT EXISTS user_posts (
     updated_at TIMESTAMP DEFAULT NOW(),
     group_id VARCHAR(50),
     text_content TEXT,
-    media_attached TEXT[],
+    media_attached TEXT[]
 );
 
 CREATE TABLE IF NOT EXISTS user_post_like (

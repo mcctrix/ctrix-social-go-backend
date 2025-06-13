@@ -77,7 +77,6 @@ type User_Profile struct {
 	Avatar          string      `json:"avatar,omitempty"`
 	Profile_picture string      `json:"profile_profile,omitempty"`
 	Last_seen       time.Time   `json:"last_seen,omitempty"`
-	Post_count      int         `json:"post_count,omitempty"`
 	Followers       StringArray `json:"followers,omitempty" gorm:"type:text[]"`
 	Followings      StringArray `json:"followings,omitempty" gorm:"type:text[]"`
 }
@@ -98,11 +97,4 @@ type User_Settings struct {
 	Hide_story  StringArray `json:"hide_story,omitempty" gorm:"type:text[]"`
 	Block_user  StringArray `json:"block_user,omitempty" gorm:"type:text[]"`
 	Show_online bool        `json:"show_online" gorm:"type:text[]"`
-}
-
-type User_Data struct {
-	Id      string      `json:"id,omitempty"`
-	Posts   StringArray `json:"posts,omitempty" gorm:"type:text[]"`
-	Stories StringArray `json:"stories,omitempty" gorm:"type:text[]"`
-	Notes   StringArray `json:"notes,omitempty" gorm:"type:text[]"`
 }
