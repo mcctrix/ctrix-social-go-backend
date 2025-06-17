@@ -195,7 +195,7 @@ func FollowUser() fiber.Handler {
 		err := db.FollowUser(follow_id, following_id)
 		if err != nil {
 			fmt.Println("Error while following user: ", err)
-			return fiber.ErrInternalServerError
+			return err
 		}
 
 		return c.SendString("User Followed Successfully!")
@@ -225,7 +225,21 @@ func CheckFollowing() fiber.Handler {
 		follow, err := db.CheckFollowing(follow_id, following_id)
 		if err != nil {
 			fmt.Println("Error while checking following: ", err)
-			return fiber.ErrInternalServerError
+			return c.Status(404).SendString(err.Error())
+		}
+
+		return c.Status(fiber.StatusOK).JSON(follow)
+	}
+}
+
+func GetFollowAndFollowing() fiber.Handler {
+	return func(c fiber.Ctx) error {
+		userID := c.Params("userID")
+
+		follow, err := db.GetFollowAndFollowing(userID)
+		if err != nil {
+			fmt.Println("Error while getting follow and following: ", err)
+			return c.Status(404).SendString(err.Error())
 		}
 
 		return c.Status(fiber.StatusOK).JSON(follow)

@@ -1,0 +1,11 @@
+meta {
+  name: Get followers and following
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseURL}}/api/profile/u3/countfollow
+  body: none
+  auth: inherit
+}

@@ -18,6 +18,7 @@ func UserManagementRouter(router fiber.Router) {
 	router.Post("/:userid/follow", controllers.FollowUser())
 	router.Delete("/:userid/follow", controllers.UnfollowUser())
 	router.Get("/:userid/follow", controllers.CheckFollowing())
+	router.Get("/:userID/countFollow", controllers.GetFollowAndFollowing())
 
 	router.Get("/additional_info", controllers.GetAdditionalUserInfo())
 	router.Patch("/additional_info", controllers.UpdateAdditionalUserInfo())

@@ -1,0 +1,11 @@
+meta {
+  name: UnFollow User
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{baseURL}}/api/profile/u3/follow
+  body: none
+  auth: inherit
+}

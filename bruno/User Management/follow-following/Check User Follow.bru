@@ -1,0 +1,11 @@
+meta {
+  name: Check User Follow
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseURL}}/api/profile/u3/follow
+  body: none
+  auth: inherit
+}

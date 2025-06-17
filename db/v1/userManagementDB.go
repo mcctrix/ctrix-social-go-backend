@@ -2,10 +2,12 @@ package v1
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/mcctrix/ctrix-social-go-backend/models"
+	"gorm.io/gorm"
 )
 
 type dataInterface interface{}
@@ -137,6 +139,13 @@ func FollowUser(follow_id string, following_id string) error {
 		Following_id: following_id,
 		Created_at:   time.Now(),
 	}).Error; err != nil {
+		if errors.Is(err, gorm.ErrForeignKeyViolated) {
+			return errors.New("following user not found")
+		}
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return errors.New("user already followed")
+		}
+
 		return err
 	}
 
@@ -156,16 +165,48 @@ func UnfollowUser(follow_id string, following_id string) error {
 	return nil
 }
 
-func CheckFollowing(follow_id string, following_id string) ([]models.Follows, error) {
+func CheckFollowing(follow_id string, following_id string) (*models.Follows, error) {
+	db, err := DBConnection()
+	if err != nil {
+		return nil, err
+	}
+
+	var follows *models.Follows
+	res := db.Table("follows").Select("created_at").Where("follower_id = ? AND following_id = ?", follow_id, following_id).Find(&follows)
+	if err = res.Error; err != nil {
+		return nil, err
+	}
+	if res.RowsAffected == 0 {
+		return nil, errors.New("Not Following")
+	}
+
+	return follows, nil
+}
+
+type FollowAndFollowerCount struct {
+	FollowerCount  int `json:"follower_count"`
+	FollowingCount int `json:"following_count"`
+}
+
+func GetFollowAndFollowing(userID string) (*FollowAndFollowerCount, error) {
 	db, err := DBConnection()
 	if err != nil {
 		return nil, err
 	}
 
 	var follows []models.Follows
-	if err = db.Table("follows").Select("created_at").Where("follower_id = ? AND following_id = ?", follow_id, following_id).Find(&follows).Error; err != nil {
+	res := db.Table("follows").Select("follower_id, following_id").Where("follower_id = ? OR following_id = ?", userID, userID).Find(&follows)
+	if err = res.Error; err != nil {
 		return nil, err
 	}
+	data := &FollowAndFollowerCount{}
+	for _, follow := range follows {
+		if follow.Follower_id == userID {
+			data.FollowerCount++
+		} else {
+			data.FollowingCount++
+		}
+	}
 
-	return follows, nil
+	return data, nil
 }

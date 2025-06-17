@@ -98,7 +98,7 @@ type User_Settings struct {
 }
 
 type Follows struct {
-	Follower_id  string    `json:"follower_id"`
-	Following_id string    `json:"following_id"`
-	Created_at   time.Time `json:"created_at"`
+	Follower_id  string    `json:"follower_id,omitempty"`
+	Following_id string    `json:"following_id,omitempty"`
+	Created_at   time.Time `json:"created_at,omitempty"`
 }
