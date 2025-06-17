@@ -63,13 +63,14 @@ func loadEnvironment() {
 	// Load the .env file in the current directory
 	godotenv.Load()
 
-	if _, err := os.Stat("./ecdsa_private_key.pem"); err == nil {
-		// Pem File exist so do nothing
-	} else {
+	if _, err := os.Stat("./ecdsa_private_key.pem"); err != nil {
 		utils.GenerateEcdsaPrivateKey()
 	}
-	// db.ResetDB()
-	// db.CreateInitialDBStructure()
+	_, err := db.DBConnection()
+	if err != nil {
+		fmt.Println("Error connecting to db: ", err)
+		os.Exit(1)
+	}
 }
 
 func makeRouter() *fiber.App {

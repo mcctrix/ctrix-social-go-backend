@@ -37,4 +37,5 @@ func PopulateDB() {
 	}
 
 	fmt.Println("Database populated successfully!")
+	fmt.Println("Please Restart the server to use the new database")
 }
