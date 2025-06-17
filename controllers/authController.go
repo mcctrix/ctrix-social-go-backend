@@ -75,7 +75,10 @@ func SignUp() fiber.Handler {
 		})
 
 		go func() {
-			db.InitNewUser(user.Id)
+			err := db.InitNewUser(user.Id)
+			if err != nil {
+				fmt.Println("Error while initializing new user: ", err)
+			}
 		}()
 
 		return c.JSON(fiber.Map{"tokenValue": gnToken.StringToken, "Expires": expireTime})

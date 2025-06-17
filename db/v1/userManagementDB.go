@@ -100,7 +100,7 @@ func InitNewUser(userid string) error {
 		return err
 	}
 	type base struct {
-		Id string
+		Id string `gorm:"primaryKey"`
 	}
 
 	data := base{Id: userid}
@@ -111,11 +111,8 @@ func InitNewUser(userid string) error {
 	if err = db.Table("user_additional_info").Create(data).Error; err != nil {
 		return err
 	}
-	if err = db.Table("user_data").Create(data).Error; err != nil {
-		return err
-	}
 	userSetting := struct {
-		Id          string
+		Id          string `gorm:"primaryKey"`
 		Show_online bool
 	}{
 		Id:          userid,
