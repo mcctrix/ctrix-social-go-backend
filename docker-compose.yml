@@ -1,0 +1,17 @@
+services:
+  ctrix-social-db:
+    image: postgres:latest
+    container_name: ctrix-social-db
+    restart: always
+    environment:
+      POSTGRES_USER: ctrix
+      POSTGRES_PASSWORD: 6205
+      POSTGRES_DB: Ctrix_Social_DB
+    ports:
+      - 5432:5432
+    volumes:
+      -  ctrix-social-db-data:/var/lib/postgresql/data
+
+volumes:
+  ctrix-social-db-data:
+    driver: local
