@@ -33,14 +33,6 @@ func GetPostFeed(userID string) ([]PostWithUserDetails, error) {
 		return nil, err
 	}
 
-	/*
-		veriedUser ?
-		poster_username
-		poster_avatar
-		poster_profile_picture
-
-	*/
-
 	var postsWithDetails []PostWithUserDetails
 
 	queryPost := dbInstance.Table("user_posts").
@@ -61,4 +53,28 @@ func GetPostFeed(userID string) ([]PostWithUserDetails, error) {
 	}
 
 	return postsWithDetails, nil
+}
+
+func GetFollowRecommendation(currentUserID string) ([]models.User_Profile, error) {
+	dbInstance, err := DBConnection()
+	if err != nil {
+		return nil, err
+	}
+
+	var currentFollows []models.Follows
+	if err = dbInstance.Table("follows").Where("follower_id = ?", currentUserID).Find(&currentFollows).Error; err != nil {
+		return nil, err
+	}
+	var followingUsers []string
+	for el := range currentFollows {
+		followingUsers = append(followingUsers, currentFollows[el].Following_id)
+	}
+	followingUsers = append(followingUsers, currentUserID)
+
+	var recommendation []models.User_Profile
+	if err = dbInstance.Table("user_profile").Not("id IN (?)", followingUsers).Find(&recommendation).Error; err != nil {
+		return nil, err
+	}
+
+	return recommendation, nil
 }

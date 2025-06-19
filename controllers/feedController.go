@@ -19,3 +19,15 @@ func GetFeed() fiber.Handler {
 		return c.JSON(posts)
 	}
 }
+func GetFollowRecommendation() fiber.Handler {
+	return func(c fiber.Ctx) error {
+		userID := c.Locals("userID").(string)
+
+		recommendation, err := db.GetFollowRecommendation(userID)
+		if err != nil {
+			fmt.Println("error while fetching follow recommendation: ", err)
+			return c.Status(fiber.StatusNotFound).SendString("unable to fetch follow recommendation!")
+		}
+		return c.JSON(recommendation)
+	}
+}

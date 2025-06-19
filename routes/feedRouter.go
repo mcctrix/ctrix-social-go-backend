@@ -10,4 +10,5 @@ func FeedManagementRouter(router fiber.Router) {
 	router.Use(middleware.AuthMiddleware())
 
 	router.Get("/", controllers.GetFeed())
+	router.Get("/follow_recommendation", controllers.GetFollowRecommendation())
 }
