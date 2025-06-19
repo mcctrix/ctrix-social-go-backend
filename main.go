@@ -81,6 +81,7 @@ func makeRouter() *fiber.App {
 			Proxies:  []string{"127.0.0.1", "0.0.0.0"},
 			Loopback: true,
 		},
+		BodyLimit: 25 * 1024 * 1024,
 	})
 	router.Use(recoverer.New())
 
