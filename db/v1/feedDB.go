@@ -7,19 +7,14 @@ import (
 )
 
 type PostWithUserDetails struct {
-	// Fields from User_Post (using anonymous embedding for convenience, or list them individually)
 	models.User_Post
 
-	// Fields from User_Auth
 	Username string `json:"username,omitempty"`
 
-	// Fields from User_Profile
 	Avatar         string `json:"avatar,omitempty"`
 	ProfilePicture string `json:"profile_picture,omitempty"`
 	VerifiedUser   bool   `json:"verified_user"`
-
-	// Fields from User_Additional_Info
-	Bio string `json:"bio,omitempty"`
+	Bio            string `json:"bio,omitempty"`
 }
 
 func GetPostFeed(userID string) ([]PostWithUserDetails, error) {
@@ -55,7 +50,13 @@ func GetPostFeed(userID string) ([]PostWithUserDetails, error) {
 	return postsWithDetails, nil
 }
 
-func GetFollowRecommendation(currentUserID string) ([]models.User_Profile, error) {
+type followRecommendation struct {
+	models.User_Profile
+
+	Username string `json:"username,omitempty"`
+}
+
+func GetFollowRecommendation(currentUserID string) ([]followRecommendation, error) {
 	dbInstance, err := DBConnection()
 	if err != nil {
 		return nil, err
@@ -71,8 +72,8 @@ func GetFollowRecommendation(currentUserID string) ([]models.User_Profile, error
 	}
 	followingUsers = append(followingUsers, currentUserID)
 
-	var recommendation []models.User_Profile
-	if err = dbInstance.Table("user_profile").Not("id IN (?)", followingUsers).Find(&recommendation).Error; err != nil {
+	var recommendation []followRecommendation
+	if err = dbInstance.Table("user_profile").Select("user_auth.username, user_profile.*").Joins("JOIN user_auth ON user_auth.id = user_profile.id").Not("user_auth.id IN (?)", followingUsers).Find(&recommendation).Error; err != nil {
 		return nil, err
 	}
 
