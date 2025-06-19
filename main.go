@@ -36,6 +36,7 @@ func main() {
 	routes.PostManagementRouter(mainRouter.Group("/api/post"))
 	routes.CommentRouter(mainRouter.Group("/api/comments"))
 	routes.FeedManagementRouter(mainRouter.Group("/api/feed"))
+	routes.BookmarkRouter(mainRouter.Group("/api/bookmark"))
 
 	err := mainRouter.Listen(":" + port)
 	if err != nil {
