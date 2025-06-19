@@ -326,3 +326,11 @@ INSERT INTO group_chat_member_requests (id, group_chat_id, user_id) VALUES
 ('gcmr2', 'gc2', 'u7'),
 ('gcmr3', 'gc3', 'u9'),
 ('gcmr4', 'gc4', 'u1'); 
+
+INSERT INTO bookmark (user_id, post_id) VALUES
+('u1', 'p1'),
+('u2', 'p2'),
+('u2', 'p3'),
+('u3', 'p3'),
+('u4', 'p4'),
+('u5', 'p5');

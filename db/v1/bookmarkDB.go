@@ -15,7 +15,7 @@ func GetBookmark(userID string) ([]models.Bookmark, error) {
 	}
 
 	var bookmarks []models.Bookmark
-	err = dbInstance.Table("bookmark").Where("user_id = ?", userID).Find(&bookmarks).Error
+	err = dbInstance.Table("bookmark").Where("user_id = ?", userID).Order("created_at desc").Find(&bookmarks).Error
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,6 @@ func CreateBookmark(userID, postID string) error {
 		User_id:    userID,
 		Post_id:    postID,
 		Created_at: time.Now(),
-		Updated_at: time.Now(),
 	}
 
 	err = dbInstance.Create(&bookmark).Error

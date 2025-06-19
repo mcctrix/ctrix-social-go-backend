@@ -50,15 +50,7 @@ CREATE TABLE IF NOT EXISTS user_settings (
     block_user TEXT[],
     show_online BOOLEAN
 );
-CREATE TABLE IF NOT EXISTS bookmark {
-    user_id VARCHAR(50) PRIMARY KEY,
-    FOREIGN KEY (user_id) REFERENCES user_auth(id) ON DELETE CASCADE ON UPDATE CASCADE
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    post_id VARCHAR(50) NOT NULL,
-    FOREIGN KEY (post_id) REFERENCES user_posts(id) ON DELETE CASCADE ON UPDATE CASCADE
-    UNIQUE (user_id, post_id)
-}
+
 -- User End
 
 -- Posts
@@ -103,6 +95,16 @@ CREATE TABLE IF NOT EXISTS user_post_comment_like (
 );
 
 -- Posts End
+
+-- Bookmark
+CREATE TABLE IF NOT EXISTS bookmark (
+    user_id VARCHAR(50) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES user_auth(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    post_id VARCHAR(50) NOT NULL,
+    FOREIGN KEY (post_id) REFERENCES user_posts(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    PRIMARY KEY (user_id, post_id)
+);
 
 -- Messenger
 CREATE TABLE IF NOT EXISTS private_chats (
