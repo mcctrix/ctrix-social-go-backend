@@ -5,7 +5,11 @@ meta {
 }
 
 get {
-  url: {{baseURL}}/api/feed
+  url: {{baseURL}}/api/feed?limit=4
   body: none
   auth: inherit
+}
+
+params:query {
+  limit: 4
 }

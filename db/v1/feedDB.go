@@ -17,7 +17,7 @@ type PostWithUserDetails struct {
 	Bio            string `json:"bio,omitempty"`
 }
 
-func GetPostFeed(userID string) ([]PostWithUserDetails, error) {
+func GetPostFeed(userID string, limit int) ([]PostWithUserDetails, error) {
 	dbInstance, err := DBConnection()
 	if err != nil {
 		return nil, err
@@ -38,6 +38,7 @@ func GetPostFeed(userID string) ([]PostWithUserDetails, error) {
 		Not("user_posts.id = ?", userSettings.Hide_post).
 		Not("user_posts.creator_id = ?", userSettings.Block_user).
 		Order("user_posts.created_at desc").
+		Limit(limit).
 		Find(&postsWithDetails)
 	if err = queryPost.Error; err != nil {
 		return nil, err
@@ -56,7 +57,7 @@ type followRecommendation struct {
 	Username string `json:"username,omitempty"`
 }
 
-func GetFollowRecommendation(currentUserID string) ([]followRecommendation, error) {
+func GetFollowRecommendation(currentUserID string, limit int) ([]followRecommendation, error) {
 	dbInstance, err := DBConnection()
 	if err != nil {
 		return nil, err
@@ -73,7 +74,7 @@ func GetFollowRecommendation(currentUserID string) ([]followRecommendation, erro
 	followingUsers = append(followingUsers, currentUserID)
 
 	var recommendation []followRecommendation
-	if err = dbInstance.Table("user_profile").Select("user_auth.username, user_profile.*").Joins("JOIN user_auth ON user_auth.id = user_profile.id").Not("user_auth.id IN (?)", followingUsers).Find(&recommendation).Error; err != nil {
+	if err = dbInstance.Table("user_profile").Select("user_auth.username, user_profile.*").Joins("JOIN user_auth ON user_auth.id = user_profile.id").Not("user_auth.id IN (?)", followingUsers).Limit(limit).Find(&recommendation).Error; err != nil {
 		return nil, err
 	}
 

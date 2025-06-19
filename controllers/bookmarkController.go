@@ -3,13 +3,15 @@ package controllers
 import (
 	"github.com/gofiber/fiber/v3"
 	db "github.com/mcctrix/ctrix-social-go-backend/db/v1"
+	"github.com/mcctrix/ctrix-social-go-backend/utils"
 )
 
 func GetBookmark() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		userID := c.Locals("userID").(string)
+		limit := utils.QueryLimit(c.Query("limit", "5"))
 
-		bookmarks, err := db.GetBookmark(userID)
+		bookmarks, err := db.GetBookmark(userID, limit)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": err.Error(),

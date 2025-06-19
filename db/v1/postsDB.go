@@ -11,13 +11,13 @@ import (
 )
 
 // Posts Database Functions
-func GetUserPostsByID(id string) ([]models.User_Post, error) {
+func GetUserPostsByID(id string, limit int) ([]models.User_Post, error) {
 	db, err := DBConnection()
 	if err != nil {
 		return nil, err
 	}
 	var userPosts []models.User_Post
-	if err = db.Table("user_posts").Order("created_at desc").Where("creator_id = ?", id).Find(&userPosts).Error; err != nil {
+	if err = db.Table("user_posts").Order("created_at desc").Where("creator_id = ?", id).Limit(limit).Find(&userPosts).Error; err != nil {
 		return nil, err
 	}
 	return userPosts, nil
@@ -60,13 +60,13 @@ func GetPostByID(postID string) (*models.User_Post, error) {
 }
 
 // Post Comments Database Functions
-func GetPostCommentsByPostID(postID string) ([]*models.User_post_Comments, error) {
+func GetPostCommentsByPostID(postID string, limit int) ([]*models.User_post_Comments, error) {
 	db, err := DBConnection()
 	if err != nil {
 		return nil, err
 	}
 	var postComments []*models.User_post_Comments
-	if err = db.Table("user_post_comments").Order("updated_at desc").Where("post_id = ?", postID).Find(&postComments).Error; err != nil {
+	if err = db.Table("user_post_comments").Order("updated_at desc").Where("post_id = ?", postID).Limit(limit).Find(&postComments).Error; err != nil {
 		return nil, err
 	}
 	return postComments, nil

@@ -5,7 +5,11 @@ meta {
 }
 
 get {
-  url: {{baseURL}}/api/feed/follow_recommendation
+  url: {{baseURL}}/api/feed/follow_recommendation?limit=2
   body: none
   auth: inherit
+}
+
+params:query {
+  limit: 2
 }

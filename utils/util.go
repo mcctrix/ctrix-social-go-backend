@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/mcctrix/ctrix-social-go-backend/models"
@@ -106,4 +107,12 @@ func ContainsString(arr []string, str string) bool {
 		}
 	}
 	return false
+}
+
+func QueryLimit(limit string) int {
+	limitInt, err := strconv.Atoi(limit)
+	if err != nil {
+		return 5
+	}
+	return limitInt
 }

@@ -16,7 +16,8 @@ import (
 func GetUserPosts() fiber.Handler {
 	return func(c fiber.Ctx) error {
 
-		posts, err := db.GetUserPostsByID(c.Locals("userID").(string))
+		limit := utils.QueryLimit(c.Query("limit", "5"))
+		posts, err := db.GetUserPostsByID(c.Locals("userID").(string), limit)
 		if err != nil {
 			fmt.Println("error while fetching user posts: ", err)
 			return c.Status(fiber.StatusNotFound).SendString("unable to fetch user posts!")
@@ -143,7 +144,8 @@ func DeleteUserPost() fiber.Handler {
 func GetPostComments() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		postID := c.Params("postid")
-		comments, err := db.GetPostCommentsByPostID(postID)
+		limit := utils.QueryLimit(c.Query("limit", "5"))
+		comments, err := db.GetPostCommentsByPostID(postID, limit)
 		if err != nil {
 			fmt.Println("error while fetching post comments: ", err)
 			return c.Status(fiber.StatusBadRequest).SendString("unable to fetch post comments!")

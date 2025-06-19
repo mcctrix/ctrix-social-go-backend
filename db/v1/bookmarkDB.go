@@ -8,14 +8,14 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetBookmark(userID string) ([]models.Bookmark, error) {
+func GetBookmark(userID string, limit int) ([]models.Bookmark, error) {
 	dbInstance, err := DBConnection()
 	if err != nil {
 		return nil, err
 	}
 
 	var bookmarks []models.Bookmark
-	err = dbInstance.Table("bookmark").Where("user_id = ?", userID).Order("created_at desc").Find(&bookmarks).Error
+	err = dbInstance.Table("bookmark").Where("user_id = ?", userID).Order("created_at desc").Limit(limit).Find(&bookmarks).Error
 	if err != nil {
 		return nil, err
 	}
