@@ -47,16 +47,24 @@ func CreateUserPostWithByteData(newPostByte []byte, userID string) error {
 	return nil
 }
 
-func GetPostByID(postID string) (*models.User_Post, error) {
-	db, err := DBConnection()
+func GetPostByID(postID string) (*PostWithUserDetails, error) {
+	dbInstance, err := DBConnection()
 	if err != nil {
 		return nil, err
 	}
-	var post *models.User_Post = &models.User_Post{}
-	if err = db.Table("user_posts").Where("id = ?", postID).First(post).Error; err != nil {
+	var postsWithDetails *PostWithUserDetails = &PostWithUserDetails{}
+	query := dbInstance.Table("user_posts").
+		Select("user_posts.*, user_auth.username, user_profile.avatar, user_profile.profile_picture, user_profile.verified_user, user_additional_info.bio").
+		Joins("JOIN user_auth ON user_auth.id = user_posts.creator_id").
+		Joins("JOIN user_profile ON user_profile.id = user_posts.creator_id").
+		Joins("JOIN user_additional_info ON user_additional_info.id = user_posts.creator_id").
+		Order("user_posts.created_at desc").
+		Where("user_posts.id = ?", postID).
+		Find(postsWithDetails)
+	if query.Error != nil {
 		return nil, err
 	}
-	return post, nil
+	return postsWithDetails, nil
 }
 
 // Post Comments Database Functions
