@@ -52,7 +52,7 @@ func GetPostByID(postID string) (*PostWithUserDetails, error) {
 	if err != nil {
 		return nil, err
 	}
-	var postsWithDetails *PostWithUserDetails = &PostWithUserDetails{}
+	var postWithDetails *PostWithUserDetails = &PostWithUserDetails{}
 	query := dbInstance.Table("user_posts").
 		Select("user_posts.*, user_auth.username, user_profile.avatar, user_profile.profile_picture, user_profile.verified_user, user_additional_info.bio").
 		Joins("JOIN user_auth ON user_auth.id = user_posts.creator_id").
@@ -60,11 +60,11 @@ func GetPostByID(postID string) (*PostWithUserDetails, error) {
 		Joins("JOIN user_additional_info ON user_additional_info.id = user_posts.creator_id").
 		Order("user_posts.created_at desc").
 		Where("user_posts.id = ?", postID).
-		Find(postsWithDetails)
+		Find(postWithDetails)
 	if query.Error != nil {
 		return nil, err
 	}
-	return postsWithDetails, nil
+	return postWithDetails, nil
 }
 
 // Post Comments Database Functions
