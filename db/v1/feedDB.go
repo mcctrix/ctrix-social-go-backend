@@ -2,9 +2,27 @@ package v1
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/mcctrix/ctrix-social-go-backend/models"
 )
+
+func checkUserLikedPost(postID string, userID string) (bool, error) {
+	db, err := DBConnection()
+	if err != nil {
+		return false, err
+	}
+	var likes []models.User_Post_Like_Table
+	query := db.Table("user_post_like").Where("post_id = ? AND user_id = ?", postID, userID).Find(&likes)
+	if query.Error != nil {
+		return false, err
+	}
+	if query.RowsAffected == 0 {
+		return false, nil
+	}
+
+	return true, nil
+}
 
 type PostWithUserDetails struct {
 	models.User_Post
@@ -15,6 +33,8 @@ type PostWithUserDetails struct {
 	ProfilePicture string `json:"profile_picture,omitempty"`
 	VerifiedUser   bool   `json:"verified_user"`
 	Bio            string `json:"bio,omitempty"`
+	IsLiked        bool   `json:"is_liked"`
+	LikesCount     int    `json:"likes_count"`
 }
 
 func GetPostFeed(userID string, limit int) ([]PostWithUserDetails, error) {
@@ -46,6 +66,30 @@ func GetPostFeed(userID string, limit int) ([]PostWithUserDetails, error) {
 
 	if queryPost.RowsAffected == 0 {
 		return nil, errors.New("no posts found")
+	}
+
+	// Adding Like Count for each Post
+	for index, _ := range postsWithDetails {
+		var likes []models.User_Post_Like_Table
+		query := dbInstance.Table("user_post_like")
+		query.Select("user_id")
+		query.Where("post_id = ?", postsWithDetails[index].Id)
+		query.Find(&likes)
+		if query.Error != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+		postsWithDetails[index].LikesCount = len(likes)
+	}
+
+	// Check if CurrentUser have liked the Post
+	for index, _ := range postsWithDetails {
+		liked, err := checkUserLikedPost(postsWithDetails[index].Id, userID)
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+		postsWithDetails[index].IsLiked = liked
 	}
 
 	return postsWithDetails, nil
