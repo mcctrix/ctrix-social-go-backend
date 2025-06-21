@@ -47,7 +47,7 @@ func CreateUserPostWithByteData(newPostByte []byte, userID string) error {
 	return nil
 }
 
-func GetPostByID(postID string) (*PostWithUserDetails, error) {
+func GetPostByID(postID string, userID string) (*PostWithUserDetails, error) {
 	dbInstance, err := DBConnection()
 	if err != nil {
 		return nil, err
@@ -64,6 +64,27 @@ func GetPostByID(postID string) (*PostWithUserDetails, error) {
 	if query.Error != nil {
 		return nil, err
 	}
+
+	// Adding Like Count for each Post
+	var likes []models.User_Post_Like_Table
+	query = dbInstance.Table("user_post_like")
+	query.Select("user_id")
+	query.Where("post_id = ?", postID)
+	query.Find(&likes)
+	if query.Error != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	postWithDetails.LikesCount = len(likes)
+
+	// Check if CurrentUser have liked the Post
+	liked, err := checkUserLikedPost(postWithDetails.Id, userID)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	postWithDetails.IsLiked = liked
+
 	return postWithDetails, nil
 }
 

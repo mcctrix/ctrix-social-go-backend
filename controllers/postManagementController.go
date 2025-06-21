@@ -79,8 +79,9 @@ func CreateUserPost() fiber.Handler {
 
 func GetPostByID() fiber.Handler {
 	return func(c fiber.Ctx) error {
+		userID := c.Locals("userID").(string)
 		postID := c.Params("postid")
-		post, err := db.GetPostByID(postID)
+		post, err := db.GetPostByID(postID, userID)
 		if err != nil {
 			fmt.Println("unable to fetch post: ", err)
 			return c.Status(fiber.StatusNotFound).SendString("unable to fetch post!")
