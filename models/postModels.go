@@ -28,7 +28,7 @@ type User_post_Comments struct {
 	Giff       string    `json:"giff"`
 }
 
-type User_comment_like struct {
+type User_post_comment_like struct {
 	User_id    string `json:"user_id"`
 	Comment_id string `json:"comment_id"`
 	Like_type  string `json:"like_type"`

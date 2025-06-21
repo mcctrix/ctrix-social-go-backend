@@ -143,9 +143,10 @@ func DeleteUserPost() fiber.Handler {
 
 func GetPostComments() fiber.Handler {
 	return func(c fiber.Ctx) error {
+		userID := c.Locals("userID").(string)
 		postID := c.Params("postid")
 		limit := utils.QueryLimit(c.Query("limit", "5"))
-		comments, err := db.GetPostCommentsByPostID(postID, limit)
+		comments, err := db.GetPostCommentsByPostID(postID, userID, limit)
 		if err != nil {
 			fmt.Println("error while fetching post comments: ", err)
 			return c.Status(fiber.StatusBadRequest).SendString("unable to fetch post comments!")

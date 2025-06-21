@@ -67,17 +67,76 @@ func GetPostByID(postID string) (*PostWithUserDetails, error) {
 	return postWithDetails, nil
 }
 
+type commentWithUserDetails struct {
+	models.User_post_Comments
+	Username        string `json:"username"`
+	Avatar          string `json:"avatar"`
+	Profile_picture string `json:"profile_picture"`
+	Verified_user   bool   `json:"verified_user"`
+	LikesCount      int    `json:"likes_count"`
+	IsLiked         bool   `json:"is_liked"`
+}
+
 // Post Comments Database Functions
-func GetPostCommentsByPostID(postID string, limit int) ([]*models.User_post_Comments, error) {
+func GetPostCommentsByPostID(postID string, userID string, limit int) ([]commentWithUserDetails, error) {
 	db, err := DBConnection()
 	if err != nil {
 		return nil, err
 	}
-	var postComments []*models.User_post_Comments
-	if err = db.Table("user_post_comments").Order("updated_at desc").Where("post_id = ?", postID).Limit(limit).Find(&postComments).Error; err != nil {
+	var postComments []commentWithUserDetails
+	query := db.Table("user_post_comments")
+	query.Select("user_post_comments.*,user_auth.username,user_profile.avatar,user_profile.profile_picture,user_profile.verified_user")
+	query.Joins("JOIN user_auth ON user_auth.id = user_post_comments.creator_id")
+	query.Joins("JOIN user_profile ON user_profile.id = user_post_comments.creator_id")
+	query.Order("updated_at desc")
+	query.Where("post_id = ?", postID)
+	query.Limit(limit).Find(&postComments)
+
+	if query.Error != nil {
 		return nil, err
 	}
+	for index, _ := range postComments {
+		var likes []models.User_post_comment_like
+		query := db.Table("user_post_comment_like")
+		query.Select("user_id")
+		query.Where("comment_id = ?", postComments[index].Id)
+		query.Find(&likes)
+		if query.Error != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+		postComments[index].LikesCount = len(likes)
+	}
+
+	// Check if CurrentUser have liked the Comment
+	for index, _ := range postComments {
+		if postComments[index].Creator_id == userID {
+			liked, err := checkUserLikedComment(postComments[index].Id, userID)
+			if err != nil {
+				fmt.Println(err)
+				return nil, err
+			}
+			postComments[index].IsLiked = liked
+		}
+	}
 	return postComments, nil
+}
+
+func checkUserLikedComment(commentID string, userID string) (bool, error) {
+	db, err := DBConnection()
+	if err != nil {
+		return false, err
+	}
+	var likes []models.User_post_comment_like
+	query := db.Table("user_post_comment_like").Where("comment_id = ? AND user_id = ?", commentID, userID).Find(&likes)
+	if query.Error != nil {
+		return false, err
+	}
+	if query.RowsAffected == 0 {
+		return false, nil
+	}
+
+	return true, nil
 }
 
 func CreatePostCommentWithByteData(newCommentByte []byte, userID string, postID string) error {
@@ -264,11 +323,11 @@ func CommentLikeToggler(commentID string, userLikedID string, liked bool, likeTy
 	}
 
 	if liked {
-		comment_like_data := models.User_comment_like{User_id: userLikedID, Comment_id: commentID, Like_type: "like"}
-		if db.Table("user_comment_like").Where("user_id = ?", userLikedID).Where("comment_id = ?", commentID).Updates(map[string]interface{}{
+		comment_like_data := models.User_post_comment_like{User_id: userLikedID, Comment_id: commentID, Like_type: "like"}
+		if db.Table("user_post_comment_like").Where("user_id = ?", userLikedID).Where("comment_id = ?", commentID).Updates(map[string]interface{}{
 			"like_type": likeType,
 		}).RowsAffected == 0 {
-			if err = db.Table("user_comment_like").Create(comment_like_data).Error; err != nil {
+			if err = db.Table("user_post_comment_like").Create(comment_like_data).Error; err != nil {
 				fmt.Println(err)
 				return errors.New("unable to create comment reaction")
 			}
@@ -276,7 +335,7 @@ func CommentLikeToggler(commentID string, userLikedID string, liked bool, likeTy
 
 	} else {
 
-		if err = db.Table("user_comment_like").Where("comment_id = ?", commentID).Where("user_id = ?", userLikedID).Delete(&models.User_comment_like{}).Error; err != nil {
+		if err = db.Table("user_post_comment_like").Where("comment_id = ?", commentID).Where("user_id = ?", userLikedID).Delete(&models.User_post_comment_like{}).Error; err != nil {
 			fmt.Println(err)
 			return errors.New("unable to remove comment reaction")
 		}
