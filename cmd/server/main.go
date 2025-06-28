@@ -32,12 +32,7 @@ func main() {
 		return c.SendString("This is backend of Ctrix Social App!")
 	})
 
-	routes.AuthRouter(mainRouter.Group("/api/auth"))
-	routes.UserManagementRouter(mainRouter.Group("/api/profile"))
-	routes.PostManagementRouter(mainRouter.Group("/api/post"))
-	routes.CommentRouter(mainRouter.Group("/api/comments"))
-	routes.FeedManagementRouter(mainRouter.Group("/api/feed"))
-	routes.BookmarkRouter(mainRouter.Group("/api/bookmark"))
+	routes.SetupRoutes(mainRouter)
 
 	err := mainRouter.Listen(":" + port)
 	if err != nil {

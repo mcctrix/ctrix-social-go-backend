@@ -6,7 +6,7 @@ import (
 	"github.com/mcctrix/ctrix-social-go-backend/internal/api/middleware"
 )
 
-func PostManagementRouter(router fiber.Router) {
+func PostRouter(router fiber.Router) {
 	router.Use(middleware.AuthMiddleware())
 
 	// Post-related routes

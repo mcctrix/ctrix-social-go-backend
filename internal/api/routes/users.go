@@ -6,7 +6,7 @@ import (
 	"github.com/mcctrix/ctrix-social-go-backend/internal/api/middleware"
 )
 
-func UserManagementRouter(router fiber.Router) {
+func UserRouter(router fiber.Router) {
 	router.Use(middleware.AuthMiddleware())
 
 	router.Get("/", users.GetCurrentUserProfile())

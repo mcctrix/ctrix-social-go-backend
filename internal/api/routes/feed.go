@@ -6,7 +6,7 @@ import (
 	"github.com/mcctrix/ctrix-social-go-backend/internal/api/middleware"
 )
 
-func FeedManagementRouter(router fiber.Router) {
+func FeedRouter(router fiber.Router) {
 	router.Use(middleware.AuthMiddleware())
 
 	router.Get("/", feed.GetFeed())
