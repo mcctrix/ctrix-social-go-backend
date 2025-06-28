@@ -6,7 +6,6 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 
-	recoverer "github.com/gofiber/fiber/v3/middleware/recover"
 	"github.com/joho/godotenv"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/api/middleware"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/api/routes"
@@ -32,6 +31,7 @@ func main() {
 	})
 
 	// Middleware
+	mainRouter.Use(middleware.RecovererMiddleware())
 	mainRouter.Use(middleware.LoggerMiddleware())
 	mainRouter.Use(middleware.CORSMiddleware())
 
@@ -82,7 +82,6 @@ func makeRouter() *fiber.App {
 		},
 		BodyLimit: 25 * 1024 * 1024,
 	})
-	router.Use(recoverer.New())
 
 	return router
 }
