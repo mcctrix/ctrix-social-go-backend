@@ -4,39 +4,20 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gofiber/fiber/v3"
-
-	"github.com/joho/godotenv"
-	"github.com/mcctrix/ctrix-social-go-backend/internal/api/middleware"
-	"github.com/mcctrix/ctrix-social-go-backend/internal/api/routes"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/config"
 	db "github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/database"
-	"github.com/mcctrix/ctrix-social-go-backend/internal/pkg/auth"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/pkg/utils"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/server"
 )
 
 func main() {
 
-	loadEnvironment()
+	config.Load()
 	CheckArgs()
 
-	port := os.Getenv("PORT")
+	port := utils.GetEnv("PORT", "4000")
 
-	if port == "" {
-		port = "4000"
-	}
-	mainRouter := makeRouter()
-
-	mainRouter.Get("/", func(c fiber.Ctx) error {
-		return c.SendString("This is backend of Ctrix Social App!")
-	})
-
-	// Middleware
-	mainRouter.Use(middleware.SecurityMiddleware())
-	mainRouter.Use(middleware.RecovererMiddleware())
-	mainRouter.Use(middleware.LoggerMiddleware())
-	mainRouter.Use(middleware.CORSMiddleware())
-
-	routes.SetupRoutes("/api", mainRouter)
+	mainRouter := server.NewServer()
 
 	err := mainRouter.Listen(":" + port)
 	if err != nil {
@@ -58,31 +39,4 @@ func CheckArgs() {
 		db.PopulateDB()
 		os.Exit(0)
 	}
-}
-
-func loadEnvironment() {
-	// Load the .env file in the current directory
-	godotenv.Load()
-
-	if _, err := os.Stat("./ecdsa_private_key.pem"); err != nil {
-		auth.GenerateEcdsaPrivateKey()
-	}
-	_, err := db.DBConnection()
-	if err != nil {
-		fmt.Println("Error connecting to db: ", err)
-		os.Exit(1)
-	}
-}
-
-func makeRouter() *fiber.App {
-	router := fiber.New(fiber.Config{
-		TrustProxy: true,
-		TrustProxyConfig: fiber.TrustProxyConfig{
-			Proxies:  []string{"127.0.0.1", "0.0.0.0"},
-			Loopback: true,
-		},
-		BodyLimit: 25 * 1024 * 1024,
-	})
-
-	return router
 }
