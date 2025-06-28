@@ -31,6 +31,7 @@ func main() {
 	})
 
 	// Middleware
+	mainRouter.Use(middleware.SecurityMiddleware())
 	mainRouter.Use(middleware.RecovererMiddleware())
 	mainRouter.Use(middleware.LoggerMiddleware())
 	mainRouter.Use(middleware.CORSMiddleware())
