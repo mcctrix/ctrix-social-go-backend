@@ -3,13 +3,12 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/gofiber/fiber/v3"
-	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/gofiber/fiber/v3/middleware/logger"
 	recoverer "github.com/gofiber/fiber/v3/middleware/recover"
 	"github.com/joho/godotenv"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/api/middleware"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/api/routes"
 	db "github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/database"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/pkg/auth"
@@ -32,7 +31,10 @@ func main() {
 		return c.SendString("This is backend of Ctrix Social App!")
 	})
 
-	routes.SetupRoutes(mainRouter)
+	// Middleware
+	mainRouter.Use(middleware.CORSMiddleware())
+
+	routes.SetupRoutes("/api", mainRouter)
 
 	err := mainRouter.Listen(":" + port)
 	if err != nil {
@@ -84,24 +86,6 @@ func makeRouter() *fiber.App {
 	router.Use(logger.New(logger.Config{
 		Format: "[${ip}]: ${port} ${status} - ${method} ${path}\n",
 	}))
-	corsMethods := strings.Split(strings.Join([]string{
-		fiber.MethodGet,
-		fiber.MethodPost,
-		fiber.MethodHead,
-		fiber.MethodPut,
-		fiber.MethodDelete,
-		fiber.MethodPatch,
-		fiber.MethodOptions,
-	}, ","), ",")
 
-	corsMiddleware := cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000", "http://127.0.0.1:3000", "https://ctrix-social.vercel.app"}, // Allows all origins
-		AllowMethods:     corsMethods,
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Set-Cookie"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-	})
-
-	router.Use(corsMiddleware)
 	return router
 }

@@ -2,11 +2,14 @@ package routes
 
 import "github.com/gofiber/fiber/v3"
 
-func SetupRoutes(app *fiber.App) {
-	AuthRouter(app.Group("/api/auth"))
-	UserRouter(app.Group("/api/profile"))
-	PostRouter(app.Group("/api/post"))
-	CommentRouter(app.Group("/api/comments"))
-	FeedRouter(app.Group("/api/feed"))
-	BookmarkRouter(app.Group("/api/bookmark"))
+func SetupRoutes(endpoint string, app *fiber.App) {
+
+	routeGroup := app.Group(endpoint)
+
+	AuthRouter(routeGroup.Group("/auth"))
+	UserRouter(routeGroup.Group("/profile"))
+	PostRouter(routeGroup.Group("/post"))
+	CommentRouter(routeGroup.Group("/comments"))
+	FeedRouter(routeGroup.Group("/feed"))
+	BookmarkRouter(routeGroup.Group("/bookmark"))
 }
