@@ -1,14 +1,15 @@
-package v1
+package repositories
 
 import (
 	"errors"
 	"fmt"
 
-	"github.com/mcctrix/ctrix-social-go-backend/models"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/models"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/database"
 )
 
 func checkUserLikedPost(postID string, userID string) (bool, error) {
-	db, err := DBConnection()
+	db, err := database.DBConnection()
 	if err != nil {
 		return false, err
 	}
@@ -38,7 +39,7 @@ type PostWithUserDetails struct {
 }
 
 func GetPostFeed(userID string, limit int) ([]PostWithUserDetails, error) {
-	dbInstance, err := DBConnection()
+	dbInstance, err := database.DBConnection()
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +103,7 @@ type followRecommendation struct {
 }
 
 func GetFollowRecommendation(currentUserID string, limit int) ([]followRecommendation, error) {
-	dbInstance, err := DBConnection()
+	dbInstance, err := database.DBConnection()
 	if err != nil {
 		return nil, err
 	}

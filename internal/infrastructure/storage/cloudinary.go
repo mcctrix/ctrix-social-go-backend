@@ -1,4 +1,4 @@
-package cloudinary
+package storage
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"github.com/cloudinary/cloudinary-go/v2/api"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/gofiber/fiber/v3"
-	"github.com/mcctrix/ctrix-social-go-backend/models"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/models"
 )
 
 var cld *cloudinary.Cloudinary

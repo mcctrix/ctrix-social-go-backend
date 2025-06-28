@@ -2,14 +2,14 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v3"
-	"github.com/mcctrix/ctrix-social-go-backend/controllers"
-	"github.com/mcctrix/ctrix-social-go-backend/middleware"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/api/handlers/bookmarks"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/api/middleware"
 )
 
 func BookmarkRouter(router fiber.Router) {
 	router.Use(middleware.AuthMiddleware())
 
-	router.Get("/", controllers.GetBookmark())
-	router.Post("/:postID", controllers.CreateBookmark())
-	router.Delete("/:postID", controllers.DeleteBookmark())
+	router.Get("/", bookmarks.GetBookmark())
+	router.Post("/:postID", bookmarks.CreateBookmark())
+	router.Delete("/:postID", bookmarks.DeleteBookmark())
 }

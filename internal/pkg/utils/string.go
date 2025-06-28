@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mcctrix/ctrix-social-go-backend/models"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/models"
 )
 
 func MergeStructs(s1, s2 interface{}) (map[string]interface{}, error) {

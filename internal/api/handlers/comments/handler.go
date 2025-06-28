@@ -1,19 +1,19 @@
-package controllers
+package comments
 
 import (
 	"fmt"
 	"time"
 
 	"github.com/gofiber/fiber/v3"
-	db "github.com/mcctrix/ctrix-social-go-backend/db/v1"
-	"github.com/mcctrix/ctrix-social-go-backend/utils"
+	repo "github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/database/repositories"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/pkg/utils"
 )
 
 func GetCommentByID() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		commentID := c.Params("commentid")
 		fmt.Println(commentID)
-		comment, err := db.GetCommentByID(commentID)
+		comment, err := repo.GetCommentByID(commentID)
 		if err != nil {
 			fmt.Println("unable to fetch comment: ", err)
 			return c.Status(fiber.StatusNotFound).SendString("unable to find comment!")
@@ -39,7 +39,7 @@ func UpdatePostComment() fiber.Handler {
 		}
 
 		commentID := c.Params("commentid")
-		err = db.UpdatePostCommentWithByteData(commentID, rawData, c.Locals("userID").(string))
+		err = repo.UpdatePostCommentWithByteData(commentID, rawData, c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("Error updating comment: ", err)
 			return c.Status(fiber.StatusBadRequest).SendString("Unable to update comment!")
@@ -53,7 +53,7 @@ func DeletePostComment() fiber.Handler {
 	return func(c fiber.Ctx) error {
 
 		commentID := c.Params("commentid")
-		err := db.DeletePostComment(commentID, c.Locals("userID").(string))
+		err := repo.DeletePostComment(commentID, c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("Error deleting comment: ", err)
 			return err

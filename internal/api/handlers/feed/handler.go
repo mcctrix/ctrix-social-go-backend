@@ -1,11 +1,11 @@
-package controllers
+package feed
 
 import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v3"
-	db "github.com/mcctrix/ctrix-social-go-backend/db/v1"
-	"github.com/mcctrix/ctrix-social-go-backend/utils"
+	repo "github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/database/repositories"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/pkg/utils"
 )
 
 func GetFeed() fiber.Handler {
@@ -13,7 +13,7 @@ func GetFeed() fiber.Handler {
 		userID := c.Locals("userID").(string)
 		limit := utils.QueryLimit(c.Query("limit", "5"))
 
-		posts, err := db.GetPostFeed(userID, limit)
+		posts, err := repo.GetPostFeed(userID, limit)
 		if err != nil {
 			fmt.Println("error while fetching feed: ", err)
 			return c.Status(fiber.StatusNotFound).SendString("unable to fetch feed!")
@@ -26,7 +26,7 @@ func GetFollowRecommendation() fiber.Handler {
 		userID := c.Locals("userID").(string)
 		limit := utils.QueryLimit(c.Query("limit", "5"))
 
-		recommendation, err := db.GetFollowRecommendation(userID, limit)
+		recommendation, err := repo.GetFollowRecommendation(userID, limit)
 		if err != nil {
 			fmt.Println("error while fetching follow recommendation: ", err)
 			return c.Status(fiber.StatusNotFound).SendString("unable to fetch follow recommendation!")

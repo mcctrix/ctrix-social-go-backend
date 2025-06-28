@@ -7,13 +7,14 @@ import (
 	"time"
 
 	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/models"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/database"
 	"gorm.io/gorm"
 )
 
 type dataInterface interface{}
 
 func GetDataFromUserAuth(id string) (*models.User_Auth, error) {
-	db, err := DBConnection()
+	db, err := database.DBConnection()
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +34,7 @@ type user_profile_data struct {
 
 func GetUserData(id string, tableName string, fieldNames []string) (dataInterface, error) {
 
-	db, err := DBConnection()
+	db, err := database.DBConnection()
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +68,7 @@ func GetUserData(id string, tableName string, fieldNames []string) (dataInterfac
 }
 
 func UpdateTableWithByteData(NewProfileData []byte, userID string, tableName string) error {
-	db, err := DBConnection()
+	db, err := database.DBConnection()
 	if err != nil {
 		return err
 	}
@@ -95,7 +96,7 @@ func UpdateTableWithByteData(NewProfileData []byte, userID string, tableName str
 }
 
 func InitNewUser(userid string) error {
-	db, err := DBConnection()
+	db, err := database.DBConnection()
 	if err != nil {
 		return err
 	}
@@ -126,7 +127,7 @@ func InitNewUser(userid string) error {
 }
 
 func FollowUser(follow_id string, following_id string) error {
-	db, err := DBConnection()
+	db, err := database.DBConnection()
 	if err != nil {
 		return err
 	}
@@ -150,7 +151,7 @@ func FollowUser(follow_id string, following_id string) error {
 }
 
 func UnfollowUser(follow_id string, following_id string) error {
-	db, err := DBConnection()
+	db, err := database.DBConnection()
 	if err != nil {
 		return err
 	}
@@ -163,7 +164,7 @@ func UnfollowUser(follow_id string, following_id string) error {
 }
 
 func CheckFollowing(follow_id string, following_id string) (*models.Follows, error) {
-	db, err := DBConnection()
+	db, err := database.DBConnection()
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +187,7 @@ type FollowAndFollowerCount struct {
 }
 
 func GetFollowAndFollowing(userID string) (*FollowAndFollowerCount, error) {
-	db, err := DBConnection()
+	db, err := database.DBConnection()
 	if err != nil {
 		return nil, err
 	}

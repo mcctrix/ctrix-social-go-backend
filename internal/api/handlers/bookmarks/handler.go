@@ -1,9 +1,9 @@
-package controllers
+package bookmarks
 
 import (
 	"github.com/gofiber/fiber/v3"
-	db "github.com/mcctrix/ctrix-social-go-backend/db/v1"
-	"github.com/mcctrix/ctrix-social-go-backend/utils"
+	repo "github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/database/repositories"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/pkg/utils"
 )
 
 func GetBookmark() fiber.Handler {
@@ -11,7 +11,7 @@ func GetBookmark() fiber.Handler {
 		userID := c.Locals("userID").(string)
 		limit := utils.QueryLimit(c.Query("limit", "5"))
 
-		bookmarks, err := db.GetBookmark(userID, limit)
+		bookmarks, err := repo.GetBookmark(userID, limit)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": err.Error(),
@@ -26,7 +26,7 @@ func CreateBookmark() fiber.Handler {
 		userID := c.Locals("userID").(string)
 		postID := c.Params("postID")
 
-		err := db.CreateBookmark(userID, postID)
+		err := repo.CreateBookmark(userID, postID)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": err.Error(),
@@ -43,7 +43,7 @@ func DeleteBookmark() fiber.Handler {
 		userID := c.Locals("userID").(string)
 		postID := c.Params("postID")
 
-		err := db.DeleteBookmark(userID, postID)
+		err := repo.DeleteBookmark(userID, postID)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": err.Error(),

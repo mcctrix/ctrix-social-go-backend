@@ -1,15 +1,16 @@
-package v1
+package repositories
 
 import (
 	"errors"
 	"time"
 
-	"github.com/mcctrix/ctrix-social-go-backend/models"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/models"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/database"
 	"gorm.io/gorm"
 )
 
 func GetBookmark(userID string, limit int) ([]models.Bookmark, error) {
-	dbInstance, err := DBConnection()
+	dbInstance, err := database.DBConnection()
 	if err != nil {
 		return nil, err
 	}
@@ -22,7 +23,7 @@ func GetBookmark(userID string, limit int) ([]models.Bookmark, error) {
 	return bookmarks, nil
 }
 func CreateBookmark(userID, postID string) error {
-	dbInstance, err := DBConnection()
+	dbInstance, err := database.DBConnection()
 	if err != nil {
 		return err
 	}
@@ -47,7 +48,7 @@ func CreateBookmark(userID, postID string) error {
 }
 
 func DeleteBookmark(userID, postID string) error {
-	dbInstance, err := DBConnection()
+	dbInstance, err := database.DBConnection()
 	if err != nil {
 		return err
 	}

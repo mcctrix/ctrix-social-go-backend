@@ -2,29 +2,29 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v3"
-	"github.com/mcctrix/ctrix-social-go-backend/controllers"
-	"github.com/mcctrix/ctrix-social-go-backend/middleware"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/api/handlers/users"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/api/middleware"
 )
 
 func UserManagementRouter(router fiber.Router) {
 	router.Use(middleware.AuthMiddleware())
 
-	router.Get("/", controllers.GetCurrentUserProfile())
-	router.Patch("/", controllers.UpdateCurrentUserProfile())
+	router.Get("/", users.GetCurrentUserProfile())
+	router.Patch("/", users.UpdateCurrentUserProfile())
 
-	router.Get("/user/:userid", controllers.GetUserProfileWithParam())
+	router.Get("/user/:userid", users.GetUserProfileWithParam())
 
 	// follow user
-	router.Post("/:userid/follow", controllers.FollowUser())
-	router.Delete("/:userid/follow", controllers.UnfollowUser())
-	router.Get("/:userid/follow", controllers.CheckFollowing())
-	router.Get("/:userID/countFollow", controllers.GetFollowAndFollowing())
+	router.Post("/:userid/follow", users.FollowUser())
+	router.Delete("/:userid/follow", users.UnfollowUser())
+	router.Get("/:userid/follow", users.CheckFollowing())
+	router.Get("/:userID/countFollow", users.GetFollowAndFollowing())
 
-	router.Get("/additional_info", controllers.GetAdditionalUserInfo())
-	router.Patch("/additional_info", controllers.UpdateAdditionalUserInfo())
+	router.Get("/additional_info", users.GetAdditionalUserInfo())
+	router.Patch("/additional_info", users.UpdateAdditionalUserInfo())
 
-	router.Get("/user_settings", controllers.GetUserSettings())
-	router.Patch("/user_settings", controllers.UpdateUserSettings())
+	router.Get("/user_settings", users.GetUserSettings())
+	router.Patch("/user_settings", users.UpdateUserSettings())
 
-	router.Post("/profile-setup", controllers.ProfileSetup())
+	router.Post("/profile-setup", users.ProfileSetup())
 }

@@ -11,7 +11,7 @@ import (
 	recoverer "github.com/gofiber/fiber/v3/middleware/recover"
 	"github.com/joho/godotenv"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/api/routes"
-	db "github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/database/connection"
+	db "github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/database"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/pkg/auth"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/pkg/utils"
 )

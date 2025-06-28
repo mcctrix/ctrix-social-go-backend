@@ -10,7 +10,7 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/models"
-	db "github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/database/connection"
+	db "github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/database"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/pkg/auth"
 	"gorm.io/gorm"
 )

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v3"
-	"github.com/mcctrix/ctrix-social-go-backend/utils"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/pkg/auth"
 )
 
 func AuthMiddleware() fiber.Handler {
@@ -16,7 +16,7 @@ func AuthMiddleware() fiber.Handler {
 			})
 		}
 
-		jwtToken, err := utils.GetJwtToken(auth_token)
+		jwtToken, err := auth.GetJwtToken(auth_token)
 		if err != nil {
 			fmt.Println(err)
 			return fiber.ErrInternalServerError
@@ -27,7 +27,7 @@ func AuthMiddleware() fiber.Handler {
 				"error": "Invalid Token",
 			})
 		}
-		c.Locals("userID", utils.GetClaimData(jwtToken, "aud"))
+		c.Locals("userID", auth.GetClaimData(jwtToken, "aud"))
 
 		err = c.Next()
 		if err != nil {

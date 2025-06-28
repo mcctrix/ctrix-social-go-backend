@@ -1,13 +1,13 @@
-package controllers
+package users
 
 import (
 	"fmt"
 	"time"
 
 	"github.com/gofiber/fiber/v3"
-	db "github.com/mcctrix/ctrix-social-go-backend/db/v1"
-	"github.com/mcctrix/ctrix-social-go-backend/models"
-	"github.com/mcctrix/ctrix-social-go-backend/utils"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/models"
+	repo "github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/database/repositories"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/pkg/utils"
 )
 
 func ProfileSetup() fiber.Handler {
@@ -26,13 +26,13 @@ func ProfileSetup() fiber.Handler {
 			return fiber.ErrInternalServerError
 		}
 
-		err = db.UpdateTableWithByteData(rawForm, c.Locals("userID").(string), "user_additional_info")
+		err = repo.UpdateTableWithByteData(rawForm, c.Locals("userID").(string), "user_additional_info")
 		if err != nil {
 			fmt.Println("Error Setting the additional profile: ", err)
 			return fiber.ErrInternalServerError
 		}
 
-		err = db.UpdateTableWithByteData(rawForm, c.Locals("userID").(string), "user_profile")
+		err = repo.UpdateTableWithByteData(rawForm, c.Locals("userID").(string), "user_profile")
 		if err != nil {
 			fmt.Println("Error Setting the user profile: ", err)
 			return fiber.ErrInternalServerError
@@ -45,12 +45,12 @@ func ProfileSetup() fiber.Handler {
 func GetCurrentUserProfile() fiber.Handler {
 	return func(c fiber.Ctx) error {
 
-		profile, err := db.GetUserData(c.Locals("userID").(string), "user_profile", []string{"first_name", "last_name", "avatar", "last_seen", "verified_user"})
+		profile, err := repo.GetUserData(c.Locals("userID").(string), "user_profile", []string{"first_name", "last_name", "avatar", "last_seen", "verified_user"})
 		if err != nil {
 			fmt.Println("unable to fetch profile: ", err)
 			return c.Status(fiber.StatusNotFound).SendString("unable to fetch user profile!")
 		}
-		userAuth, err := db.GetUserData(c.Locals("userID").(string), "user_auth", []string{"email", "username", "created_at"})
+		userAuth, err := repo.GetUserData(c.Locals("userID").(string), "user_auth", []string{"email", "username", "created_at"})
 		if err != nil {
 			fmt.Println("unable to fetch user Auth: ", err)
 			return c.Status(fiber.StatusNotFound).SendString("unable to fetch user auth!")
@@ -67,12 +67,12 @@ func GetCurrentUserProfile() fiber.Handler {
 func GetUserProfileWithParam() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		userID := c.Params("userid")
-		profile, err := db.GetUserData(userID, "user_profile", []string{"first_name", "last_name", "avatar", "last_seen"})
+		profile, err := repo.GetUserData(userID, "user_profile", []string{"first_name", "last_name", "avatar", "last_seen"})
 		if err != nil {
 			fmt.Println("unable to fetch profile: ", err)
 			return c.Status(fiber.StatusNotFound).SendString("unable to fetch user profile!")
 		}
-		userAuth, err := db.GetUserData(userID, "user_auth", []string{"email", "username"})
+		userAuth, err := repo.GetUserData(userID, "user_auth", []string{"email", "username"})
 		if err != nil {
 			fmt.Println("unable to fetch user Auth: ", err)
 			return c.Status(fiber.StatusNotFound).SendString("unable to fetch user auth!")
@@ -101,7 +101,7 @@ func UpdateCurrentUserProfile() fiber.Handler {
 			return fiber.ErrInternalServerError
 		}
 
-		err = db.UpdateTableWithByteData(rawForm, c.Locals("userID").(string), "user_profile")
+		err = repo.UpdateTableWithByteData(rawForm, c.Locals("userID").(string), "user_profile")
 		if err != nil {
 			fmt.Println("Error Setting the profile: ", err)
 			return fiber.ErrInternalServerError
@@ -114,7 +114,7 @@ func UpdateCurrentUserProfile() fiber.Handler {
 func GetAdditionalUserInfo() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		fmt.Println("Get Additional User Info")
-		additional_profile, err := db.GetUserData(c.Locals("userID").(string), "user_additional_info", []string{"hobbies", "relation_status", "dob", "bio", "gender"})
+		additional_profile, err := repo.GetUserData(c.Locals("userID").(string), "user_additional_info", []string{"hobbies", "relation_status", "dob", "bio", "gender"})
 		if err != nil {
 			fmt.Println("error while fetching additional profile: ", err)
 			return c.Status(500).SendString("unable to fetch user additional profile!")
@@ -142,7 +142,7 @@ func UpdateAdditionalUserInfo() fiber.Handler {
 			return fiber.ErrInternalServerError
 		}
 
-		err = db.UpdateTableWithByteData(rawForm, c.Locals("userID").(string), "user_additional_info")
+		err = repo.UpdateTableWithByteData(rawForm, c.Locals("userID").(string), "user_additional_info")
 		if err != nil {
 			fmt.Println("Error Setting the additional profile: ", err)
 			return fiber.ErrInternalServerError
@@ -153,7 +153,7 @@ func UpdateAdditionalUserInfo() fiber.Handler {
 
 func GetUserSettings() fiber.Handler {
 	return func(c fiber.Ctx) error {
-		additional_profile, err := db.GetUserData(c.Locals("userID").(string), "user_settings", []string{"hide_post", "hide_story", "block_user", "show_online"})
+		additional_profile, err := repo.GetUserData(c.Locals("userID").(string), "user_settings", []string{"hide_post", "hide_story", "block_user", "show_online"})
 		if err != nil {
 			fmt.Println("error while fetching additional profile: ", err)
 			return c.Status(500).SendString("unable to fetch user settings!")
@@ -178,7 +178,7 @@ func UpdateUserSettings() fiber.Handler {
 			return fiber.ErrInternalServerError
 		}
 
-		err = db.UpdateTableWithByteData(rawForm, c.Locals("userID").(string), "user_settings")
+		err = repo.UpdateTableWithByteData(rawForm, c.Locals("userID").(string), "user_settings")
 		if err != nil {
 			fmt.Println("Error Setting the additional profile: ", err)
 			return fiber.ErrInternalServerError
@@ -192,7 +192,7 @@ func FollowUser() fiber.Handler {
 		follow_id := c.Params("userid")
 		following_id := c.Locals("userID").(string)
 
-		err := db.FollowUser(follow_id, following_id)
+		err := repo.FollowUser(follow_id, following_id)
 		if err != nil {
 			fmt.Println("Error while following user: ", err)
 			return err
@@ -207,7 +207,7 @@ func UnfollowUser() fiber.Handler {
 		follow_id := c.Params("userid")
 		following_id := c.Locals("userID").(string)
 
-		err := db.UnfollowUser(follow_id, following_id)
+		err := repo.UnfollowUser(follow_id, following_id)
 		if err != nil {
 			fmt.Println("Error while unfollowing user: ", err)
 			return fiber.ErrInternalServerError
@@ -222,7 +222,7 @@ func CheckFollowing() fiber.Handler {
 		follow_id := c.Params("userid")
 		following_id := c.Locals("userID").(string)
 
-		follow, err := db.CheckFollowing(follow_id, following_id)
+		follow, err := repo.CheckFollowing(follow_id, following_id)
 		if err != nil {
 			fmt.Println("Error while checking following: ", err)
 			return c.Status(404).SendString(err.Error())
@@ -236,7 +236,7 @@ func GetFollowAndFollowing() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		userID := c.Params("userID")
 
-		follow, err := db.GetFollowAndFollowing(userID)
+		follow, err := repo.GetFollowAndFollowing(userID)
 		if err != nil {
 			fmt.Println("Error while getting follow and following: ", err)
 			return c.Status(404).SendString(err.Error())

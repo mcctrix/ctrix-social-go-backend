@@ -1,4 +1,4 @@
-package v1
+package repositories
 
 import (
 	"encoding/json"
@@ -7,12 +7,13 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v3"
-	"github.com/mcctrix/ctrix-social-go-backend/models"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/models"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/database"
 )
 
 // Posts Database Functions
 func GetUserPostsByID(id string, limit int) ([]models.User_Post, error) {
-	db, err := DBConnection()
+	db, err := database.DBConnection()
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +25,7 @@ func GetUserPostsByID(id string, limit int) ([]models.User_Post, error) {
 }
 
 func CreateUserPostWithByteData(newPostByte []byte, userID string) error {
-	db, err := DBConnection()
+	db, err := database.DBConnection()
 	if err != nil {
 		return err
 	}
@@ -48,7 +49,7 @@ func CreateUserPostWithByteData(newPostByte []byte, userID string) error {
 }
 
 func GetPostByID(postID string, userID string) (*PostWithUserDetails, error) {
-	dbInstance, err := DBConnection()
+	dbInstance, err := database.DBConnection()
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +101,7 @@ type commentWithUserDetails struct {
 
 // Post Comments Database Functions
 func GetPostCommentsByPostID(postID string, userID string, limit int) ([]commentWithUserDetails, error) {
-	db, err := DBConnection()
+	db, err := database.DBConnection()
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +145,7 @@ func GetPostCommentsByPostID(postID string, userID string, limit int) ([]comment
 }
 
 func checkUserLikedComment(commentID string, userID string) (bool, error) {
-	db, err := DBConnection()
+	db, err := database.DBConnection()
 	if err != nil {
 		return false, err
 	}
@@ -161,7 +162,7 @@ func checkUserLikedComment(commentID string, userID string) (bool, error) {
 }
 
 func CreatePostCommentWithByteData(newCommentByte []byte, userID string, postID string) error {
-	db, err := DBConnection()
+	db, err := database.DBConnection()
 	if err != nil {
 		return err
 	}
@@ -187,7 +188,7 @@ func CreatePostCommentWithByteData(newCommentByte []byte, userID string, postID 
 }
 
 func GetCommentByID(commentID string) (*models.User_post_Comments, error) {
-	db, err := DBConnection()
+	db, err := database.DBConnection()
 	if err != nil {
 		return nil, err
 	}
@@ -200,7 +201,7 @@ func GetCommentByID(commentID string) (*models.User_post_Comments, error) {
 
 // Update functions for Posts and Comments
 func UpdateUserPostWithByteData(postID string, updatedPostByte []byte, userID string) error {
-	db, err := DBConnection()
+	db, err := database.DBConnection()
 	if err != nil {
 		return err
 	}
@@ -225,7 +226,7 @@ func UpdateUserPostWithByteData(postID string, updatedPostByte []byte, userID st
 }
 
 func UpdatePostCommentWithByteData(commentID string, updatedCommentByte []byte, userID string) error {
-	db, err := DBConnection()
+	db, err := database.DBConnection()
 	if err != nil {
 		return err
 	}
@@ -251,7 +252,7 @@ func UpdatePostCommentWithByteData(commentID string, updatedCommentByte []byte, 
 
 // Delete functions for Posts and Comments
 func DeleteUserPost(postID string, userID string) error {
-	db, err := DBConnection()
+	db, err := database.DBConnection()
 	if err != nil {
 		return err
 	}
@@ -271,7 +272,7 @@ func DeleteUserPost(postID string, userID string) error {
 }
 
 func DeletePostComment(commentID string, userID string) error {
-	db, err := DBConnection()
+	db, err := database.DBConnection()
 	if err != nil {
 		fmt.Println(err)
 		return fiber.ErrInternalServerError
@@ -292,7 +293,7 @@ func DeletePostComment(commentID string, userID string) error {
 }
 
 func GetAllPostReaction(postID string) ([]models.User_Post_Like_Table, error) {
-	db, err := DBConnection()
+	db, err := database.DBConnection()
 	if err != nil {
 		return nil, err
 	}
@@ -308,7 +309,7 @@ func GetAllPostReaction(postID string) ([]models.User_Post_Like_Table, error) {
 }
 
 func PostLikeToggler(postID string, userLikedID string, liked bool, likeType string) error {
-	db, err := DBConnection()
+	db, err := database.DBConnection()
 	if err != nil {
 		fmt.Println(err)
 		return fiber.ErrInternalServerError
@@ -337,7 +338,7 @@ func PostLikeToggler(postID string, userLikedID string, liked bool, likeType str
 }
 
 func CommentLikeToggler(commentID string, userLikedID string, liked bool, likeType string) error {
-	db, err := DBConnection()
+	db, err := database.DBConnection()
 	if err != nil {
 		fmt.Println(err)
 		return fiber.ErrInternalServerError

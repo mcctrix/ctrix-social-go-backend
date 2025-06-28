@@ -1,4 +1,4 @@
-package controllers
+package posts
 
 import (
 	"encoding/json"
@@ -7,17 +7,17 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
-	db "github.com/mcctrix/ctrix-social-go-backend/db/v1"
-	"github.com/mcctrix/ctrix-social-go-backend/models"
-	"github.com/mcctrix/ctrix-social-go-backend/utils"
-	"github.com/mcctrix/ctrix-social-go-backend/utils/cloudinary"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/models"
+	repo "github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/database/repositories"
+	storage "github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/storage"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/pkg/utils"
 )
 
 func GetUserPosts() fiber.Handler {
 	return func(c fiber.Ctx) error {
 
 		limit := utils.QueryLimit(c.Query("limit", "5"))
-		posts, err := db.GetUserPostsByID(c.Locals("userID").(string), limit)
+		posts, err := repo.GetUserPostsByID(c.Locals("userID").(string), limit)
 		if err != nil {
 			fmt.Println("error while fetching user posts: ", err)
 			return c.Status(fiber.StatusNotFound).SendString("unable to fetch user posts!")
@@ -30,7 +30,7 @@ func GetUserPosts() fiber.Handler {
 func GetPostReactions() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		postID := c.Params("postid")
-		reactions, err := db.GetAllPostReaction(postID)
+		reactions, err := repo.GetAllPostReaction(postID)
 		if err != nil {
 			fmt.Println(err)
 			return c.Status(fiber.StatusInternalServerError).SendString("Unable to fetch Reactions for the post!")
@@ -45,7 +45,7 @@ func CreateUserPost() fiber.Handler {
 
 		postData := &models.User_Post{}
 
-		cloudinaryURLs, err := cloudinary.UploadMediaHandler(c)
+		cloudinaryURLs, err := storage.UploadMediaHandler(c)
 		if err != nil {
 			fmt.Println("Error uploading media: ", err)
 			return c.Status(fiber.StatusRequestTimeout).SendString("Unable to upload media!")
@@ -67,7 +67,7 @@ func CreateUserPost() fiber.Handler {
 			return fiber.ErrInternalServerError
 		}
 
-		err = db.CreateUserPostWithByteData(bodyData, c.Locals("userID").(string))
+		err = repo.CreateUserPostWithByteData(bodyData, c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("Error creating post: ", err)
 			return c.Status(fiber.StatusInternalServerError).SendString("Unable to create post!")
@@ -81,7 +81,7 @@ func GetPostByID() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		userID := c.Locals("userID").(string)
 		postID := c.Params("postid")
-		post, err := db.GetPostByID(postID, userID)
+		post, err := repo.GetPostByID(postID, userID)
 		if err != nil {
 			fmt.Println("unable to fetch post: ", err)
 			return c.Status(fiber.StatusNotFound).SendString("unable to fetch post!")
@@ -98,7 +98,7 @@ func UpdateUserPost() fiber.Handler {
 			Media_attached models.StringArray `json:"pictures_attached" gorm:"type:text[]"`
 		}{}
 
-		cloudinaryURLs, err := cloudinary.UploadMediaHandler(c)
+		cloudinaryURLs, err := storage.UploadMediaHandler(c)
 		if err != nil {
 			fmt.Println("Error uploading media: ", err)
 			return c.Status(fiber.StatusInternalServerError).SendString("Unable to upload media!")
@@ -118,7 +118,7 @@ func UpdateUserPost() fiber.Handler {
 		}
 
 		postID := c.Params("postid")
-		err = db.UpdateUserPostWithByteData(postID, rawData, c.Locals("userID").(string))
+		err = repo.UpdateUserPostWithByteData(postID, rawData, c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("Error updating post: ", err)
 			return c.Status(fiber.StatusBadRequest).SendString("Unable to update post!")
@@ -132,7 +132,7 @@ func DeleteUserPost() fiber.Handler {
 	return func(c fiber.Ctx) error {
 
 		postID := c.Params("postid")
-		err := db.DeleteUserPost(postID, c.Locals("userID").(string))
+		err := repo.DeleteUserPost(postID, c.Locals("userID").(string))
 		if err != nil {
 			fmt.Println("Error deleting post: ", err)
 			return fiber.ErrInternalServerError
@@ -147,7 +147,7 @@ func GetPostComments() fiber.Handler {
 		userID := c.Locals("userID").(string)
 		postID := c.Params("postid")
 		limit := utils.QueryLimit(c.Query("limit", "5"))
-		comments, err := db.GetPostCommentsByPostID(postID, userID, limit)
+		comments, err := repo.GetPostCommentsByPostID(postID, userID, limit)
 		if err != nil {
 			fmt.Println("error while fetching post comments: ", err)
 			return c.Status(fiber.StatusBadRequest).SendString("unable to fetch post comments!")
@@ -163,7 +163,7 @@ func CreatePostComment() fiber.Handler {
 		postID := c.Params("postid")
 		commentData := c.BodyRaw()
 
-		err := db.CreatePostCommentWithByteData(commentData, c.Locals("userID").(string), postID)
+		err := repo.CreatePostCommentWithByteData(commentData, c.Locals("userID").(string), postID)
 		if err != nil {
 			fmt.Println("Error creating comment: ", err)
 			return c.Status(fiber.StatusBadRequest).SendString("Unable to create comment!")
@@ -188,7 +188,7 @@ func PostLikeToggler() fiber.Handler {
 			return fiber.ErrInternalServerError
 		}
 
-		if err = db.PostLikeToggler(c.Params("postid"), c.Locals("userID").(string), bodyData.Toggle, bodyData.Like_type); err != nil {
+		if err = repo.PostLikeToggler(c.Params("postid"), c.Locals("userID").(string), bodyData.Toggle, bodyData.Like_type); err != nil {
 			fmt.Println(err)
 			return err
 		}
@@ -212,7 +212,7 @@ func CommentLikeToggler() fiber.Handler {
 			return fiber.ErrInternalServerError
 		}
 
-		if err = db.CommentLikeToggler(c.Params("commentid"), c.Locals("userID").(string), bodyData.Toggle, bodyData.Like_type); err != nil {
+		if err = repo.CommentLikeToggler(c.Params("commentid"), c.Locals("userID").(string), bodyData.Toggle, bodyData.Like_type); err != nil {
 			fmt.Println(err)
 			return err
 		}
