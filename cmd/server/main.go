@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/gofiber/fiber/v3"
-	"github.com/gofiber/fiber/v3/middleware/logger"
+
 	recoverer "github.com/gofiber/fiber/v3/middleware/recover"
 	"github.com/joho/godotenv"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/api/middleware"
@@ -32,6 +32,7 @@ func main() {
 	})
 
 	// Middleware
+	mainRouter.Use(middleware.LoggerMiddleware())
 	mainRouter.Use(middleware.CORSMiddleware())
 
 	routes.SetupRoutes("/api", mainRouter)
@@ -82,10 +83,6 @@ func makeRouter() *fiber.App {
 		BodyLimit: 25 * 1024 * 1024,
 	})
 	router.Use(recoverer.New())
-
-	router.Use(logger.New(logger.Config{
-		Format: "[${ip}]: ${port} ${status} - ${method} ${path}\n",
-	}))
 
 	return router
 }
