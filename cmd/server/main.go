@@ -10,9 +10,10 @@ import (
 	"github.com/gofiber/fiber/v3/middleware/logger"
 	recoverer "github.com/gofiber/fiber/v3/middleware/recover"
 	"github.com/joho/godotenv"
-	db "github.com/mcctrix/ctrix-social-go-backend/db/v1"
-	"github.com/mcctrix/ctrix-social-go-backend/routes"
-	"github.com/mcctrix/ctrix-social-go-backend/utils"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/api/routes"
+	db "github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/database/connection"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/pkg/auth"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/pkg/utils"
 )
 
 func main() {
@@ -65,7 +66,7 @@ func loadEnvironment() {
 	godotenv.Load()
 
 	if _, err := os.Stat("./ecdsa_private_key.pem"); err != nil {
-		utils.GenerateEcdsaPrivateKey()
+		auth.GenerateEcdsaPrivateKey()
 	}
 	_, err := db.DBConnection()
 	if err != nil {

@@ -1,0 +1,443 @@
+# Improved Codebase Structure for Ctrix Social Go Backend
+
+## Recommended New Structure:
+
+```
+ctrix-social-go-backend/
+├── cmd/                               # Command-line applications
+│   └── server/                        # Main server application
+│       └── main.go                    # Application entry point - wire up dependencies, start server
+├── internal/                          # Private application code (not importable by other projects)
+│   ├── api/                           # HTTP API layer
+│   │   ├── handlers/                  # HTTP request handlers (controllers)
+│   │   │   ├── auth/                  # Authentication handlers
+│   │   │   │   ├── handler.go         # Login, signup, logout, refresh token endpoints
+│   │   │   │   └── validator.go       # Request validation for auth endpoints
+│   │   │   ├── posts/                 # Post management handlers
+│   │   │   │   ├── handler.go         # CRUD operations for posts, likes, reactions
+│   │   │   │   └── validator.go       # Post creation/update validation
+│   │   │   ├── users/                 # User management handlers
+│   │   │   │   ├── handler.go         # Profile CRUD, follow/unfollow, settings
+│   │   │   │   └── validator.go       # User data validation
+│   │   │   ├── comments/              # Comment handlers
+│   │   │   │   ├── handler.go         # Comment CRUD, likes, nested comments
+│   │   │   │   └── validator.go       # Comment validation
+│   │   │   ├── bookmarks/             # Bookmark handlers
+│   │   │   │   ├── handler.go         # Add/remove bookmarks, get bookmarked posts
+│   │   │   │   └── validator.go       # Bookmark validation
+│   │   │   └── feed/                  # Feed generation handlers
+│   │   │       ├── handler.go         # Get user feed, recommendations, trending
+│   │   │       └── validator.go       # Feed query validation
+│   │   ├── middleware/                # HTTP middleware functions
+│   │   │   ├── auth.go                # JWT authentication middleware
+│   │   │   ├── cors.go                # CORS configuration middleware
+│   │   │   ├── logging.go             # Request/response logging middleware
+│   │   │   ├── rate_limiter.go        # Rate limiting middleware (Redis-based)
+│   │   │   └── recovery.go            # Panic recovery middleware
+│   │   └── routes/                    # Route definitions
+│   │       ├── auth.go                # Auth route group (/api/auth/*)
+│   │       ├── posts.go               # Post routes (/api/posts/*)
+│   │       ├── users.go               # User routes (/api/users/*)
+│   │       ├── comments.go            # Comment routes (/api/comments/*)
+│   │       ├── bookmarks.go           # Bookmark routes (/api/bookmarks/*)
+│   │       ├── feed.go                # Feed routes (/api/feed/*)
+│   │       └── routes.go              # Main router setup and middleware registration
+│   ├── config/                        # Configuration management
+│   │   ├── config.go                  # Main config struct and loading logic
+│   │   ├── database.go                # Database configuration
+│   │   ├── jwt.go                     # JWT configuration (secret, expiration)
+│   │   └── server.go                  # Server configuration (port, host)
+│   ├── domain/                        # Business logic and domain models
+│   │   ├── models/                    # Domain entities and value objects
+│   │   │   ├── user.go                # User entity with business rules
+│   │   │   ├── post.go                # Post entity with validation
+│   │   │   ├── comment.go             # Comment entity
+│   │   │   ├── bookmark.go            # Bookmark entity
+│   │   │   └── common.go              # Shared types (ID, timestamps, pagination)
+│   │   ├── repositories/              # Repository interfaces (contracts)
+│   │   │   ├── user_repository.go     # User data access interface
+│   │   │   ├── post_repository.go     # Post data access interface
+│   │   │   ├── comment_repository.go  # Comment data access interface
+│   │   │   └── bookmark_repository.go # Bookmark data access interface
+│   │   └── services/                  # Business logic services
+│   │       ├── auth_service.go        # Authentication business logic
+│   │       ├── user_service.go        # User management business logic
+│   │       ├── post_service.go        # Post business logic (feed generation, etc.)
+│   │       ├── comment_service.go     # Comment business logic
+│   │       └── bookmark_service.go    # Bookmark business logic
+│   ├── infrastructure/                # External dependencies and implementations
+│   │   ├── database/                  # Database layer
+│   │   │   ├── connection.go          # Database connection management
+│   │   │   ├── migrations/            # Database schema migrations
+│   │   │   │   ├── 001_initial_schema.sql    # Initial tables creation
+│   │   │   │   ├── 002_add_indexes.sql       # Performance indexes
+│   │   │   │   └── 003_add_constraints.sql   # Data integrity constraints
+│   │   │   └── repositories/          # Repository implementations
+│   │   │       ├── user_repository.go         # PostgreSQL user repository
+│   │   │       ├── post_repository.go         # PostgreSQL post repository
+│   │   │       ├── comment_repository.go      # PostgreSQL comment repository
+│   │   │       └── bookmark_repository.go     # PostgreSQL bookmark repository
+│   │   ├── cache/                     # Caching layer
+│   │   │   ├── redis.go               # Redis connection and client
+│   │   │   └── cache_service.go       # Cache operations (get, set, delete)
+│   │   ├── storage/                   # File storage layer
+│   │   │   ├── cloudinary.go          # Cloudinary integration for media
+│   │   │   └── file_service.go        # File upload/download operations
+│   │   └── external/                  # External service integrations
+│   │       ├── email/                 # Email service
+│   │       │   └── email_service.go   # Email sending (SMTP, SendGrid, etc.)
+│   │       └── notifications/         # Push notifications
+│   │           └── notification_service.go    # FCM, webhooks, etc.
+│   └── pkg/                           # Internal shared packages
+│       ├── auth/                      # Authentication utilities
+│       │   ├── jwt.go                 # JWT token generation/validation
+│       │   ├── password.go            # Password hashing/verification
+│       │   └── validator.go           # Input validation utilities
+│       ├── logger/                    # Logging utilities
+│       │   └── logger.go              # Structured logging setup
+│       ├── errors/                    # Error handling
+│       │   ├── errors.go              # Custom error types
+│       │   └── error_handler.go       # Error response formatting
+│       ├── utils/                     # General utilities
+│       │   ├── response.go            # HTTP response helpers
+│       │   ├── time.go                # Time utility functions
+│       │   └── string.go              # String manipulation utilities
+│       └── constants/                 # Application constants
+│           └── constants.go           # Error codes, status messages, etc.
+├── pkg/                               # Public packages (importable by other projects)
+│   └── (future public packages)       # If you create reusable packages
+├── api/                               # API documentation and specs
+│   └── docs/                          # API documentation
+│       ├── swagger.json               # Swagger/OpenAPI specification
+│       └── openapi.yaml               # OpenAPI 3.0 specification
+├── scripts/                           # Build and deployment scripts
+│   ├── build.sh                       # Application build script
+│   ├── deploy.sh                      # Deployment automation
+│   └── migrate.sh                     # Database migration script
+├── deployments/                       # Deployment configurations
+│   ├── docker/                        # Docker configurations
+│   │   ├── Dockerfile                 # Multi-stage Docker build
+│   │   └── docker-compose.yml         # Local development environment
+│   └── kubernetes/                    # Kubernetes manifests
+│       ├── deployment.yaml            # Application deployment
+│       └── service.yaml               # Kubernetes service
+├── tests/                             # Test files and test utilities
+│   ├── unit/                          # Unit tests (fast, isolated)
+│   │   ├── handlers/                  # HTTP handler tests
+│   │   │   ├── auth_test.go           # Test auth endpoints
+│   │   │   ├── posts_test.go          # Test post endpoints
+│   │   │   └── users_test.go          # Test user endpoints
+│   │   ├── services/                  # Business logic tests
+│   │   │   ├── auth_service_test.go   # Test auth business logic
+│   │   │   ├── user_service_test.go   # Test user business logic
+│   │   │   └── post_service_test.go   # Test post business logic
+│   │   └── repositories/              # Data access tests
+│   │       ├── user_repository_test.go        # Test user repository
+│   │       ├── post_repository_test.go        # Test post repository
+│   │       └── comment_repository_test.go     # Test comment repository
+│   ├── integration/                   # Integration tests (with dependencies)
+│   │   └── api/                       # API integration tests
+│   │       ├── auth_integration_test.go       # Full auth flow tests
+│   │       ├── posts_integration_test.go      # Full post flow tests
+│   │       └── users_integration_test.go      # Full user flow tests
+│   └── fixtures/                      # Test data and fixtures
+│       └── test_data.sql              # Sample data for tests
+├── docs/                              # Project documentation
+│   ├── README.md                      # Project overview and setup
+│   ├── API.md                         # API usage documentation
+│   ├── DEPLOYMENT.md                  # Deployment instructions
+│   └── CONTRIBUTING.md                # Development guidelines
+├── .env.example                       # Environment variables template
+├── .env.local                         # Local development environment
+├── .env.production                    # Production environment
+├── .gitignore                         # Git ignore rules
+├── go.mod                             # Go module definition
+├── go.sum                             # Go module checksums
+├── Makefile                           # Build and development commands
+├── README.md                          # Project main documentation
+└── bruno/                             # API testing collection
+    └── collection.bru                 # Bruno API testing collection
+
+# =============================================================================
+# KEY IMPROVEMENTS EXPLAINED
+# =============================================================================
+
+## 1. Separation of Concerns
+- **Domain Layer**: Pure business logic, no dependencies on external systems
+- **Infrastructure Layer**: Database, cache, external services implementation
+- **API Layer**: HTTP handling, routing, middleware
+- **Configuration**: Centralized config management
+
+## 2. Dependency Injection
+- Use interfaces for all external dependencies
+- Easy to mock for testing
+- Clear dependency flow: Handlers → Services → Repositories
+
+## 3. Better Testing Structure
+- Unit tests for business logic
+- Integration tests for API endpoints
+- Repository tests with database mocks
+- Clear test data management
+
+## 4. Configuration Management
+- Environment-specific configs
+- Centralized configuration loading
+- Type-safe configuration structs
+
+## 5. Error Handling
+- Custom error types
+- Consistent error responses
+- Proper error logging
+
+## 6. Logging and Monitoring
+- Structured logging
+- Request/response logging
+- Performance monitoring hooks
+
+# =============================================================================
+# MIGRATION STRATEGY
+# =============================================================================
+
+## Phase 1: Create New Structure (Week 1)
+1. Create new directory structure
+2. Move existing files to new locations
+3. Update import paths
+4. Ensure application still runs
+
+## Phase 2: Refactor Controllers (Week 2)
+1. Split controllers into handlers and services
+2. Create repository interfaces
+3. Implement dependency injection
+4. Add request validation
+
+## Phase 3: Improve Database Layer (Week 3)
+1. Create proper repository implementations
+2. Add database migrations
+3. Implement connection pooling
+4. Add database health checks
+
+## Phase 4: Add Testing (Week 4)
+1. Write unit tests for services
+2. Write integration tests for handlers
+3. Add test coverage reporting
+4. Set up CI/CD pipeline
+
+## Phase 5: Documentation and Polish (Week 5)
+1. Add API documentation
+2. Update README files
+3. Add deployment guides
+4. Performance optimization
+
+# =============================================================================
+# EXAMPLE CODE STRUCTURE
+# =============================================================================
+
+## Example Handler (internal/api/handlers/auth/handler.go):
+```go
+package auth
+
+import (
+    "github.com/gofiber/fiber/v3"
+    "github.com/mcctrix/ctrix-social-go-backend/internal/domain/services"
+    "github.com/mcctrix/ctrix-social-go-backend/internal/pkg/errors"
+    "github.com/mcctrix/ctrix-social-go-backend/internal/pkg/response"
+)
+
+type AuthHandler struct {
+    authService services.AuthService
+}
+
+func NewAuthHandler(authService services.AuthService) *AuthHandler {
+    return &AuthHandler{
+        authService: authService,
+    }
+}
+
+func (h *AuthHandler) Login(c fiber.Ctx) error {
+    var req LoginRequest
+    if err := c.BodyParser(&req); err != nil {
+        return response.BadRequest(c, "Invalid request body")
+    }
+
+    if err := req.Validate(); err != nil {
+        return response.BadRequest(c, err.Error())
+    }
+
+    user, token, err := h.authService.Login(req.Email, req.Password)
+    if err != nil {
+        return response.Unauthorized(c, "Invalid credentials")
+    }
+
+    return response.Success(c, fiber.Map{
+        "user":  user,
+        "token": token,
+    })
+}
+```
+
+## Example Service (internal/domain/services/auth_service.go):
+```go
+package services
+
+import (
+    "github.com/mcctrix/ctrix-social-go-backend/internal/domain/models"
+    "github.com/mcctrix/ctrix-social-go-backend/internal/domain/repositories"
+    "github.com/mcctrix/ctrix-social-go-backend/internal/pkg/auth"
+)
+
+type AuthService struct {
+    userRepo repositories.UserRepository
+    jwtUtil  auth.JWTUtil
+}
+
+func NewAuthService(userRepo repositories.UserRepository, jwtUtil auth.JWTUtil) *AuthService {
+    return &AuthService{
+        userRepo: userRepo,
+        jwtUtil:  jwtUtil,
+    }
+}
+
+func (s *AuthService) Login(email, password string) (*models.User, string, error) {
+    user, err := s.userRepo.GetByEmail(email)
+    if err != nil {
+        return nil, "", err
+    }
+
+    if !auth.VerifyPassword(password, user.Password) {
+        return nil, "", errors.New("invalid credentials")
+    }
+
+    token, err := s.jwtUtil.GenerateToken(user.ID)
+    if err != nil {
+        return nil, "", err
+    }
+
+    return user, token, nil
+}
+```
+
+## Example Repository Interface (internal/domain/repositories/user_repository.go):
+```go
+package repositories
+
+import (
+    "context"
+    "github.com/mcctrix/ctrix-social-go-backend/internal/domain/models"
+)
+
+type UserRepository interface {
+    Create(ctx context.Context, user *models.User) error
+    GetByID(ctx context.Context, id string) (*models.User, error)
+    GetByEmail(ctx context.Context, email string) (*models.User, error)
+    Update(ctx context.Context, user *models.User) error
+    Delete(ctx context.Context, id string) error
+    List(ctx context.Context, filter UserFilter) ([]*models.User, error)
+}
+```
+
+## Example Configuration (internal/config/config.go):
+```go
+package config
+
+import (
+    "os"
+    "strconv"
+)
+
+type Config struct {
+    Server   ServerConfig
+    Database DatabaseConfig
+    JWT      JWTConfig
+    Redis    RedisConfig
+}
+
+type ServerConfig struct {
+    Port string
+    Host string
+}
+
+type DatabaseConfig struct {
+    Host     string
+    Port     int
+    User     string
+    Password string
+    Name     string
+    SSLMode  string
+}
+
+func Load() (*Config, error) {
+    port, _ := strconv.Atoi(getEnv("DB_PORT", "5432"))
+    
+    return &Config{
+        Server: ServerConfig{
+            Port: getEnv("PORT", "4000"),
+            Host: getEnv("HOST", "localhost"),
+        },
+        Database: DatabaseConfig{
+            Host:     getEnv("DB_HOST", "localhost"),
+            Port:     port,
+            User:     getEnv("DB_USER", "postgres"),
+            Password: getEnv("DB_PASSWORD", ""),
+            Name:     getEnv("DB_NAME", "ctrix_social"),
+            SSLMode:  getEnv("DB_SSLMODE", "disable"),
+        },
+        JWT: JWTConfig{
+            Secret:     getEnv("JWT_SECRET", ""),
+            Expiration: getEnv("JWT_EXPIRATION", "24h"),
+        },
+    }, nil
+}
+
+func getEnv(key, defaultValue string) string {
+    if value := os.Getenv(key); value != "" {
+        return value
+    }
+    return defaultValue
+}
+```
+
+# =============================================================================
+# BENEFITS OF THIS STRUCTURE
+# =============================================================================
+
+## 1. Maintainability
+- Clear separation of concerns
+- Easy to locate and modify code
+- Consistent patterns across the codebase
+
+## 2. Testability
+- Dependency injection makes mocking easy
+- Isolated business logic
+- Clear test boundaries
+
+## 3. Scalability
+- Easy to add new features
+- Modular architecture
+- Clear interfaces for extensions
+
+## 4. Team Collaboration
+- Clear ownership of different layers
+- Consistent coding patterns
+- Easy onboarding for new developers
+
+## 5. Deployment
+- Clear build and deployment scripts
+- Environment-specific configurations
+- Docker and Kubernetes ready
+
+## 6. Documentation
+- Self-documenting structure
+- Clear API documentation
+- Comprehensive README files
+
+# =============================================================================
+# NEXT STEPS
+# =============================================================================
+
+1. **Start with Phase 1**: Create the new directory structure
+2. **Move files gradually**: Don't try to refactor everything at once
+3. **Write tests**: Add tests as you refactor
+4. **Document changes**: Update documentation as you go
+5. **Get team feedback**: Ensure the structure works for your team
+
+This structure follows Go best practices and will make your codebase much more maintainable and enjoyable to work with! 
