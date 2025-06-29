@@ -14,16 +14,16 @@ import (
 	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/models"
 )
 
-type gnData struct {
+type TokenData struct {
 	Token       *jwt.Token
 	Exp_Time    int64
 	StringToken string
 }
 
 /*This Function takes User model and return a raw jwt token in string format*/
-func GenerateJwtToken(user *models.User) (*gnData, error) {
+func GenerateJwtToken(user *models.User) (*TokenData, error) {
 
-	returnData := &gnData{}
+	returnData := &TokenData{}
 
 	returnData.Exp_Time = time.Now().Add(time.Hour * 24 * 60).Unix()
 

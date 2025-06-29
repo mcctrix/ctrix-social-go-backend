@@ -5,10 +5,11 @@ import (
 	"github.com/mcctrix/ctrix-social-go-backend/internal/api/middleware"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/api/routes"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/config"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/services"
 )
 
 // NewServer creates and configures a new Fiber application.
-func NewServer() *fiber.App {
+func NewServer(services *services.Services) *fiber.App {
 	router := fiber.New(config.Fiber)
 
 	// Global Middleware
@@ -23,7 +24,7 @@ func NewServer() *fiber.App {
 	})
 
 	// API Routes
-	routes.SetupRoutes("/api", router)
+	routes.SetupRoutes("/api", router, services)
 
 	return router
 }

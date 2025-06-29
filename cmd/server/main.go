@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/mcctrix/ctrix-social-go-backend/internal/app"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/config"
 	db "github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/database"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/pkg/utils"
@@ -13,15 +14,17 @@ import (
 func main() {
 
 	cfg := config.LoadConfig()
-	CheckArgs()
 
-	_, err := db.DBConnect(cfg.DBConfig)
+	db, err := db.DBConnect(cfg.DBConfig)
 	if err != nil {
 		fmt.Println("Error connecting to db: ", err)
 		os.Exit(1)
 	}
+	CheckArgs()
 
-	mainRouter := server.NewServer()
+	services := app.BuildApplicationDependencies(db)
+
+	mainRouter := server.NewServer(services)
 
 	err = mainRouter.Listen(":" + cfg.Port)
 	if err != nil {

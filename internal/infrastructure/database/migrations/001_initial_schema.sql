@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS user_auth (
     id VARCHAR(50) PRIMARY KEY,
     email VARCHAR(50) UNIQUE NOT NULL,
     username VARCHAR(30) UNIQUE NOT NULL,
-    password VARCHAR(50) NOT NULL,
+    password VARCHAR(60) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );

@@ -6,6 +6,7 @@ import (
 
 	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/models"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/repositories"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/pkg/auth"
 )
 
 // UserService defines the business logic for user-related operations.
@@ -28,6 +29,7 @@ func (s *UserService) RegisterUser(email, username, password string) (*models.Us
 	if err != nil && err.Error() != "user not found" { // Assuming repository returns specific error for not found
 		return nil, fmt.Errorf("failed to check existing user: %w", err)
 	}
+	fmt.Println(existingUser)
 	if existingUser != nil {
 		return nil, errors.New("user with this email already exists")
 	}
@@ -56,15 +58,18 @@ func (s *UserService) GetUserByID(userID string) (*models.User, error) {
 }
 
 // AuthenticateUser handles user login and authentication.
-func (s *UserService) AuthenticateUser(email, password string) (*models.User, error) {
-	user, err := s.userRepo.FindByEmail(email)
+func (s *UserService) AuthenticateUser(username, password string) (*models.User, error) {
+	user, err := s.userRepo.FindByUsername(username)
 	if err != nil {
 		return nil, fmt.Errorf("user not found: %w", err)
 	}
-
 	if err := user.ComparePassword(password); err != nil {
 		return nil, errors.New("invalid credentials")
 	}
 
 	return user, nil
+}
+
+func (s *UserService) GenerateJwtToken(user *models.User) (*auth.TokenData, error) {
+	return s.userRepo.GenerateJwtToken(user)
 }
