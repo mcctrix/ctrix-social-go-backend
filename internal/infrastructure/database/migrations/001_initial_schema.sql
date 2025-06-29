@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS user_profile (
     verified_user BOOLEAN DEFAULT FALSE
 );
 
-CREATE TABLE IF NOT EXISTS follows (
+CREATE TABLE IF NOT EXISTS follow (
     follower_id text NOT NULL,  
     following_id text NOT NULL, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
