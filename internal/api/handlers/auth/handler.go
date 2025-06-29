@@ -36,7 +36,7 @@ func SignUp() fiber.Handler {
 		user.Id = uuid.New().String()
 		user.Created_at = time.Now()
 
-		dbInstance, err := db.DBConnection()
+		dbInstance, err := db.GetDB()
 		if err != nil {
 			fmt.Println(err)
 			return fiber.ErrInternalServerError
@@ -94,7 +94,7 @@ func Login() fiber.Handler {
 			return c.SendString("User already logged in!")
 		}
 
-		dbConn, err := db.DBConnection()
+		dbConn, err := db.GetDB()
 		if err != nil {
 			fmt.Println(err)
 			return fiber.ErrInternalServerError
@@ -192,7 +192,7 @@ func RefreshToken() fiber.Handler {
 			return fiber.ErrInternalServerError
 		}
 
-		db, err := db.DBConnection()
+		db, err := db.GetDB()
 		if err != nil {
 			fmt.Println(err)
 			return fiber.ErrInternalServerError
@@ -237,7 +237,7 @@ func ForgetPassword() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		email := c.FormValue("email")
 
-		db, err := db.DBConnection()
+		db, err := db.GetDB()
 		if err != nil {
 			fmt.Println("Error while connecting to db: ", err)
 			return fiber.ErrInternalServerError
@@ -258,7 +258,7 @@ func ResetPassword() fiber.Handler {
 		oldPassword := c.FormValue("old_password")
 		newPassword := c.FormValue("new_password")
 
-		db, err := db.DBConnection()
+		db, err := db.GetDB()
 		if err != nil {
 			fmt.Println("Error while connecting to db: ", err)
 			return fiber.ErrInternalServerError

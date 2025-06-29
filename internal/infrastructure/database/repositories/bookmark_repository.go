@@ -10,23 +10,17 @@ import (
 )
 
 func GetBookmark(userID string, limit int) ([]models.Bookmark, error) {
-	dbInstance, err := database.DBConnection()
-	if err != nil {
-		return nil, err
-	}
+	dbInstance := database.GetDB()
 
 	var bookmarks []models.Bookmark
-	err = dbInstance.Table("bookmark").Where("user_id = ?", userID).Order("created_at desc").Limit(limit).Find(&bookmarks).Error
+	err := dbInstance.Table("bookmark").Where("user_id = ?", userID).Order("created_at desc").Limit(limit).Find(&bookmarks).Error
 	if err != nil {
 		return nil, err
 	}
 	return bookmarks, nil
 }
 func CreateBookmark(userID, postID string) error {
-	dbInstance, err := database.DBConnection()
-	if err != nil {
-		return err
-	}
+	dbInstance := database.GetDB()
 
 	bookmark := models.Bookmark{
 		User_id:    userID,
@@ -34,7 +28,7 @@ func CreateBookmark(userID, postID string) error {
 		Created_at: time.Now(),
 	}
 
-	err = dbInstance.Create(&bookmark).Error
+	err := dbInstance.Create(&bookmark).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
 			return errors.New("bookmark already exists")
@@ -48,12 +42,9 @@ func CreateBookmark(userID, postID string) error {
 }
 
 func DeleteBookmark(userID, postID string) error {
-	dbInstance, err := database.DBConnection()
-	if err != nil {
-		return err
-	}
+	dbInstance := database.GetDB()
 
-	err = dbInstance.Table("bookmark").Where("user_id = ? AND post_id = ?", userID, postID).Delete(&models.Bookmark{}).Error
+	err := dbInstance.Table("bookmark").Where("user_id = ? AND post_id = ?", userID, postID).Delete(&models.Bookmark{}).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("bookmark does not exist")

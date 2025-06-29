@@ -12,14 +12,18 @@ import (
 
 func main() {
 
-	config.Load()
+	cfg := config.LoadConfig()
 	CheckArgs()
 
-	port := utils.GetEnv("PORT", "4000")
+	_, err := db.DBConnect(cfg.DBConfig)
+	if err != nil {
+		fmt.Println("Error connecting to db: ", err)
+		os.Exit(1)
+	}
 
 	mainRouter := server.NewServer()
 
-	err := mainRouter.Listen(":" + port)
+	err = mainRouter.Listen(":" + cfg.Port)
 	if err != nil {
 		fmt.Println(err)
 	}

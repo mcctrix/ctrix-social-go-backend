@@ -9,13 +9,11 @@ import (
 )
 
 func checkUserLikedPost(postID string, userID string) (bool, error) {
-	db, err := database.DBConnection()
-	if err != nil {
-		return false, err
-	}
+	db := database.GetDB()
+
 	var likes []models.User_Post_Like_Table
 	query := db.Table("user_post_like").Where("post_id = ? AND user_id = ?", postID, userID).Find(&likes)
-	if query.Error != nil {
+	if err := query.Error; err != nil {
 		return false, err
 	}
 	if query.RowsAffected == 0 {
@@ -39,13 +37,10 @@ type PostWithUserDetails struct {
 }
 
 func GetPostFeed(userID string, limit int) ([]PostWithUserDetails, error) {
-	dbInstance, err := database.DBConnection()
-	if err != nil {
-		return nil, err
-	}
+	dbInstance := database.GetDB()
 
 	var userSettings models.User_Settings
-	if err = dbInstance.Table("user_settings").Where("id = ?", userID).First(&userSettings).Error; err != nil {
+	if err := dbInstance.Table("user_settings").Where("id = ?", userID).First(&userSettings).Error; err != nil {
 		return nil, err
 	}
 
@@ -61,7 +56,7 @@ func GetPostFeed(userID string, limit int) ([]PostWithUserDetails, error) {
 		Order("user_posts.created_at desc").
 		Limit(limit).
 		Find(&postsWithDetails)
-	if err = queryPost.Error; err != nil {
+	if err := queryPost.Error; err != nil {
 		return nil, err
 	}
 
@@ -76,7 +71,7 @@ func GetPostFeed(userID string, limit int) ([]PostWithUserDetails, error) {
 		query.Select("user_id")
 		query.Where("post_id = ?", postsWithDetails[index].Id)
 		query.Find(&likes)
-		if query.Error != nil {
+		if err := query.Error; err != nil {
 			fmt.Println(err)
 			return nil, err
 		}
@@ -103,13 +98,10 @@ type followRecommendation struct {
 }
 
 func GetFollowRecommendation(currentUserID string, limit int) ([]followRecommendation, error) {
-	dbInstance, err := database.DBConnection()
-	if err != nil {
-		return nil, err
-	}
+	dbInstance := database.GetDB()
 
 	var currentFollows []models.Follows
-	if err = dbInstance.Table("follows").Where("follower_id = ?", currentUserID).Find(&currentFollows).Error; err != nil {
+	if err := dbInstance.Table("follows").Where("follower_id = ?", currentUserID).Find(&currentFollows).Error; err != nil {
 		return nil, err
 	}
 	var followingUsers []string
@@ -119,7 +111,7 @@ func GetFollowRecommendation(currentUserID string, limit int) ([]followRecommend
 	followingUsers = append(followingUsers, currentUserID)
 
 	var recommendation []followRecommendation
-	if err = dbInstance.Table("user_profile").Select("user_auth.username, user_profile.*").Joins("JOIN user_auth ON user_auth.id = user_profile.id").Not("user_auth.id IN (?)", followingUsers).Limit(limit).Find(&recommendation).Error; err != nil {
+	if err := dbInstance.Table("user_profile").Select("user_auth.username, user_profile.*").Joins("JOIN user_auth ON user_auth.id = user_profile.id").Not("user_auth.id IN (?)", followingUsers).Limit(limit).Find(&recommendation).Error; err != nil {
 		return nil, err
 	}
 

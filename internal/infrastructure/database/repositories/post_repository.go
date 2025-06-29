@@ -6,33 +6,27 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gofiber/fiber/v3"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/models"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/database"
 )
 
 // Posts Database Functions
 func GetUserPostsByID(id string, limit int) ([]models.User_Post, error) {
-	db, err := database.DBConnection()
-	if err != nil {
-		return nil, err
-	}
+	db := database.GetDB()
+
 	var userPosts []models.User_Post
-	if err = db.Table("user_posts").Order("created_at desc").Where("creator_id = ?", id).Limit(limit).Find(&userPosts).Error; err != nil {
+	if err := db.Table("user_posts").Order("created_at desc").Where("creator_id = ?", id).Limit(limit).Find(&userPosts).Error; err != nil {
 		return nil, err
 	}
 	return userPosts, nil
 }
 
 func CreateUserPostWithByteData(newPostByte []byte, userID string) error {
-	db, err := database.DBConnection()
-	if err != nil {
-		return err
-	}
+	db := database.GetDB()
 
 	// Create a new post
 	newPost := &models.User_Post{}
-	if err = json.Unmarshal(newPostByte, newPost); err != nil {
+	if err := json.Unmarshal(newPostByte, newPost); err != nil {
 		return err
 	}
 
@@ -41,7 +35,7 @@ func CreateUserPostWithByteData(newPostByte []byte, userID string) error {
 	newPost.Created_at = time.Now()
 
 	// Save the post1
-	if err = db.Table("user_posts").Create(newPost).Error; err != nil {
+	if err := db.Table("user_posts").Create(newPost).Error; err != nil {
 		return err
 	}
 
@@ -49,10 +43,8 @@ func CreateUserPostWithByteData(newPostByte []byte, userID string) error {
 }
 
 func GetPostByID(postID string, userID string) (*PostWithUserDetails, error) {
-	dbInstance, err := database.DBConnection()
-	if err != nil {
-		return nil, err
-	}
+	dbInstance := database.GetDB()
+
 	var postWithDetails *PostWithUserDetails = &PostWithUserDetails{}
 	query := dbInstance.Table("user_posts").
 		Select("user_posts.*, user_auth.username, user_profile.avatar, user_profile.profile_picture, user_profile.verified_user, user_additional_info.bio").
@@ -62,7 +54,7 @@ func GetPostByID(postID string, userID string) (*PostWithUserDetails, error) {
 		Order("user_posts.created_at desc").
 		Where("user_posts.id = ?", postID).
 		Find(postWithDetails)
-	if query.Error != nil {
+	if err := query.Error; err != nil {
 		return nil, err
 	}
 
@@ -72,7 +64,7 @@ func GetPostByID(postID string, userID string) (*PostWithUserDetails, error) {
 	query.Select("user_id")
 	query.Where("post_id = ?", postID)
 	query.Find(&likes)
-	if query.Error != nil {
+	if err := query.Error; err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
@@ -101,10 +93,8 @@ type commentWithUserDetails struct {
 
 // Post Comments Database Functions
 func GetPostCommentsByPostID(postID string, userID string, limit int) ([]commentWithUserDetails, error) {
-	db, err := database.DBConnection()
-	if err != nil {
-		return nil, err
-	}
+	db := database.GetDB()
+
 	var postComments []commentWithUserDetails
 	query := db.Table("user_post_comments")
 	query.Select("user_post_comments.*,user_auth.username,user_profile.avatar,user_profile.profile_picture,user_profile.verified_user")
@@ -114,7 +104,7 @@ func GetPostCommentsByPostID(postID string, userID string, limit int) ([]comment
 	query.Where("post_id = ?", postID)
 	query.Limit(limit).Find(&postComments)
 
-	if query.Error != nil {
+	if err := query.Error; err != nil {
 		return nil, err
 	}
 	for index, _ := range postComments {
@@ -123,7 +113,7 @@ func GetPostCommentsByPostID(postID string, userID string, limit int) ([]comment
 		query.Select("user_id")
 		query.Where("comment_id = ?", postComments[index].Id)
 		query.Find(&likes)
-		if query.Error != nil {
+		if err := query.Error; err != nil {
 			fmt.Println(err)
 			return nil, err
 		}
@@ -145,13 +135,11 @@ func GetPostCommentsByPostID(postID string, userID string, limit int) ([]comment
 }
 
 func checkUserLikedComment(commentID string, userID string) (bool, error) {
-	db, err := database.DBConnection()
-	if err != nil {
-		return false, err
-	}
+	db := database.GetDB()
+
 	var likes []models.User_post_comment_like
 	query := db.Table("user_post_comment_like").Where("comment_id = ? AND user_id = ?", commentID, userID).Find(&likes)
-	if query.Error != nil {
+	if err := query.Error; err != nil {
 		return false, err
 	}
 	if query.RowsAffected == 0 {
@@ -162,14 +150,11 @@ func checkUserLikedComment(commentID string, userID string) (bool, error) {
 }
 
 func CreatePostCommentWithByteData(newCommentByte []byte, userID string, postID string) error {
-	db, err := database.DBConnection()
-	if err != nil {
-		return err
-	}
+	db := database.GetDB()
 
 	// Create a new comment
 	newComment := &models.User_post_Comments{}
-	if err = json.Unmarshal(newCommentByte, newComment); err != nil {
+	if err := json.Unmarshal(newCommentByte, newComment); err != nil {
 		return err
 	}
 
@@ -180,7 +165,7 @@ func CreatePostCommentWithByteData(newCommentByte []byte, userID string, postID 
 	newComment.Post_id = postID
 
 	// Save the comment
-	if err = db.Table("user_post_comments").Create(newComment).Error; err != nil {
+	if err := db.Table("user_post_comments").Create(newComment).Error; err != nil {
 		return err
 	}
 
@@ -188,12 +173,10 @@ func CreatePostCommentWithByteData(newCommentByte []byte, userID string, postID 
 }
 
 func GetCommentByID(commentID string) (*models.User_post_Comments, error) {
-	db, err := database.DBConnection()
-	if err != nil {
-		return nil, err
-	}
+	db := database.GetDB()
+
 	var comment *models.User_post_Comments = &models.User_post_Comments{}
-	if err = db.Table("user_post_comments").Where("id = ?", commentID).First(comment).Error; err != nil {
+	if err := db.Table("user_post_comments").Where("id = ?", commentID).First(comment).Error; err != nil {
 		return nil, err
 	}
 	return comment, nil
@@ -201,24 +184,21 @@ func GetCommentByID(commentID string) (*models.User_post_Comments, error) {
 
 // Update functions for Posts and Comments
 func UpdateUserPostWithByteData(postID string, updatedPostByte []byte, userID string) error {
-	db, err := database.DBConnection()
-	if err != nil {
-		return err
-	}
+	db := database.GetDB()
 
 	// Find the existing post
 	var existingPost *models.User_Post = &models.User_Post{}
-	if err = db.Table("user_posts").Where("id = ? AND creator_id = ?", postID, userID).First(existingPost).Error; err != nil {
+	if err := db.Table("user_posts").Where("id = ? AND creator_id = ?", postID, userID).First(existingPost).Error; err != nil {
 		return err
 	}
 
 	// Unmarshal the updated post data
-	if err = json.Unmarshal(updatedPostByte, existingPost); err != nil {
+	if err := json.Unmarshal(updatedPostByte, existingPost); err != nil {
 		return err
 	}
 
 	// Save the updated post
-	if err = db.Table("user_posts").Save(existingPost).Error; err != nil {
+	if err := db.Table("user_posts").Save(existingPost).Error; err != nil {
 		return err
 	}
 
@@ -226,24 +206,21 @@ func UpdateUserPostWithByteData(postID string, updatedPostByte []byte, userID st
 }
 
 func UpdatePostCommentWithByteData(commentID string, updatedCommentByte []byte, userID string) error {
-	db, err := database.DBConnection()
-	if err != nil {
-		return err
-	}
+	db := database.GetDB()
 
 	// Find the existing comment
 	var existingComment *models.User_post_Comments = &models.User_post_Comments{}
-	if err = db.Table("user_post_comments").Where("id = ? AND creator_id = ?", commentID, userID).First(existingComment).Error; err != nil {
+	if err := db.Table("user_post_comments").Where("id = ? AND creator_id = ?", commentID, userID).First(existingComment).Error; err != nil {
 		return err
 	}
 
 	// Unmarshal the updated comment data
-	if err = json.Unmarshal(updatedCommentByte, existingComment); err != nil {
+	if err := json.Unmarshal(updatedCommentByte, existingComment); err != nil {
 		return err
 	}
 
 	// Save the updated comment
-	if err = db.Table("user_post_comments").Save(existingComment).Error; err != nil {
+	if err := db.Table("user_post_comments").Save(existingComment).Error; err != nil {
 		return err
 	}
 
@@ -252,10 +229,7 @@ func UpdatePostCommentWithByteData(commentID string, updatedCommentByte []byte, 
 
 // Delete functions for Posts and Comments
 func DeleteUserPost(postID string, userID string) error {
-	db, err := database.DBConnection()
-	if err != nil {
-		return err
-	}
+	db := database.GetDB()
 
 	// Delete the post, ensuring it belongs to the user
 	result := db.Table("user_posts").Where("id = ? AND creator_id = ?", postID, userID).Delete(&models.User_Post{})
@@ -272,11 +246,7 @@ func DeleteUserPost(postID string, userID string) error {
 }
 
 func DeletePostComment(commentID string, userID string) error {
-	db, err := database.DBConnection()
-	if err != nil {
-		fmt.Println(err)
-		return fiber.ErrInternalServerError
-	}
+	db := database.GetDB()
 
 	// Delete the comment, ensuring it belongs to the user
 	result := db.Table("user_post_comments").Where("id = ? AND creator_id = ?", commentID, userID).Delete(&models.User_post_Comments{})
@@ -293,14 +263,11 @@ func DeletePostComment(commentID string, userID string) error {
 }
 
 func GetAllPostReaction(postID string) ([]models.User_Post_Like_Table, error) {
-	db, err := database.DBConnection()
-	if err != nil {
-		return nil, err
-	}
+	db := database.GetDB()
 
 	var allReacts []models.User_Post_Like_Table
 
-	if err = db.Table("user_post_like").Where("post_id = ? ", postID).Select("user_id", "like_type").Find(&allReacts).Error; err != nil {
+	if err := db.Table("user_post_like").Where("post_id = ? ", postID).Select("user_id", "like_type").Find(&allReacts).Error; err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
@@ -309,18 +276,14 @@ func GetAllPostReaction(postID string) ([]models.User_Post_Like_Table, error) {
 }
 
 func PostLikeToggler(postID string, userLikedID string, liked bool, likeType string) error {
-	db, err := database.DBConnection()
-	if err != nil {
-		fmt.Println(err)
-		return fiber.ErrInternalServerError
-	}
+	db := database.GetDB()
 
 	if liked {
 		post_like_data := models.User_Post_Like_Table{User_id: userLikedID, Post_id: postID, Like_type: "like"}
 		if db.Table("user_post_like").Where("user_id = ?", userLikedID).Where("post_id = ?", postID).Updates(map[string]interface{}{
 			"like_type": likeType,
 		}).RowsAffected == 0 {
-			if err = db.Table("user_post_like").Create(post_like_data).Error; err != nil {
+			if err := db.Table("user_post_like").Create(post_like_data).Error; err != nil {
 				fmt.Println(err)
 				return errors.New("unable to create post reaction")
 			}
@@ -328,7 +291,7 @@ func PostLikeToggler(postID string, userLikedID string, liked bool, likeType str
 
 	} else {
 
-		if err = db.Table("user_post_like").Where("post_id = ?", postID).Where("user_id = ?", userLikedID).Delete(&models.User_Post_Like_Table{}).Error; err != nil {
+		if err := db.Table("user_post_like").Where("post_id = ?", postID).Where("user_id = ?", userLikedID).Delete(&models.User_Post_Like_Table{}).Error; err != nil {
 			fmt.Println(err)
 			return errors.New("unable to remove post reaction")
 		}
@@ -338,18 +301,14 @@ func PostLikeToggler(postID string, userLikedID string, liked bool, likeType str
 }
 
 func CommentLikeToggler(commentID string, userLikedID string, liked bool, likeType string) error {
-	db, err := database.DBConnection()
-	if err != nil {
-		fmt.Println(err)
-		return fiber.ErrInternalServerError
-	}
+	db := database.GetDB()
 
 	if liked {
 		comment_like_data := models.User_post_comment_like{User_id: userLikedID, Comment_id: commentID, Like_type: "like"}
 		if db.Table("user_post_comment_like").Where("user_id = ?", userLikedID).Where("comment_id = ?", commentID).Updates(map[string]interface{}{
 			"like_type": likeType,
 		}).RowsAffected == 0 {
-			if err = db.Table("user_post_comment_like").Create(comment_like_data).Error; err != nil {
+			if err := db.Table("user_post_comment_like").Create(comment_like_data).Error; err != nil {
 				fmt.Println(err)
 				return errors.New("unable to create comment reaction")
 			}
@@ -357,7 +316,7 @@ func CommentLikeToggler(commentID string, userLikedID string, liked bool, likeTy
 
 	} else {
 
-		if err = db.Table("user_post_comment_like").Where("comment_id = ?", commentID).Where("user_id = ?", userLikedID).Delete(&models.User_post_comment_like{}).Error; err != nil {
+		if err := db.Table("user_post_comment_like").Where("comment_id = ?", commentID).Where("user_id = ?", userLikedID).Delete(&models.User_post_comment_like{}).Error; err != nil {
 			fmt.Println(err)
 			return errors.New("unable to remove comment reaction")
 		}

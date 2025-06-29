@@ -4,18 +4,12 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/api/middleware"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/api/routes"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/config"
 )
 
 // NewServer creates and configures a new Fiber application.
 func NewServer() *fiber.App {
-	router := fiber.New(fiber.Config{
-		TrustProxy: true,
-		TrustProxyConfig: fiber.TrustProxyConfig{
-			Proxies:  []string{"127.0.0.1", "0.0.0.0"},
-			Loopback: true,
-		},
-		BodyLimit: 25 * 1024 * 1024,
-	})
+	router := fiber.New(config.Fiber)
 
 	// Global Middleware
 	router.Use(middleware.RecovererMiddleware())

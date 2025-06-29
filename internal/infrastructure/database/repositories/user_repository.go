@@ -14,30 +14,19 @@ import (
 type dataInterface interface{}
 
 func GetDataFromUserAuth(id string) (*models.User_Auth, error) {
-	db, err := database.DBConnection()
-	if err != nil {
-		return nil, err
-	}
+	db := database.GetDB()
+
 	var user_auth *models.User_Auth = &models.User_Auth{}
-	if err = db.Table("user_auth").Select("username", "email").Where("id = ?", id).First(user_auth).Error; err != nil {
+	if err := db.Table("user_auth").Select("username", "email").Where("id = ?", id).First(user_auth).Error; err != nil {
 		return nil, err
 	}
 
 	return user_auth, nil
 }
 
-type user_profile_data struct {
-	models.User_Profile
-	Email    string `json:"email"`
-	Username string `json:"username"`
-}
-
 func GetUserData(id string, tableName string, fieldNames []string) (dataInterface, error) {
 
-	db, err := database.DBConnection()
-	if err != nil {
-		return nil, err
-	}
+	db := database.GetDB()
 
 	var userData dataInterface
 
@@ -55,11 +44,11 @@ func GetUserData(id string, tableName string, fieldNames []string) (dataInterfac
 	}
 
 	if len(fieldNames) > 0 {
-		if err = db.Table(tableName).Select(fieldNames).Where("id = ?", id).First(userData).Error; err != nil {
+		if err := db.Table(tableName).Select(fieldNames).Where("id = ?", id).First(userData).Error; err != nil {
 			return nil, err
 		}
 	} else {
-		if err = db.Table(tableName).Where("id = ?", id).First(userData).Error; err != nil {
+		if err := db.Table(tableName).Where("id = ?", id).First(userData).Error; err != nil {
 			return nil, err
 		}
 	}
@@ -68,10 +57,8 @@ func GetUserData(id string, tableName string, fieldNames []string) (dataInterfac
 }
 
 func UpdateTableWithByteData(NewProfileData []byte, userID string, tableName string) error {
-	db, err := database.DBConnection()
-	if err != nil {
-		return err
-	}
+	db := database.GetDB()
+
 	var userProfile dataInterface
 
 	switch tableName {
@@ -85,31 +72,29 @@ func UpdateTableWithByteData(NewProfileData []byte, userID string, tableName str
 		return fmt.Errorf("unsupported table name for update: %s", tableName)
 	}
 
-	if err = db.Table(tableName).Where("id = ?", userID).First(&userProfile).Error; err != nil {
+	if err := db.Table(tableName).Where("id = ?", userID).First(&userProfile).Error; err != nil {
 		return err
 	}
 
-	if err = json.Unmarshal(NewProfileData, userProfile); err != nil {
+	if err := json.Unmarshal(NewProfileData, userProfile); err != nil {
 		return err
 	}
 	return db.Table(tableName).Save(userProfile).Error
 }
 
 func InitNewUser(userid string) error {
-	db, err := database.DBConnection()
-	if err != nil {
-		return err
-	}
+	db := database.GetDB()
+
 	type base struct {
 		Id string `gorm:"primaryKey"`
 	}
 
 	data := base{Id: userid}
 
-	if err = db.Table("user_profile").Create(data).Error; err != nil {
+	if err := db.Table("user_profile").Create(data).Error; err != nil {
 		return err
 	}
-	if err = db.Table("user_additional_info").Create(data).Error; err != nil {
+	if err := db.Table("user_additional_info").Create(data).Error; err != nil {
 		return err
 	}
 	userSetting := struct {
@@ -120,19 +105,16 @@ func InitNewUser(userid string) error {
 		Show_online: true,
 	}
 
-	if err = db.Table("user_settings").Create(userSetting).Error; err != nil {
+	if err := db.Table("user_settings").Create(userSetting).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 func FollowUser(follow_id string, following_id string) error {
-	db, err := database.DBConnection()
-	if err != nil {
-		return err
-	}
+	db := database.GetDB()
 
-	if err = db.Table("follows").Create(&models.Follows{
+	if err := db.Table("follows").Create(&models.Follows{
 		Follower_id:  follow_id,
 		Following_id: following_id,
 		Created_at:   time.Now(),
@@ -151,12 +133,9 @@ func FollowUser(follow_id string, following_id string) error {
 }
 
 func UnfollowUser(follow_id string, following_id string) error {
-	db, err := database.DBConnection()
-	if err != nil {
-		return err
-	}
+	db := database.GetDB()
 
-	if err = db.Table("follows").Where("follower_id = ? AND following_id = ?", follow_id, following_id).Delete(&models.Follows{}).Error; err != nil {
+	if err := db.Table("follows").Where("follower_id = ? AND following_id = ?", follow_id, following_id).Delete(&models.Follows{}).Error; err != nil {
 		return err
 	}
 
@@ -164,18 +143,15 @@ func UnfollowUser(follow_id string, following_id string) error {
 }
 
 func CheckFollowing(follow_id string, following_id string) (*models.Follows, error) {
-	db, err := database.DBConnection()
-	if err != nil {
-		return nil, err
-	}
+	db := database.GetDB()
 
 	var follows *models.Follows
 	res := db.Table("follows").Select("created_at").Where("follower_id = ? AND following_id = ?", follow_id, following_id).Find(&follows)
-	if err = res.Error; err != nil {
+	if err := res.Error; err != nil {
 		return nil, err
 	}
 	if res.RowsAffected == 0 {
-		return nil, errors.New("Not Following")
+		return nil, errors.New("not following")
 	}
 
 	return follows, nil
@@ -187,14 +163,11 @@ type FollowAndFollowerCount struct {
 }
 
 func GetFollowAndFollowing(userID string) (*FollowAndFollowerCount, error) {
-	db, err := database.DBConnection()
-	if err != nil {
-		return nil, err
-	}
+	db := database.GetDB()
 
 	var follows []models.Follows
 	res := db.Table("follows").Select("follower_id, following_id").Where("follower_id = ? OR following_id = ?", userID, userID).Find(&follows)
-	if err = res.Error; err != nil {
+	if err := res.Error; err != nil {
 		return nil, err
 	}
 	data := &FollowAndFollowerCount{}
