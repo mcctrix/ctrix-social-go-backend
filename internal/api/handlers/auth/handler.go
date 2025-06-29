@@ -36,12 +36,9 @@ func SignUp() fiber.Handler {
 		user.Id = uuid.New().String()
 		user.Created_at = time.Now()
 
-		dbInstance, err := db.GetDB()
-		if err != nil {
-			fmt.Println(err)
-			return fiber.ErrInternalServerError
-		}
-		if err = dbInstance.Table("user_auth").Create(user).Error; err != nil {
+		dbInstance := db.GetDB()
+
+		if err := dbInstance.Table("user_auth").Create(user).Error; err != nil {
 			fmt.Println("Error in Creating New User:", err.Error())
 			if errors.Is(err, gorm.ErrDuplicatedKey) {
 				return c.Status(400).SendString("Duplicate Email or Username.")
@@ -94,11 +91,8 @@ func Login() fiber.Handler {
 			return c.SendString("User already logged in!")
 		}
 
-		dbConn, err := db.GetDB()
-		if err != nil {
-			fmt.Println(err)
-			return fiber.ErrInternalServerError
-		}
+		dbConn := db.GetDB()
+
 		username := strings.ToLower(c.FormValue("username"))
 		password := c.FormValue("password")
 
@@ -113,7 +107,7 @@ func Login() fiber.Handler {
 		}
 
 		// select * from user_auth where password="12345678"
-		if err = dbConn.Table("user_auth").Where(whereConditionData).First(user).Error; err != nil {
+		if err := dbConn.Table("user_auth").Where(whereConditionData).First(user).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				return c.Status(fiber.StatusNotFound).SendString("User not Found!")
 			}
@@ -192,11 +186,8 @@ func RefreshToken() fiber.Handler {
 			return fiber.ErrInternalServerError
 		}
 
-		db, err := db.GetDB()
-		if err != nil {
-			fmt.Println(err)
-			return fiber.ErrInternalServerError
-		}
+		db := db.GetDB()
+
 		var user *models.User_Auth = &models.User_Auth{}
 
 		if err = db.Table("user_auth").Where("id = ?", userID).First(user).Error; err != nil {
@@ -237,13 +228,10 @@ func ForgetPassword() fiber.Handler {
 	return func(c fiber.Ctx) error {
 		email := c.FormValue("email")
 
-		db, err := db.GetDB()
-		if err != nil {
-			fmt.Println("Error while connecting to db: ", err)
-			return fiber.ErrInternalServerError
-		}
+		db := db.GetDB()
+
 		var user *models.User_Auth = &models.User_Auth{}
-		if err = db.Table("user_auth").Where(struct{ Email string }{Email: email}).First(user).Error; err != nil {
+		if err := db.Table("user_auth").Where(struct{ Email string }{Email: email}).First(user).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				return c.SendString("User not found with this email!")
 			}
@@ -258,13 +246,10 @@ func ResetPassword() fiber.Handler {
 		oldPassword := c.FormValue("old_password")
 		newPassword := c.FormValue("new_password")
 
-		db, err := db.GetDB()
-		if err != nil {
-			fmt.Println("Error while connecting to db: ", err)
-			return fiber.ErrInternalServerError
-		}
+		db := db.GetDB()
+
 		var user *models.User_Auth = &models.User_Auth{}
-		if err = db.Table("user_auth").Where(struct {
+		if err := db.Table("user_auth").Where(struct {
 			Email    string
 			Password string
 		}{Email: email, Password: oldPassword}).First(user).Error; err != nil {
@@ -274,7 +259,7 @@ func ResetPassword() fiber.Handler {
 		}
 
 		user.Password = newPassword
-		if err = db.Table("user_auth").Save(user).Error; err != nil {
+		if err := db.Table("user_auth").Save(user).Error; err != nil {
 			fmt.Println("Error while updating password: ", err)
 			return fiber.ErrInternalServerError
 		}
