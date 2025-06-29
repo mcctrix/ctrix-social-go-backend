@@ -45,6 +45,6 @@ func LoadDBConfig() *DatabaseConfig {
 		}
 		DBConfig.Port = port
 	}
-	fmt.Println(DBConfig)
+
 	return DBConfig
 }
