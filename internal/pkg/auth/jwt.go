@@ -21,7 +21,7 @@ type gnData struct {
 }
 
 /*This Function takes User model and return a raw jwt token in string format*/
-func GenerateJwtToken(user *models.User_Auth) (*gnData, error) {
+func GenerateJwtToken(user *models.User) (*gnData, error) {
 
 	returnData := &gnData{}
 

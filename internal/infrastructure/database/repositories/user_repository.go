@@ -13,10 +13,10 @@ import (
 
 type dataInterface interface{}
 
-func GetDataFromUserAuth(id string) (*models.User_Auth, error) {
+func GetDataFromUserAuth(id string) (*models.User, error) {
 	db := database.GetDB()
 
-	var user_auth *models.User_Auth = &models.User_Auth{}
+	var user_auth *models.User = &models.User{}
 	if err := db.Table("user_auth").Select("username", "email").Where("id = ?", id).First(user_auth).Error; err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func GetUserData(id string, tableName string, fieldNames []string) (dataInterfac
 
 	switch tableName {
 	case "user_auth":
-		userData = &models.User_Auth{}
+		userData = &models.User{}
 	case "user_profile":
 		userData = &models.User_Profile{}
 	case "user_additional_info":

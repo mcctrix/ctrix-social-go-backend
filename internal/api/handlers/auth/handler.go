@@ -29,7 +29,7 @@ func SignUp() fiber.Handler {
 		username := strings.ToLower(c.FormValue("username"))
 		password := c.FormValue("password")
 
-		user := &models.User_Auth{}
+		user := &models.User{}
 		user.Email = email
 		user.Username = username
 		user.Password = password
@@ -96,7 +96,7 @@ func Login() fiber.Handler {
 		username := strings.ToLower(c.FormValue("username"))
 		password := c.FormValue("password")
 
-		user := &models.User_Auth{}
+		user := &models.User{}
 
 		whereConditionData := &struct {
 			Username string
@@ -188,7 +188,7 @@ func RefreshToken() fiber.Handler {
 
 		db := db.GetDB()
 
-		var user *models.User_Auth = &models.User_Auth{}
+		var user *models.User = &models.User{}
 
 		if err = db.Table("user_auth").Where("id = ?", userID).First(user).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -230,7 +230,7 @@ func ForgetPassword() fiber.Handler {
 
 		db := db.GetDB()
 
-		var user *models.User_Auth = &models.User_Auth{}
+		var user *models.User = &models.User{}
 		if err := db.Table("user_auth").Where(struct{ Email string }{Email: email}).First(user).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				return c.SendString("User not found with this email!")
@@ -248,7 +248,7 @@ func ResetPassword() fiber.Handler {
 
 		db := db.GetDB()
 
-		var user *models.User_Auth = &models.User_Auth{}
+		var user *models.User = &models.User{}
 		if err := db.Table("user_auth").Where(struct {
 			Email    string
 			Password string
