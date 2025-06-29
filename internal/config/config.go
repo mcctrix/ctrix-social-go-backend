@@ -14,7 +14,7 @@ type loadConfigs struct {
 	DBConfig *DatabaseConfig
 }
 
-var configs *loadConfigs
+var configs *loadConfigs = &loadConfigs{}
 
 func LoadConfig() *loadConfigs {
 	// Load the .env file in the current directory
