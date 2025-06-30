@@ -15,7 +15,7 @@ func NewPostgresFollowRepository(db *gorm.DB) *PostgresFollowRepository {
 
 func (r *PostgresFollowRepository) CreateFollow(follower_id, following_id string) error {
 	follow := models.NewFollow(follower_id, following_id)
-	if err := r.db.Table("follow").Create(follow).Error; err != nil {
+	if err := r.db.Model(&models.Follow{}).Create(follow).Error; err != nil {
 		return err
 	}
 	return nil
@@ -23,7 +23,7 @@ func (r *PostgresFollowRepository) CreateFollow(follower_id, following_id string
 
 func (r *PostgresFollowRepository) IsFollowing(follower_id, following_id string) bool {
 	var follow models.Follow
-	res := r.db.Table("follow").Where("follower_id = ? AND following_id = ?", follower_id, following_id).First(&follow)
+	res := r.db.Model(&models.Follow{}).Where("follower_id = ? AND following_id = ?", follower_id, following_id).First(&follow)
 	if res.Error != nil {
 		return false
 	}
@@ -42,7 +42,7 @@ func (r *PostgresFollowRepository) CountFollowAndFollowing(userID string) (*stru
 	followingCount int
 }, error) {
 	var follows []models.Follow
-	res := r.db.Table("follow").Select("follower_id, following_id").Where("follower_id = ? OR following_id = ?", userID, userID).Find(&follows)
+	res := r.db.Model(&models.Follow{}).Select("follower_id, following_id").Where("follower_id = ? OR following_id = ?", userID, userID).Find(&follows)
 	if err := res.Error; err != nil {
 		return nil, err
 	}

@@ -15,7 +15,7 @@ func NewPostgresUserSettingRepository(db *gorm.DB) *PostgresUserSettingRepositor
 
 func (r *PostgresUserSettingRepository) FindByID(id string) (*models.User_Settings, error) {
 	var settings *models.User_Settings
-	query := r.db.Model(&settings).Where("id = ?", id).First(&settings)
+	query := r.db.Model(&models.User_Settings{}).Where("id = ?", id).First(&settings)
 	if query.Error != nil {
 		return nil, query.Error
 	}
@@ -23,7 +23,7 @@ func (r *PostgresUserSettingRepository) FindByID(id string) (*models.User_Settin
 }
 
 func (r *PostgresUserSettingRepository) Update(settings *models.User_Settings) error {
-	query := r.db.Model(&settings).Where("id = ?", settings.Id).Updates(settings)
+	query := r.db.Model(&models.User_Settings{}).Where("id = ?", settings.Id).Updates(settings)
 	if query.Error != nil {
 		return query.Error
 	}

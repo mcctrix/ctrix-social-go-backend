@@ -24,7 +24,7 @@ func NewPostgreSQLUserRepository(db *gorm.DB) repositories.UserRepository {
 // FindByID retrieves a user from the database by their ID.
 func (r *PostgreSQLUserRepository) FindByID(id string) (*models.User, error) {
 	user := &models.User{}
-	query := r.db.Table("user_auth").Where("id = ?", id)
+	query := r.db.Model(&models.User{}).Where("id = ?", id)
 	err := query.First(user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -38,7 +38,7 @@ func (r *PostgreSQLUserRepository) FindByID(id string) (*models.User, error) {
 // FindByEmail retrieves a user from the database by their email address.
 func (r *PostgreSQLUserRepository) FindByEmail(email string) (*models.User, error) {
 	user := &models.User{}
-	query := r.db.Table("user_auth").Where("email = ?", email).Find(user)
+	query := r.db.Model(&models.User{}).Where("email = ?", email).Find(user)
 	err := query.Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -53,7 +53,7 @@ func (r *PostgreSQLUserRepository) FindByEmail(email string) (*models.User, erro
 }
 func (r *PostgreSQLUserRepository) FindByUsername(username string) (*models.User, error) {
 	user := &models.User{}
-	query := r.db.Table("user_auth").Where("username = ?", username).Find(user)
+	query := r.db.Model(&models.User{}).Where("username = ?", username).First(&user)
 	err := query.Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -71,7 +71,7 @@ func (r *PostgreSQLUserRepository) GenerateJwtToken(user *models.User) (*auth.To
 // Save creates a new user or updates an existing one in the database.
 func (r *PostgreSQLUserRepository) Save(user *models.User) error {
 	// Check if user exists to decide between INSERT and UPDATE
-	query := r.db.Table("user_auth").Save(user)
+	query := r.db.Model(&models.User{}).Save(user)
 	if err := query.Error; err != nil {
 		return fmt.Errorf("failed to save user: %w", err)
 	}
@@ -80,7 +80,7 @@ func (r *PostgreSQLUserRepository) Save(user *models.User) error {
 
 // Delete removes a user from the database by their ID.
 func (r *PostgreSQLUserRepository) Delete(id string) error {
-	query := r.db.Table("user_auth").Delete(id)
+	query := r.db.Model(&models.User{}).Delete(id)
 	if err := query.Error; err != nil {
 		return fmt.Errorf("failed to delete user: %w", err)
 	}
