@@ -28,7 +28,7 @@ func (r *PostgresProfileRepository) FindByID(id string) (*models.User_Profile, e
 }
 
 func (r *PostgresProfileRepository) Update(profile *models.User_Profile) error {
-	query := r.db.Model(&models.User_Profile{}).Save(profile)
+	query := r.db.Model(&models.User_Profile{}).Updates(profile)
 	if err := query.Error; err != nil {
 		return err
 	}

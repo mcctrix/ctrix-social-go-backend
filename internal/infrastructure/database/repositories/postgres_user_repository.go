@@ -71,7 +71,7 @@ func (r *PostgreSQLUserRepository) GenerateJwtToken(user *models.User) (*auth.To
 // Save creates a new user or updates an existing one in the database.
 func (r *PostgreSQLUserRepository) Save(user *models.User) error {
 	// Check if user exists to decide between INSERT and UPDATE
-	query := r.db.Model(&models.User{}).Save(user)
+	query := r.db.Model(&models.User{}).Updates(user)
 	if err := query.Error; err != nil {
 		return fmt.Errorf("failed to save user: %w", err)
 	}
