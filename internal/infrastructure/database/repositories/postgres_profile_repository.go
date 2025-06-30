@@ -21,7 +21,7 @@ func (r *PostgresProfileRepository) FindByID(id string) (*models.User_Profile, e
 	query := r.db.Model(&models.User_Profile{}).Where("id = ?", id).Find(profile)
 	if err := query.Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("Failed to find profile: %w", err)
+			return nil, fmt.Errorf("failed to find profile: %w", err)
 		}
 	}
 	return profile, nil

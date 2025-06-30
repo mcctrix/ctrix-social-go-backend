@@ -24,10 +24,7 @@ func (r *PostgresFollowRepository) CreateFollow(follower_id, following_id string
 func (r *PostgresFollowRepository) IsFollowing(follower_id, following_id string) bool {
 	var follow models.Follow
 	res := r.db.Model(&models.Follow{}).Where("follower_id = ? AND following_id = ?", follower_id, following_id).First(&follow)
-	if res.Error != nil {
-		return false
-	}
-	return true
+	return res.Error == nil
 }
 
 func (r *PostgresFollowRepository) UnFollow(follower_id, following_id string) error {
