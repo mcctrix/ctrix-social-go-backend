@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS user_settings (
     hide_post TEXT[],
     hide_story TEXT[],
     block_user TEXT[],
-    show_online BOOLEAN
+    show_online BOOLEAN DEFAULT TRUE
 );
 
 -- User End
