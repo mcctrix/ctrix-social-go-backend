@@ -100,7 +100,7 @@ type followRecommendation struct {
 func GetFollowRecommendation(currentUserID string, limit int) ([]followRecommendation, error) {
 	dbInstance := database.GetDB()
 
-	var currentFollows []models.Follows
+	var currentFollows []models.Follow
 	if err := dbInstance.Table("follows").Where("follower_id = ?", currentUserID).Find(&currentFollows).Error; err != nil {
 		return nil, err
 	}

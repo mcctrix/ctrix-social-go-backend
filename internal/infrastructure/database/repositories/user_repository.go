@@ -114,7 +114,7 @@ func InitNewUser(userid string) error {
 func FollowUser(follow_id string, following_id string) error {
 	db := database.GetDB()
 
-	if err := db.Table("follows").Create(&models.Follows{
+	if err := db.Table("follows").Create(&models.Follow{
 		Follower_id:  follow_id,
 		Following_id: following_id,
 		Created_at:   time.Now(),
@@ -135,17 +135,17 @@ func FollowUser(follow_id string, following_id string) error {
 func UnfollowUser(follow_id string, following_id string) error {
 	db := database.GetDB()
 
-	if err := db.Table("follows").Where("follower_id = ? AND following_id = ?", follow_id, following_id).Delete(&models.Follows{}).Error; err != nil {
+	if err := db.Table("follows").Where("follower_id = ? AND following_id = ?", follow_id, following_id).Delete(&models.Follow{}).Error; err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func CheckFollowing(follow_id string, following_id string) (*models.Follows, error) {
+func CheckFollowing(follow_id string, following_id string) (*models.Follow, error) {
 	db := database.GetDB()
 
-	var follows *models.Follows
+	var follows *models.Follow
 	res := db.Table("follows").Select("created_at").Where("follower_id = ? AND following_id = ?", follow_id, following_id).Find(&follows)
 	if err := res.Error; err != nil {
 		return nil, err
@@ -165,7 +165,7 @@ type FollowAndFollowerCount struct {
 func GetFollowAndFollowing(userID string) (*FollowAndFollowerCount, error) {
 	db := database.GetDB()
 
-	var follows []models.Follows
+	var follows []models.Follow
 	res := db.Table("follows").Select("follower_id, following_id").Where("follower_id = ? OR following_id = ?", userID, userID).Find(&follows)
 	if err := res.Error; err != nil {
 		return nil, err
