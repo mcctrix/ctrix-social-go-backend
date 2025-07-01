@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"errors"
+
 	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/models"
 	"gorm.io/gorm"
 )
@@ -16,6 +18,9 @@ func NewPostgresFollowRepository(db *gorm.DB) *PostgresFollowRepository {
 func (r *PostgresFollowRepository) CreateFollow(follower_id, following_id string) error {
 	follow := models.NewFollow(follower_id, following_id)
 	if err := r.db.Model(&models.Follow{}).Create(follow).Error; err != nil {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return errors.New("Already Following the User!")
+		}
 		return err
 	}
 	return nil
@@ -34,14 +39,11 @@ func (r *PostgresFollowRepository) UnFollow(follower_id, following_id string) er
 	return nil
 }
 
-func (r *PostgresFollowRepository) CountFollowAndFollowing(userID string) (*struct {
-	followCount    int
-	followingCount int
-}, error) {
+func (r *PostgresFollowRepository) CountFollowAndFollowing(userID string) (int, int, error) {
 	var follows []models.Follow
 	res := r.db.Model(&models.Follow{}).Select("follower_id, following_id").Where("follower_id = ? OR following_id = ?", userID, userID).Find(&follows)
 	if err := res.Error; err != nil {
-		return nil, err
+		return 0, 0, err
 	}
 	followerCount := 0
 	followingCount := 0
@@ -52,13 +54,6 @@ func (r *PostgresFollowRepository) CountFollowAndFollowing(userID string) (*stru
 			followingCount++
 		}
 	}
-	result := &struct {
-		followCount    int
-		followingCount int
-	}{
-		followCount:    followerCount,
-		followingCount: followingCount,
-	}
 
-	return result, nil
+	return followerCount, followingCount, nil
 }

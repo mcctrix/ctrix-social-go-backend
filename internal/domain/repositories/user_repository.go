@@ -17,9 +17,8 @@ type UserRepository interface {
 
 	GenerateJwtToken(user *models.User) (*auth.TokenData, error)
 
-	// Save creates a new user or updates an existing one.
-	// If the user's ID is empty, it's considered a new user to be created.
-	Save(user *models.User) error
+	//  creates a new user
+	Create(user *models.User) error
 
 	// Delete removes a user from the storage by their ID.
 	Delete(id string) error

@@ -9,6 +9,10 @@ type ProfileService struct {
 	userRepo repositories.ProfileRepository
 }
 
+func NewProfileService(userRepo repositories.ProfileRepository) *ProfileService {
+	return &ProfileService{userRepo: userRepo}
+}
+
 func (s *ProfileService) GetProfileByID(id string) (*models.User_Profile, error) {
 	profile, err := s.userRepo.FindByID(id)
 	if err != nil {

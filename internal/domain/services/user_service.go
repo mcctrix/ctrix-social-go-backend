@@ -29,7 +29,7 @@ func (s *UserService) RegisterUser(email, username, password string) (*models.Us
 	if err != nil && err.Error() != "user not found" { // Assuming repository returns specific error for not found
 		return nil, fmt.Errorf("failed to check existing user: %w", err)
 	}
-	fmt.Println(existingUser)
+
 	if existingUser != nil {
 		return nil, errors.New("user with this email already exists")
 	}
@@ -41,7 +41,7 @@ func (s *UserService) RegisterUser(email, username, password string) (*models.Us
 	}
 
 	// 3. Use the repository to persist the new user
-	if err := s.userRepo.Save(newUser); err != nil {
+	if err := s.userRepo.Create(newUser); err != nil {
 		return nil, fmt.Errorf("failed to save new user: %w", err)
 	}
 

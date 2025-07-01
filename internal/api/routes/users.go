@@ -4,9 +4,10 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/api/handlers/users"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/api/middleware"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/services"
 )
 
-func UserRouter(router fiber.Router) {
+func UserRouter(router fiber.Router, services *services.Services) {
 	router.Use(middleware.AuthMiddleware())
 
 	router.Get("/", users.GetCurrentUserProfile())
@@ -15,10 +16,10 @@ func UserRouter(router fiber.Router) {
 	router.Get("/user/:userid", users.GetUserProfileWithParam())
 
 	// follow user
-	router.Post("/:userid/follow", users.FollowUser())
-	router.Delete("/:userid/follow", users.UnfollowUser())
-	router.Get("/:userid/follow", users.CheckFollowing())
-	router.Get("/:userID/countFollow", users.GetFollowAndFollowing())
+	// router.Post("/:userid/follow", users.FollowUser())
+	// router.Delete("/:userid/follow", users.UnfollowUser())
+	// router.Get("/:userid/follow", users.CheckFollowing())
+	// router.Get("/:userID/countFollow", users.GetFollowAndFollowing())
 
 	router.Get("/additional_info", users.GetAdditionalUserInfo())
 	router.Patch("/additional_info", users.UpdateAdditionalUserInfo())
