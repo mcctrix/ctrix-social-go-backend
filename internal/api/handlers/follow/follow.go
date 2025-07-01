@@ -49,17 +49,18 @@ func (h *followHandler) CheckFollowing(c fiber.Ctx) error {
 	followerID := c.Locals("userID").(string)
 	followingID := c.Params("followingid")
 
-	isFollowing := h.followService.CheckFollowing(followerID, followingID)
-
-	if isFollowing {
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{
-			"message": "following the user",
+	data, err := h.followService.CheckFollowing(followerID, followingID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
 		})
 	}
 
-	return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-		"message": "not following the user",
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message":       "following the user",
+		"followingFrom": data.Created_at,
 	})
+
 }
 
 func (h *followHandler) CountFollowAndFollowing(c fiber.Ctx) error {

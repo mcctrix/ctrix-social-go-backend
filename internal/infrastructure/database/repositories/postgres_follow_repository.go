@@ -26,10 +26,16 @@ func (r *PostgresFollowRepository) CreateFollow(follower_id, following_id string
 	return nil
 }
 
-func (r *PostgresFollowRepository) IsFollowing(follower_id, following_id string) bool {
-	var follow models.Follow
-	res := r.db.Model(&models.Follow{}).Where("follower_id = ? AND following_id = ?", follower_id, following_id).First(&follow)
-	return res.Error == nil
+func (r *PostgresFollowRepository) IsFollowing(follower_id, following_id string) (*models.Follow, error) {
+	follow := &models.Follow{}
+	res := r.db.Model(&models.Follow{}).Select("created_at").Where("follower_id = ? AND following_id = ?", follower_id, following_id).First(&follow)
+	if res.Error != nil {
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			return nil, errors.New("not following the user")
+		}
+		return nil, res.Error
+	}
+	return follow, nil
 }
 
 func (r *PostgresFollowRepository) UnFollow(follower_id, following_id string) error {

@@ -18,7 +18,7 @@ func NewPostgresProfileRepository(DB *gorm.DB) *PostgresProfileRepository {
 
 func (r *PostgresProfileRepository) FindByID(id string) (*models.User_Profile, error) {
 	var profile *models.User_Profile = new(models.User_Profile)
-	query := r.db.Table("user_profile").Where("id = ?", id).First(profile)
+	query := r.db.Model(&models.User_Profile{}).Select("first_name, last_name, avatar, profile_picture, last_seen, verified_user").Where("id = ?", id).First(profile)
 	if err := query.Error; err != nil {
 		fmt.Println("error in getting profile: ", err)
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -26,7 +26,6 @@ func (r *PostgresProfileRepository) FindByID(id string) (*models.User_Profile, e
 		}
 		return nil, err
 	}
-	fmt.Println("profile", profile)
 	return profile, nil
 }
 

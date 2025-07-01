@@ -1,6 +1,9 @@
 package services
 
-import "github.com/mcctrix/ctrix-social-go-backend/internal/domain/repositories"
+import (
+	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/models"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/repositories"
+)
 
 type FollowService struct {
 	followRepo repositories.FollowRepository
@@ -18,8 +21,12 @@ func (s *FollowService) UnFollowUser(follower_id, following_id string) error {
 	return s.followRepo.UnFollow(follower_id, following_id)
 }
 
-func (s *FollowService) CheckFollowing(follower_id, following_id string) bool {
-	return s.followRepo.IsFollowing(follower_id, following_id)
+func (s *FollowService) CheckFollowing(follower_id, following_id string) (*models.Follow, error) {
+	data, err := s.followRepo.IsFollowing(follower_id, following_id)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }
 
 type followAndFollowerCount struct {

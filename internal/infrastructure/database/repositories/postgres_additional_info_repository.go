@@ -15,7 +15,7 @@ func NewPostgresAdditionalInfoRepository(db *gorm.DB) *PostgresAdditionalInfoRep
 
 func (r *PostgresAdditionalInfoRepository) FindByID(id string) (*models.User_Additional_Info, error) {
 	var additionalInfo *models.User_Additional_Info = new(models.User_Additional_Info)
-	query := r.db.Model(&models.User_Additional_Info{}).Where("id = ?", id).First(additionalInfo)
+	query := r.db.Model(&models.User_Additional_Info{}).Select("hobbies, relation_status, dob, bio, gender").Where("id = ?", id).First(additionalInfo)
 	if query.Error != nil {
 		return nil, query.Error
 	}
