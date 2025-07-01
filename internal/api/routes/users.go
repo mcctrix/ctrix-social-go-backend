@@ -10,10 +10,10 @@ import (
 func UserRouter(router fiber.Router, services *services.Services) {
 	router.Use(middleware.AuthMiddleware())
 
-	router.Get("/", users.GetCurrentUserProfile())
-	router.Patch("/", users.UpdateCurrentUserProfile())
+	profileHandler := users.NewProfileHandler(services.ProfileService)
 
-	router.Get("/user/:userid", users.GetUserProfileWithParam())
+	router.Get("/", profileHandler.GetCurrentUserProfile)
+	router.Patch("/", profileHandler.UpdateCurrentUserProfile)
 
-	router.Post("/profile-setup", users.ProfileSetup())
+	router.Get("/user/:userid", profileHandler.GetUserProfileWithParam)
 }
