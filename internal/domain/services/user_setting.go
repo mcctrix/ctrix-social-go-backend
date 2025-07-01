@@ -9,6 +9,10 @@ type UserSettingService struct {
 	userRepo repositories.UserSettingRepository
 }
 
+func NewUserSettingService(userRepo repositories.UserSettingRepository) *UserSettingService {
+	return &UserSettingService{userRepo: userRepo}
+}
+
 func (s *UserSettingService) GetUserSettingByID(id string) (*models.User_Settings, error) {
 	settings, err := s.userRepo.FindByID(id)
 	if err != nil {

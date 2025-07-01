@@ -150,39 +150,3 @@ func UpdateAdditionalUserInfo() fiber.Handler {
 		return c.SendString("User Additional profile updated Successfully!")
 	}
 }
-
-func GetUserSettings() fiber.Handler {
-	return func(c fiber.Ctx) error {
-		additional_profile, err := repo.GetUserData(c.Locals("userID").(string), "user_settings", []string{"hide_post", "hide_story", "block_user", "show_online"})
-		if err != nil {
-			fmt.Println("error while fetching additional profile: ", err)
-			return c.Status(500).SendString("unable to fetch user settings!")
-		}
-
-		return c.JSON(additional_profile)
-	}
-}
-
-func UpdateUserSettings() fiber.Handler {
-	return func(c fiber.Ctx) error {
-		dataInterface := &struct {
-			Hide_post   models.StringArray `json:"hide_post,omitempty" gorm:"type:text[]"`
-			Hide_story  models.StringArray `json:"hide_story,omitempty" gorm:"type:text[]"`
-			Block_user  models.StringArray `json:"block_user,omitempty" gorm:"type:text[]"`
-			Show_online bool               `json:"show_online" gorm:"type:text[]"`
-		}{}
-
-		rawForm, err := utils.ClearStruct(dataInterface, c.BodyRaw())
-		if err != nil {
-			fmt.Println("Error Marshalling the data: ", err)
-			return fiber.ErrInternalServerError
-		}
-
-		err = repo.UpdateTableWithByteData(rawForm, c.Locals("userID").(string), "user_settings")
-		if err != nil {
-			fmt.Println("Error Setting the additional profile: ", err)
-			return fiber.ErrInternalServerError
-		}
-		return c.SendString("User Additional profile updated Successfully!")
-	}
-}
