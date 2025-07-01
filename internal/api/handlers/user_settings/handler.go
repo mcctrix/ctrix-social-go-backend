@@ -1,4 +1,4 @@
-package user_settings
+package userSetting
 
 import (
 	"encoding/json"

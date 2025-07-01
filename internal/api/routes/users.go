@@ -15,8 +15,5 @@ func UserRouter(router fiber.Router, services *services.Services) {
 
 	router.Get("/user/:userid", users.GetUserProfileWithParam())
 
-	router.Get("/additional_info", users.GetAdditionalUserInfo())
-	router.Patch("/additional_info", users.UpdateAdditionalUserInfo())
-
 	router.Post("/profile-setup", users.ProfileSetup())
 }

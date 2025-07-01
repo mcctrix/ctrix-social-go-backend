@@ -1,10 +1,11 @@
 package services
 
 type Services struct {
-	UserService         *UserService
-	ProfileService      *ProfileService
-	FollowService       *FollowService
-	UserSettingsService *UserSettingService
+	UserService               *UserService
+	ProfileService            *ProfileService
+	FollowService             *FollowService
+	UserSettingsService       *UserSettingService
+	AdditionalUserInfoService *AdditionalUserInfoService
 }
 
 func NewServiceContainer(
@@ -12,11 +13,13 @@ func NewServiceContainer(
 	profileService *ProfileService,
 	followService *FollowService,
 	userSettingsService *UserSettingService,
+	additionalUserInfoService *AdditionalUserInfoService,
 ) *Services {
 	return &Services{
-		UserService:         userService,
-		ProfileService:      profileService,
-		FollowService:       followService,
-		UserSettingsService: userSettingsService,
+		UserService:               userService,
+		ProfileService:            profileService,
+		FollowService:             followService,
+		UserSettingsService:       userSettingsService,
+		AdditionalUserInfoService: additionalUserInfoService,
 	}
 }

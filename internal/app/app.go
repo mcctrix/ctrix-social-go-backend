@@ -19,5 +19,8 @@ func BuildApplicationDependencies(db *gorm.DB) *services.Services {
 	userSettingsRepo := repositories.NewPostgresUserSettingRepository(db)
 	userSettingsService := services.NewUserSettingService(userSettingsRepo)
 
-	return services.NewServiceContainer(userService, profileService, followService, userSettingsService)
+	additionalUserInfoRepo := repositories.NewPostgresAdditionalInfoRepository(db)
+	additionalUserInfoService := services.NewAdditionalService(additionalUserInfoRepo)
+
+	return services.NewServiceContainer(userService, profileService, followService, userSettingsService, additionalUserInfoService)
 }
