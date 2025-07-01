@@ -10,7 +10,10 @@ import (
 func BookmarkRouter(router fiber.Router, services *services.Services) {
 	router.Use(middleware.AuthMiddleware())
 
-	router.Get("/", bookmarks.GetBookmark())
-	router.Post("/:postID", bookmarks.CreateBookmark())
-	router.Delete("/:postID", bookmarks.DeleteBookmark())
+	bookmarkHandler := bookmarks.NewBookmarkHandler(services.BookmarkService)
+
+	router.Get("/", bookmarkHandler.GetBookmark)
+	router.Post("/:postID", bookmarkHandler.CreateBookmark)
+	router.Delete("/:postID", bookmarkHandler.DeleteBookmark)
+
 }

@@ -5,22 +5,27 @@ import (
 	"time"
 
 	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/models"
-	"github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/database"
 	"gorm.io/gorm"
 )
 
-func GetBookmark(userID string, limit int) ([]models.Bookmark, error) {
-	dbInstance := database.GetDB()
+type PostgresBookmarkRepository struct {
+	db *gorm.DB
+}
+
+func NewPostgresBookmarkRepository(db *gorm.DB) *PostgresBookmarkRepository {
+	return &PostgresBookmarkRepository{db: db}
+}
+
+func (r *PostgresBookmarkRepository) GetBookmark(userID string, limit int) ([]models.Bookmark, error) {
 
 	var bookmarks []models.Bookmark
-	err := dbInstance.Model(&models.Bookmark{}).Where("user_id = ?", userID).Order("created_at desc").Limit(limit).Find(&bookmarks).Error
+	err := r.db.Model(&models.Bookmark{}).Where("user_id = ?", userID).Order("created_at desc").Limit(limit).Find(&bookmarks).Error
 	if err != nil {
 		return nil, err
 	}
 	return bookmarks, nil
 }
-func CreateBookmark(userID, postID string) error {
-	dbInstance := database.GetDB()
+func (r *PostgresBookmarkRepository) CreateBookmark(userID, postID string) error {
 
 	bookmark := models.Bookmark{
 		User_id:    userID,
@@ -28,7 +33,7 @@ func CreateBookmark(userID, postID string) error {
 		Created_at: time.Now(),
 	}
 
-	err := dbInstance.Create(&bookmark).Error
+	err := r.db.Create(&bookmark).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
 			return errors.New("bookmark already exists")
@@ -41,10 +46,9 @@ func CreateBookmark(userID, postID string) error {
 	return nil
 }
 
-func DeleteBookmark(userID, postID string) error {
-	dbInstance := database.GetDB()
+func (r *PostgresBookmarkRepository) DeleteBookmark(userID, postID string) error {
 
-	err := dbInstance.Model(&models.Bookmark{}).Where("user_id = ? AND post_id = ?", userID, postID).Delete(&models.Bookmark{}).Error
+	err := r.db.Model(&models.Bookmark{}).Where("user_id = ? AND post_id = ?", userID, postID).Delete(&models.Bookmark{}).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return errors.New("bookmark does not exist")

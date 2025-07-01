@@ -2,56 +2,59 @@ package bookmarks
 
 import (
 	"github.com/gofiber/fiber/v3"
-	repo "github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/database/repositories"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/services"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/pkg/utils"
 )
 
-func GetBookmark() fiber.Handler {
-	return func(c fiber.Ctx) error {
-		userID := c.Locals("userID").(string)
-		limit := utils.QueryLimit(c.Query("limit", "5"))
+type bookmarkHandler struct {
+	bookmarkService *services.BookmarkService
+}
 
-		bookmarks, err := repo.GetBookmark(userID, limit)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
-		}
-
-		return c.Status(fiber.StatusOK).JSON(bookmarks)
+func NewBookmarkHandler(bookmarkService *services.BookmarkService) *bookmarkHandler {
+	return &bookmarkHandler{
+		bookmarkService: bookmarkService,
 	}
 }
-func CreateBookmark() fiber.Handler {
-	return func(c fiber.Ctx) error {
-		userID := c.Locals("userID").(string)
-		postID := c.Params("postID")
 
-		err := repo.CreateBookmark(userID, postID)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
-		}
+func (h *bookmarkHandler) GetBookmark(c fiber.Ctx) error {
+	userID := c.Locals("userID").(string)
+	limit := utils.QueryLimit(c.Query("limit"))
 
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{
-			"message": "bookmark created successfully",
+	bookmarks, err := h.bookmarkService.GetBookmark(userID, limit)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
 		})
 	}
+	return c.JSON(bookmarks)
 }
-func DeleteBookmark() fiber.Handler {
-	return func(c fiber.Ctx) error {
-		userID := c.Locals("userID").(string)
-		postID := c.Params("postID")
 
-		err := repo.DeleteBookmark(userID, postID)
-		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": err.Error(),
-			})
-		}
+func (h *bookmarkHandler) CreateBookmark(c fiber.Ctx) error {
+	userID := c.Locals("userID").(string)
+	postID := c.Params("postID")
 
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{
-			"message": "bookmark deleted successfully",
+	err := h.bookmarkService.CreateBookmark(userID, postID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
 		})
 	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "bookmark created successfully",
+	})
+}
+
+func (h *bookmarkHandler) DeleteBookmark(c fiber.Ctx) error {
+	userID := c.Locals("userID").(string)
+	postID := c.Params("postID")
+
+	err := h.bookmarkService.DeleteBookmark(userID, postID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "bookmark deleted successfully",
+	})
 }
