@@ -7,6 +7,7 @@ type Services struct {
 	UserSettingsService       *UserSettingService
 	AdditionalUserInfoService *AdditionalUserInfoService
 	BookmarkService           *BookmarkService
+	CommentService            *CommentService
 }
 
 func NewServiceContainer(
@@ -16,6 +17,7 @@ func NewServiceContainer(
 	userSettingsService *UserSettingService,
 	additionalUserInfoService *AdditionalUserInfoService,
 	bookmarkService *BookmarkService,
+	commentService *CommentService,
 ) *Services {
 	return &Services{
 		UserService:               userService,
@@ -24,5 +26,6 @@ func NewServiceContainer(
 		UserSettingsService:       userSettingsService,
 		AdditionalUserInfoService: additionalUserInfoService,
 		BookmarkService:           bookmarkService,
+		CommentService:            commentService,
 	}
 }

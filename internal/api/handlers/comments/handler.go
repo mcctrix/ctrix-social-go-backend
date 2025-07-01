@@ -1,64 +1,104 @@
 package comments
 
 import (
-	"fmt"
-	"time"
+	"encoding/json"
 
 	"github.com/gofiber/fiber/v3"
-	repo "github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/database/repositories"
+	"github.com/google/uuid"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/models"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/services"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/pkg/utils"
 )
 
-func GetCommentByID() fiber.Handler {
-	return func(c fiber.Ctx) error {
-		commentID := c.Params("commentid")
-		fmt.Println(commentID)
-		comment, err := repo.GetCommentByID(commentID)
-		if err != nil {
-			fmt.Println("unable to fetch comment: ", err)
-			return c.Status(fiber.StatusNotFound).SendString("unable to find comment!")
-		}
-		return c.JSON(comment)
+type CommentHandler struct {
+	commentService *services.CommentService
+}
+
+func NewCommentHandler(commentService *services.CommentService) *CommentHandler {
+	return &CommentHandler{
+		commentService: commentService,
 	}
 }
 
-func UpdatePostComment() fiber.Handler {
-	return func(c fiber.Ctx) error {
-		commentData := &struct {
-			Updated_at time.Time `json:"updated_at"`
-			Content    string    `json:"content"`
-			Giff       string    `json:"giff"`
-		}{}
-
-		commentData.Updated_at = time.Now()
-
-		rawData, err := utils.ClearStruct(commentData, c.BodyRaw())
-		if err != nil {
-			fmt.Println("Error clearing struct: ", err)
-			return fiber.ErrInternalServerError
-		}
-
-		commentID := c.Params("commentid")
-		err = repo.UpdatePostCommentWithByteData(commentID, rawData, c.Locals("userID").(string))
-		if err != nil {
-			fmt.Println("Error updating comment: ", err)
-			return c.Status(fiber.StatusBadRequest).SendString("Unable to update comment!")
-		}
-
-		return c.SendString("Comment updated successfully!")
+func (h *CommentHandler) CreateComment(c fiber.Ctx) error {
+	postID := c.Params("postid")
+	rawData := c.BodyRaw()
+	comment := &models.User_post_Comments{}
+	err := json.Unmarshal(rawData, comment)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
+
+	comment.Post_id = postID
+	comment.Id = uuid.New().String()
+	comment.Creator_id = c.Locals("userID").(string)
+
+	err = h.commentService.CreateComment(comment)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "comment created successfully"})
 }
 
-func DeletePostComment() fiber.Handler {
-	return func(c fiber.Ctx) error {
+func (h *CommentHandler) GetCommentByID(c fiber.Ctx) error {
+	commentID := c.Params("commentid")
 
-		commentID := c.Params("commentid")
-		err := repo.DeletePostComment(commentID, c.Locals("userID").(string))
-		if err != nil {
-			fmt.Println("Error deleting comment: ", err)
-			return err
-		}
-
-		return c.SendString("Comment deleted successfully!")
+	comment, err := h.commentService.GetCommentByID(commentID)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": err.Error()})
 	}
+
+	return c.JSON(fiber.Map{"message": "comment fetched successfully", "data": comment})
+}
+
+func (h *CommentHandler) GetCommentsByPostID(c fiber.Ctx) error {
+	postID := c.Params("postid")
+	limit := utils.QueryLimit(c.Query("limit"))
+
+	comments, err := h.commentService.GetCommentsByPostID(postID, limit)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(fiber.Map{"message": "comments fetched successfully", "data": comments})
+}
+
+func (h *CommentHandler) GetCommentByUserID(c fiber.Ctx) error {
+	userID := c.Params("userid")
+	limit := utils.QueryLimit(c.Query("limit"))
+
+	comments, err := h.commentService.GetCommentByUserID(userID, limit)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(fiber.Map{"message": "comments fetched successfully", "data": comments})
+}
+
+func (h *CommentHandler) UpdateCommentByID(c fiber.Ctx) error {
+	commentID := c.Params("commentid")
+	rawData := c.BodyRaw()
+	comment := &models.User_post_Comments{}
+	err := json.Unmarshal(rawData, comment)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	err = h.commentService.UpdateCommentByID(commentID, comment, c.Locals("userID").(string))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "comment updated successfully"})
+}
+
+func (h *CommentHandler) DeleteCommentByID(c fiber.Ctx) error {
+	commentID := c.Params("commentid")
+	err := h.commentService.DeleteCommentByID(commentID, c.Locals("userID").(string))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "comment deleted successfully"})
 }

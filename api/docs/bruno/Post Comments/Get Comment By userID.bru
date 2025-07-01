@@ -1,0 +1,11 @@
+meta {
+  name: Get Comment By userID
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseURL}}/api/comment/user/userid
+  body: none
+  auth: inherit
+}
