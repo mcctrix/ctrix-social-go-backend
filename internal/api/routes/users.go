@@ -15,12 +15,6 @@ func UserRouter(router fiber.Router, services *services.Services) {
 
 	router.Get("/user/:userid", users.GetUserProfileWithParam())
 
-	// follow user
-	// router.Post("/:userid/follow", users.FollowUser())
-	// router.Delete("/:userid/follow", users.UnfollowUser())
-	// router.Get("/:userid/follow", users.CheckFollowing())
-	// router.Get("/:userID/countFollow", users.GetFollowAndFollowing())
-
 	router.Get("/additional_info", users.GetAdditionalUserInfo())
 	router.Patch("/additional_info", users.UpdateAdditionalUserInfo())
 
