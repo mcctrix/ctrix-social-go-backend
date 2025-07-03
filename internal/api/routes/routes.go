@@ -17,5 +17,5 @@ func SetupRoutes(endpoint string, app *fiber.App, services *services.Services) {
 	BookmarkRouter(routeGroup.Group("/bookmark"), services)
 	PostRouter(routeGroup.Group("/post"), services)
 	CommentRouter(routeGroup.Group("/comment"), services)
-	FeedRouter(routeGroup.Group("/feed"))
+	FeedRouter(routeGroup.Group("/feed"), services)
 }

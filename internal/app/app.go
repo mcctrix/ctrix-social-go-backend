@@ -34,5 +34,11 @@ func BuildApplicationDependencies(db *gorm.DB) *services.Services {
 	postRepo := repositories.NewPostgresPostRepository(db)
 	postService := services.NewPostService(postRepo)
 
-	return services.NewServiceContainer(userService, profileService, followService, userSettingsService, additionalUserInfoService, bookmarkService, commentService, commentReactionService, postService)
+	feedRepo := repositories.NewPostgresFeedRepository(db)
+	feedService := services.NewFeedService(feedRepo)
+
+	return services.NewServiceContainer(userService, profileService, followService,
+		userSettingsService, additionalUserInfoService,
+		bookmarkService, commentService, commentReactionService,
+		postService, feedService)
 }

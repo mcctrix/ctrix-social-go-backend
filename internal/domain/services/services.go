@@ -10,6 +10,7 @@ type Services struct {
 	CommentService            *CommentService
 	CommentReactionService    *CommentReactionService
 	PostService               *PostService
+	FeedService               *FeedService
 }
 
 func NewServiceContainer(
@@ -22,6 +23,7 @@ func NewServiceContainer(
 	commentService *CommentService,
 	commentReactionService *CommentReactionService,
 	postService *PostService,
+	feedService *FeedService,
 ) *Services {
 	return &Services{
 		UserService:               userService,
@@ -33,5 +35,6 @@ func NewServiceContainer(
 		CommentService:            commentService,
 		CommentReactionService:    commentReactionService,
 		PostService:               postService,
+		FeedService:               feedService,
 	}
 }
