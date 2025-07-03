@@ -2,13 +2,10 @@ package repositories
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
-	"time"
 
 	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/models"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/infrastructure/database"
-	"gorm.io/gorm"
 )
 
 type dataInterface interface{}
@@ -109,75 +106,4 @@ func InitNewUser(userid string) error {
 		return err
 	}
 	return nil
-}
-
-func FollowUser(follow_id string, following_id string) error {
-	db := database.GetDB()
-
-	if err := db.Table("follows").Create(&models.Follow{
-		Follower_id:  follow_id,
-		Following_id: following_id,
-		Created_at:   time.Now(),
-	}).Error; err != nil {
-		if errors.Is(err, gorm.ErrForeignKeyViolated) {
-			return errors.New("following user not found")
-		}
-		if errors.Is(err, gorm.ErrDuplicatedKey) {
-			return errors.New("user already followed")
-		}
-
-		return err
-	}
-
-	return nil
-}
-
-func UnfollowUser(follow_id string, following_id string) error {
-	db := database.GetDB()
-
-	if err := db.Table("follows").Where("follower_id = ? AND following_id = ?", follow_id, following_id).Delete(&models.Follow{}).Error; err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func CheckFollowing(follow_id string, following_id string) (*models.Follow, error) {
-	db := database.GetDB()
-
-	var follows *models.Follow
-	res := db.Table("follows").Select("created_at").Where("follower_id = ? AND following_id = ?", follow_id, following_id).Find(&follows)
-	if err := res.Error; err != nil {
-		return nil, err
-	}
-	if res.RowsAffected == 0 {
-		return nil, errors.New("not following")
-	}
-
-	return follows, nil
-}
-
-type FollowAndFollowerCount struct {
-	FollowerCount  int `json:"follower_count"`
-	FollowingCount int `json:"following_count"`
-}
-
-func GetFollowAndFollowing(userID string) (*FollowAndFollowerCount, error) {
-	db := database.GetDB()
-
-	var follows []models.Follow
-	res := db.Table("follows").Select("follower_id, following_id").Where("follower_id = ? OR following_id = ?", userID, userID).Find(&follows)
-	if err := res.Error; err != nil {
-		return nil, err
-	}
-	data := &FollowAndFollowerCount{}
-	for _, follow := range follows {
-		if follow.Follower_id == userID {
-			data.FollowerCount++
-		} else {
-			data.FollowingCount++
-		}
-	}
-
-	return data, nil
 }
