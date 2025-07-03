@@ -20,17 +20,27 @@ func NewPostHandler(postService *services.PostService) *PostHandler {
 }
 
 func (h *PostHandler) CreatePost(c fiber.Ctx) error {
-	post := &models.User_Post{}
-	err := json.Unmarshal(c.BodyRaw(), post)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	var post models.User_Post
+	postData := c.FormValue("post_data")
+	if postData != "" {
+		// Handle multipart form: parse post_data field as JSON
+		err := json.Unmarshal([]byte(postData), &post)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+		}
+	} else {
+		// Handle raw JSON
+		err := json.Unmarshal(c.BodyRaw(), &post)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+		}
 	}
 	post.Id = uuid.New().String()
 	post.Created_at = time.Now()
 	post.Updated_at = time.Now()
 	post.Creator_id = c.Locals("userID").(string)
 
-	err = h.postService.CreatePost(post)
+	err := h.postService.CreatePost(&post)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
