@@ -4,24 +4,22 @@ import (
 	"github.com/gofiber/fiber/v3"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/api/handlers/posts"
 	"github.com/mcctrix/ctrix-social-go-backend/internal/api/middleware"
+	"github.com/mcctrix/ctrix-social-go-backend/internal/domain/services"
 )
 
-func PostRouter(router fiber.Router) {
+func PostRouter(router fiber.Router, services *services.Services) {
 	router.Use(middleware.AuthMiddleware())
 
-	// Post-related routes
-	router.Get("/", posts.GetUserPosts())
-	router.Post("/", posts.CreateUserPost())
-	router.Get("/:postid", posts.GetPostByID())
-	router.Get("/:postid/reacts", posts.GetPostReactions())
-	router.Patch("/:postid", posts.UpdateUserPost())
-	router.Delete("/:postid", posts.DeleteUserPost())
+	handler := posts.NewPostHandler(services.PostService)
 
-	// Comment-related routes
-	router.Get("/comments/:postid", posts.GetPostComments())
-	router.Post("/comments/:postid", posts.CreatePostComment())
+	// Post-related routes
+	router.Get("/", handler.GetUserPosts)
+	router.Post("/", handler.CreatePost)
+	router.Get("/:postid", handler.GetPostByID)
+	router.Get("/:postid/reacts", handler.GetPostReactions)
+	router.Patch("/:postid", handler.UpdatePost)
+	router.Delete("/:postid", handler.DeletePost)
 
 	// Reactions
-	router.Patch("/:postid/liketoggler", posts.PostLikeToggler())
-	router.Patch("/comments/:commentid/liketoggler", posts.CommentLikeToggler())
+	router.Patch("/:postid/liketoggler", handler.TogglePostLike)
 }

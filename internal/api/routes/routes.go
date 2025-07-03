@@ -15,7 +15,7 @@ func SetupRoutes(endpoint string, app *fiber.App, services *services.Services) {
 	UserSettingsRouter(routeGroup.Group("/user_settings"), services)
 	AdditionalUserInfoRouter(routeGroup.Group("/additional_info_user"), services)
 	BookmarkRouter(routeGroup.Group("/bookmark"), services)
+	PostRouter(routeGroup.Group("/post"), services)
 	CommentRouter(routeGroup.Group("/comment"), services)
-	PostRouter(routeGroup.Group("/post"))
 	FeedRouter(routeGroup.Group("/feed"))
 }

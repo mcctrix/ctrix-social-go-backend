@@ -9,6 +9,7 @@ type Services struct {
 	BookmarkService           *BookmarkService
 	CommentService            *CommentService
 	CommentReactionService    *CommentReactionService
+	PostService               *PostService
 }
 
 func NewServiceContainer(
@@ -20,6 +21,7 @@ func NewServiceContainer(
 	bookmarkService *BookmarkService,
 	commentService *CommentService,
 	commentReactionService *CommentReactionService,
+	postService *PostService,
 ) *Services {
 	return &Services{
 		UserService:               userService,
@@ -30,5 +32,6 @@ func NewServiceContainer(
 		BookmarkService:           bookmarkService,
 		CommentService:            commentService,
 		CommentReactionService:    commentReactionService,
+		PostService:               postService,
 	}
 }
