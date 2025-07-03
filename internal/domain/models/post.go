@@ -17,9 +17,8 @@ func (User_Post) TableName() string {
 }
 
 type User_Post_Like_Table struct {
-	User_id   string `json:"user_id" gorm:"column:user_id;type:varchar(50)"`
-	Post_id   string `json:"post_id,omitempty" gorm:"column:post_id;type:varchar(50);not null"`
-	Like_type string `json:"like_type" gorm:"column:like_type;type:varchar(20)"`
+	User_id string `json:"user_id" gorm:"column:user_id;type:varchar(50)"`
+	Post_id string `json:"post_id,omitempty" gorm:"column:post_id;type:varchar(50);not null"`
 }
 
 func (User_Post_Like_Table) TableName() string {
