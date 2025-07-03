@@ -16,10 +16,11 @@ func PostRouter(router fiber.Router, services *services.Services) {
 	router.Get("/", handler.GetUserPosts)
 	router.Post("/", handler.CreatePost)
 	router.Get("/:postid", handler.GetPostByID)
-	router.Get("/:postid/reacts", handler.GetPostReactions)
 	router.Patch("/:postid", handler.UpdatePost)
 	router.Delete("/:postid", handler.DeletePost)
 
 	// Reactions
-	router.Patch("/:postid/liketoggler", handler.TogglePostLike)
+	router.Get("/:postid/reaction", handler.GetPostReactions)
+	router.Post("/:postid/reaction", handler.LikePost)
+	router.Delete("/:postid/reaction", handler.DislikePost)
 }

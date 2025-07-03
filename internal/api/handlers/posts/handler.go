@@ -92,20 +92,22 @@ func (h *PostHandler) GetPostReactions(c fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(reactions)
 }
 
-func (h *PostHandler) TogglePostLike(c fiber.Ctx) error {
+func (h *PostHandler) LikePost(c fiber.Ctx) error {
 	postID := c.Params("postid")
 	userID := c.Locals("userID").(string)
-	var body struct {
-		Toggle    bool   `json:"toggle"`
-		Like_type string `json:"like_type"`
-	}
-	err := json.Unmarshal(c.BodyRaw(), &body)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
-	}
-	err = h.postService.TogglePostLike(postID, userID, body.Toggle, body.Like_type)
+	err := h.postService.LikePost(postID, userID)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Like updated successfully!"})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Post liked successfully!"})
+}
+
+func (h *PostHandler) DislikePost(c fiber.Ctx) error {
+	postID := c.Params("postid")
+	userID := c.Locals("userID").(string)
+	err := h.postService.DislikePost(postID, userID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Post disliked successfully!"})
 }

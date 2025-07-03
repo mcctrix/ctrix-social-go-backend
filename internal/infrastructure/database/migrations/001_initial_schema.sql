@@ -69,7 +69,6 @@ CREATE TABLE IF NOT EXISTS user_post_like (
     FOREIGN KEY(user_id) REFERENCES user_auth(id) ON DELETE CASCADE ON UPDATE CASCADE,
     post_id VARCHAR(50) NOT NULL,
     FOREIGN KEY(post_id) REFERENCES user_posts(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    like_type VARCHAR(20),
     UNIQUE (post_id, user_id)
 );
 

@@ -37,6 +37,10 @@ func (s *PostService) GetPostReactions(postID string) ([]models.User_Post_Like_T
 	return s.postRepo.GetPostReactions(postID)
 }
 
-func (s *PostService) TogglePostLike(postID string, userID string, liked bool, likeType string) error {
-	return s.postRepo.TogglePostLike(postID, userID, liked, likeType)
-} 
+func (s *PostService) LikePost(postID string, userID string) error {
+	return s.postRepo.LikePost(postID, userID)
+}
+
+func (s *PostService) DislikePost(postID string, userID string) error {
+	return s.postRepo.DislikePost(postID, userID)
+}

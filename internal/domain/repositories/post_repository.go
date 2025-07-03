@@ -9,5 +9,6 @@ type PostRepository interface {
 	UpdatePost(postID string, updatedPost *models.User_Post, userID string) error
 	DeletePost(postID string, userID string) error
 	GetPostReactions(postID string) ([]models.User_Post_Like_Table, error)
-	TogglePostLike(postID string, userID string, liked bool, likeType string) error
+	LikePost(postID string, userID string) error
+	DislikePost(postID string, userID string) error
 }
