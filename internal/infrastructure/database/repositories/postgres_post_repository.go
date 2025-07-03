@@ -21,27 +21,56 @@ func (r *PostgresPostRepository) CreatePost(post *models.User_Post) error {
 	return r.db.Model(&models.User_Post{}).Create(post).Error
 }
 
-func (r *PostgresPostRepository) GetUserPostsByID(userID string, limit int) ([]models.User_Post, error) {
-	var posts []models.User_Post
-	err := r.db.Model(&models.User_Post{}).Where("creator_id = ?", userID).Order("created_at desc").Limit(limit).Find(&posts).Error
+func (r *PostgresPostRepository) GetUserPostsByID(userID string, limit int) ([]models.PostWithUserDetails, error) {
+	var posts []models.PostWithUserDetails
+	err := r.db.Table("user_posts").
+		Select("user_posts.*, user_auth.username, user_profile.avatar, user_profile.profile_picture, user_profile.verified_user, user_additional_info.bio").
+		Joins("JOIN user_auth ON user_auth.id = user_posts.creator_id").
+		Joins("JOIN user_profile ON user_profile.id = user_posts.creator_id").
+		Joins("JOIN user_additional_info ON user_additional_info.id = user_posts.creator_id").
+		Where("user_posts.creator_id = ?", userID).
+		Order("user_posts.created_at desc").
+		Limit(limit).
+		Find(&posts).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("no posts found")
 		}
 		return nil, err
 	}
+	for index := range posts {
+		var likes []models.User_Post_Like_Table
+		query := r.db.Table("user_post_like")
+		query.Select("user_id")
+		query.Where("post_id = ?", posts[index].Id)
+		query.Find(&likes)
+		posts[index].LikesCount = len(likes)
+		liked, _ := checkUserLikedPostGorm(r.db, posts[index].Id, userID)
+		posts[index].IsLiked = liked
+	}
 	return posts, nil
 }
 
-func (r *PostgresPostRepository) GetPostByID(postID string, userID string) (*models.User_Post, error) {
-	var post models.User_Post
-	err := r.db.Model(&models.User_Post{}).Where("id = ?", postID).First(&post).Error
+func (r *PostgresPostRepository) GetPostByID(postID string, userID string) (*models.PostWithUserDetails, error) {
+	var post models.PostWithUserDetails
+	err := r.db.Table("user_posts").
+		Select("user_posts.*, user_auth.username, user_profile.avatar, user_profile.profile_picture, user_profile.verified_user, user_additional_info.bio").
+		Joins("JOIN user_auth ON user_auth.id = user_posts.creator_id").
+		Joins("JOIN user_profile ON user_profile.id = user_posts.creator_id").
+		Joins("JOIN user_additional_info ON user_additional_info.id = user_posts.creator_id").
+		Where("user_posts.id = ?", postID).
+		First(&post).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("post not found")
 		}
 		return nil, err
 	}
+	var likes []models.User_Post_Like_Table
+	r.db.Table("user_post_like").Select("user_id").Where("post_id = ?", post.Id).Find(&likes)
+	post.LikesCount = len(likes)
+	liked, _ := checkUserLikedPostGorm(r.db, post.Id, userID)
+	post.IsLiked = liked
 	return &post, nil
 }
 

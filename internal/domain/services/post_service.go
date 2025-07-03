@@ -17,11 +17,11 @@ func (s *PostService) CreatePost(post *models.User_Post) error {
 	return s.postRepo.CreatePost(post)
 }
 
-func (s *PostService) GetUserPostsByID(userID string, limit int) ([]models.User_Post, error) {
+func (s *PostService) GetUserPostsByID(userID string, limit int) ([]models.PostWithUserDetails, error) {
 	return s.postRepo.GetUserPostsByID(userID, limit)
 }
 
-func (s *PostService) GetPostByID(postID string, userID string) (*models.User_Post, error) {
+func (s *PostService) GetPostByID(postID string, userID string) (*models.PostWithUserDetails, error) {
 	return s.postRepo.GetPostByID(postID, userID)
 }
 
