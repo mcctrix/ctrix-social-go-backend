@@ -19,7 +19,7 @@ func (r *PostgresFollowRepository) CreateFollow(follower_id, following_id string
 	follow := models.NewFollow(follower_id, following_id)
 	if err := r.db.Model(&models.Follow{}).Create(follow).Error; err != nil {
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
-			return errors.New("already following the user!")
+			return errors.New("already following the user")
 		}
 		return err
 	}
