@@ -304,7 +304,7 @@ func CommentLikeToggler(commentID string, userLikedID string, liked bool, likeTy
 	db := database.GetDB()
 
 	if liked {
-		comment_like_data := models.User_post_comment_like{User_id: userLikedID, Comment_id: commentID, Like_type: "like"}
+		comment_like_data := models.User_post_comment_like{User_id: userLikedID, Comment_id: commentID}
 		if db.Table("user_post_comment_like").Where("user_id = ?", userLikedID).Where("comment_id = ?", commentID).Updates(map[string]interface{}{
 			"like_type": likeType,
 		}).RowsAffected == 0 {

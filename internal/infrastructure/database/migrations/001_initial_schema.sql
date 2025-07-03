@@ -90,7 +90,6 @@ CREATE TABLE IF NOT EXISTS user_post_comment_like (
     FOREIGN KEY(user_id) REFERENCES user_auth(id) ON DELETE CASCADE ON UPDATE CASCADE,
     comment_id VARCHAR(50) NOT NULL,
     FOREIGN KEY(comment_id) REFERENCES user_post_comments(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    like_type VARCHAR(20),
     UNIQUE (comment_id, user_id)
 );
 

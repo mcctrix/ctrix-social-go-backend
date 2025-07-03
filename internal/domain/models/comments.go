@@ -19,7 +19,6 @@ func (User_post_Comments) TableName() string {
 type User_post_comment_like struct {
 	User_id    string `json:"user_id" gorm:"column:user_id;type:varchar(50)"`
 	Comment_id string `json:"comment_id" gorm:"column:comment_id;type:varchar(50);not null"`
-	Like_type  string `json:"like_type" gorm:"column:like_type;type:varchar(20)"`
 }
 
 func (User_post_comment_like) TableName() string {

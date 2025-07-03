@@ -12,4 +12,7 @@ type CommentRepository interface {
 }
 
 type CommentReactionRepository interface {
+	CreateCommentReaction(commentID string, userID string) error
+	DeleteCommentReaction(commentID string, userID string) error
+	GetCommentReactioCount(commentID string) (int, error)
 }

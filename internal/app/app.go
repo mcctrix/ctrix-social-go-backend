@@ -28,5 +28,8 @@ func BuildApplicationDependencies(db *gorm.DB) *services.Services {
 	commentRepo := repositories.NewPostgresCommentRepository(db)
 	commentService := services.NewCommentService(commentRepo)
 
-	return services.NewServiceContainer(userService, profileService, followService, userSettingsService, additionalUserInfoService, bookmarkService, commentService)
+	commentReactionRepo := repositories.NewPostgresCommentReactionRepository(db)
+	commentReactionService := services.NewCommentReactionService(commentReactionRepo)
+
+	return services.NewServiceContainer(userService, profileService, followService, userSettingsService, additionalUserInfoService, bookmarkService, commentService, commentReactionService)
 }
