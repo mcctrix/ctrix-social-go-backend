@@ -6,7 +6,7 @@ TRUNCATE TABLE user_post_comment_like CASCADE;
 TRUNCATE TABLE user_post_comments CASCADE;
 TRUNCATE TABLE user_post_like CASCADE;
 TRUNCATE TABLE user_posts CASCADE;
-TRUNCATE TABLE follows CASCADE;
+TRUNCATE TABLE follow CASCADE;
 TRUNCATE TABLE user_additional_info CASCADE;
 TRUNCATE TABLE user_settings CASCADE;
 TRUNCATE TABLE user_profile CASCADE;
@@ -77,8 +77,7 @@ INSERT INTO user_settings (id, hide_post, hide_story, block_user, show_online) V
 ('u10', ARRAY['p35', 'p36'], ARRAY[]::TEXT[], ARRAY['u2'], false);
 
 -- Insert Follows (Random following relationships with varying counts)
-INSERT INTO follows (follower_id, following_id, created_at) VALUES
--- Ctrix (u1) - 4 followers, 3 following
+INSERT INTO follow (follower_id, following_id, created_at) VALUES
 ('u2', 'u1', '2020-04-01 10:00:00'),
 ('u3', 'u1', '2020-05-15 14:30:00'),
 ('u4', 'u1', '2020-06-20 09:45:00'),
@@ -198,30 +197,30 @@ INSERT INTO user_post_comments (id, post_id, creator_id, created_at, updated_at,
 ('c16', 'p23', 'u6', '2021-09-20 10:30:00', '2021-09-20 10:30:00', 'Perfect weather!');
 
 -- Insert Post Likes (with different timestamps)
-INSERT INTO user_post_like (user_id, post_id, like_type) VALUES
-('u1', 'p11', 'like'),
-('u1', 'p12', 'love'),
-('u2', 'p1', 'like'),
-('u2', 'p2', 'love'),
-('u3', 'p3', 'like'),
-('u3', 'p4', 'like'),
-('u4', 'p5', 'love'),
-('u4', 'p6', 'like'),
-('u5', 'p7', 'like'),
-('u5', 'p8', 'love');
+INSERT INTO user_post_like (user_id, post_id) VALUES
+('u1', 'p11'),
+('u1', 'p12'),
+('u2', 'p1'),
+('u2', 'p2'),
+('u3', 'p3'),
+('u3', 'p4'),
+('u4', 'p5'),
+('u4', 'p6'),
+('u5', 'p7'),
+('u5', 'p8');
 
 -- Insert Comment Likes (with different timestamps)
-INSERT INTO user_post_comment_like (user_id, comment_id, like_type) VALUES
-('u1', 'c1', 'like'),
-('u1', 'c2', 'love'),
-('u2', 'c3', 'like'),
-('u2', 'c4', 'love'),
-('u3', 'c5', 'like'),
-('u3', 'c6', 'like'),
-('u4', 'c7', 'love'),
-('u4', 'c8', 'like'),
-('u5', 'c9', 'like'),
-('u5', 'c10', 'love');
+INSERT INTO user_post_comment_like (user_id, comment_id) VALUES
+('u1', 'c1'),
+('u1', 'c2'),
+('u2', 'c3'),
+('u2', 'c4'),
+('u3', 'c5'),
+('u3', 'c6'),
+('u4', 'c7'),
+('u4', 'c8'),
+('u5', 'c9'),
+('u5', 'c10');
 
 -- Messenger Section
 -- Clear existing messenger data
