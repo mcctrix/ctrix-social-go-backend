@@ -1,0 +1,11 @@
+meta {
+  name: Dislike Post
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{baseURL}}/api/post/p1/reaction
+  body: none
+  auth: inherit
+}

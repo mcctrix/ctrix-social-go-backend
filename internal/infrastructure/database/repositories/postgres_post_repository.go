@@ -89,6 +89,9 @@ func (r *PostgresPostRepository) LikePost(postID string, userID string) error {
 	post_like_data := models.User_Post_Like_Table{User_id: userID, Post_id: postID}
 	if err := r.db.Table("user_post_like").Create(post_like_data).Error; err != nil {
 		fmt.Println(err)
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return errors.New("post already liked")
+		}
 		return err
 	}
 	return nil
